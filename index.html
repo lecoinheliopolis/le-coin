@@ -120,7 +120,7 @@
   <!-- LOGIN -->
   <div class="login-wrap" id="login-screen">
     <div class="login-card">
-      <div class="login-brand"><div class="lb-name">Le Coin</div><div class="lb-tag">POINT OF SALE</div></div>
+      <div class="login-brand"><img id="login-logo" alt="Le Coin" style="max-width:180px;width:62%;height:auto;display:block;margin:0 auto 10px;border-radius:14px;box-shadow:0 6px 18px rgba(31,58,46,0.18);"><div class="lb-tag">POINT OF SALE</div></div>
       <div class="field"><label class="lbl" id="l-email-lbl">البريد الإلكتروني</label><input class="input" id="login-email" type="email" autocomplete="username"></div>
       <div class="field"><label class="lbl" id="l-pass-lbl">كلمة المرور</label><input class="input" id="login-pass" type="password" autocomplete="current-password"></div>
       <button class="btn-gold btn-wide" id="login-btn" style="margin-top:6px;">دخول</button>
@@ -133,7 +133,7 @@
   <div id="app" class="hidden">
     <header>
       <div class="header-inner">
-        <span class="brand-name">Le Coin</span>
+        <img id="header-logo" class="brand-name" alt="Le Coin" style="height:34px;width:auto;border-radius:7px;">
         <div class="header-ctrl">
           <select class="branch-sel" id="branch-select"></select>
           <button class="lang-btn" id="lang-btn">EN</button>
@@ -157,21 +157,21 @@
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
     import { getFirestore, collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
+    const LOGO = 'data:image/png;base64,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';
+
     // ============================================================
     // ⚠️ INCOLLA QUI LA TUA CONFIGURAZIONE FIREBASE (vedi FIREBASE-SETUP.md Parte 2)
     // ============================================================
-   // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyBPasx-SbUqik32aA6tYSJCF7_XQgolh04",
-  authDomain: "lecoin-1f8a5.firebaseapp.com",
-  databaseURL: "https://lecoin-1f8a5-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "lecoin-1f8a5",
-  storageBucket: "lecoin-1f8a5.firebasestorage.app",
-  messagingSenderId: "671148497332",
-  appId: "1:671148497332:web:a9307722d7ad1857ac3ae1",
-  measurementId: "G-93XD4LFQ3K"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyBPasx-SbUqik32aA6tYSJCF7_XQgolh04",
+      authDomain: "lecoin-1f8a5.firebaseapp.com",
+      databaseURL: "https://lecoin-1f8a5-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "lecoin-1f8a5",
+      storageBucket: "lecoin-1f8a5.firebasestorage.app",
+      messagingSenderId: "671148497332",
+      appId: "1:671148497332:web:a9307722d7ad1857ac3ae1",
+      measurementId: "G-93XD4LFQ3K"
+    };
     // ============================================================
 
     const fbApp = initializeApp(firebaseConfig);
@@ -219,6 +219,16 @@ const firebaseConfig = {
         thisMonth:'هذا الشهر', monthRev:'إيراد الشهر', stockValue:'قيمة المخزون', atCost:'بالتكلفة',
         atPrice:'بسعر البيع', totalStockCost:'إجمالي التكلفة', totalStockPrice:'إجمالي البيع المتوقع',
         potentialProfit:'الربح المتوقع', units:'الكمية', noStock:'لا يوجد مخزون', stockReport:'تقرير المخزون',
+        shift_tab:'الوردية', shift:'الوردية', openShift:'فتح وردية', closeShift:'قفل الوردية',
+        openCash:'الكاش في الدرج (البداية)', countedCash:'الكاش المعدود (النهاية)', shiftOpen:'وردية مفتوحة',
+        noOpenShift:'لا توجد وردية مفتوحة', openedAt:'فُتحت', closedAt:'قُفلت', elapsed:'المدة', worked:'ساعات العمل',
+        pause:'استراحة', resume:'استئناف', onPause:'في استراحة', pausedTime:'وقت الاستراحات', shiftSales:'مبيعات الوردية',
+        expectedCash:'الكاش المتوقع', cashDiff:'فرق الدرج', shiftReport:'تقرير الوردية', shiftHistory:'سجل الورديات',
+        confirmCloseShift:'متأكد إنك عايز تقفل الوردية؟', shiftOpened:'تم فتح الوردية', shiftClosed:'تم قفل الوردية',
+        openCashHint:'اكتب الكاش اللي في الدرج وانت بتفتح الوردية', countedCashHint:'عُدّ الكاش في الدرج واكتب الرقم',
+        noShiftsYet:'لا توجد ورديات بعد', hShort:'س', mShort:'د', byUser:'الكاشير', cashOver:'زيادة', cashShort:'عجز',
+        branches_tab:'الفروع', addBranch:'فرع جديد', editBranch:'تعديل الفرع', noBranchesYet:'لا توجد فروع',
+        confirmDelBranch:'متأكد إنك عايز تمسح الفرع؟ ممكن يأثر على بيانات مرتبطة بيه (منتجات/مبيعات). يُفضّل توقفه بدل ما تمسحه.',
         warehouse:'المخزن', receive:'استلام بضاعة', receiveQty:'الكمية المستلمة', newCost:'التكلفة الجديدة (للوحدة)',
         receiveDone:'تم الاستلام', currentQty:'الكمية الحالية', afterReceive:'بعد الاستلام', selectProduct:'— اختر المنتج —',
         physInv:'الجرد الفعلي', countedQty:'الكمية المعدودة', systemQty:'كمية النظام', diff:'الفرق',
@@ -226,7 +236,16 @@ const firebaseConfig = {
         invReport:'تقرير الجرد', adjustNote:'سيتم تعديل كميات النظام لتطابق العدّ الفعلي', confirmApplyInv:'تأكيد تطبيق الجرد؟ سيتم تعديل المخزون.',
         receiveTab:'استلام', invTab:'جرد', print:'طباعة', download:'تحميل', noChanges:'لا توجد تغييرات',
         valueImpact:'أثر القيمة', invDate:'تاريخ الجرد', totalItems:'عدد الأصناف', enterCount:'أدخل العدد',
-        leaveBlank:'(اتركه فارغاً لتجاهل الصنف)', receiveHint:'أضف الكمية اللي وصلتك للمخزون', skipped:'لم يُعدّ'
+        leaveBlank:'(اتركه فارغاً لتجاهل الصنف)', receiveHint:'أضف الكمية اللي وصلتك للمخزون', skipped:'لم يُعدّ',
+        shifts:'الوردية', openShift:'فتح وردية', closeShift:'قفل وردية', startCash:'النقدية في الدرج (البداية)',
+        countedCash:'النقدية المعدودة (النهاية)', shiftOpen:'وردية مفتوحة', noOpenShift:'لا توجد وردية مفتوحة',
+        startedAt:'بدأت', elapsed:'المدة', worked:'ساعات العمل', onBreak:'في استراحة', pause:'استراحة', resume:'استئناف',
+        breaks:'الاستراحات', breakTime:'وقت الاستراحة', shiftClosed:'تم قفل الوردية', confirmCloseShift:'تأكيد قفل الوردية؟',
+        cashSales:'مبيعات الوردية', expectedCash:'النقدية المتوقعة', cashDiff:'الفرق', over:'زيادة', short:'عجز', balanced:'مطابق',
+        openShiftHint:'اكتب النقدية اللي في الدرج وافتح ورديتك', enterStartCash:'أدخل النقدية الابتدائية',
+        shiftReport:'تقرير الوردية', allShifts:'كل الورديات', myShift:'ورديتي', cashier:'الكاشير', date:'التاريخ',
+        duration:'المدة', status:'الحالة', closed:'مقفولة', open2:'مفتوحة', shiftsList:'سجل الورديات', noShifts:'لا توجد ورديات',
+        hrs:'س', mins:'د', breakNote:'الوقت في الاستراحة لا يُحسب من ساعات العمل', resumeFirst:'استأنف الاستراحة أولاً قبل القفل'
       },
       en: {
         dir:'ltr', langBtn:'ع', email:'Email', pass:'Password', login:'Sign in',
@@ -263,6 +282,16 @@ const firebaseConfig = {
         thisMonth:'This month', monthRev:'Month revenue', stockValue:'Stock value', atCost:'At cost',
         atPrice:'At sale price', totalStockCost:'Total cost', totalStockPrice:'Expected sales',
         potentialProfit:'Potential profit', units:'Qty', noStock:'No stock', stockReport:'Stock report',
+        shift_tab:'Shift', shift:'Shift', openShift:'Open shift', closeShift:'Close shift',
+        openCash:'Cash in drawer (start)', countedCash:'Counted cash (end)', shiftOpen:'Shift open',
+        noOpenShift:'No open shift', openedAt:'Opened', closedAt:'Closed', elapsed:'Elapsed', worked:'Worked',
+        pause:'Break', resume:'Resume', onPause:'On break', pausedTime:'Break time', shiftSales:'Shift sales',
+        expectedCash:'Expected cash', cashDiff:'Drawer difference', shiftReport:'Shift report', shiftHistory:'Shift history',
+        confirmCloseShift:'Confirm closing the shift?', shiftOpened:'Shift opened', shiftClosed:'Shift closed',
+        openCashHint:'Enter the cash in the drawer when opening', countedCashHint:'Count the cash in the drawer and enter it',
+        noShiftsYet:'No shifts yet', hShort:'h', mShort:'m', byUser:'Cashier', cashOver:'Over', cashShort:'Short',
+        branches_tab:'Branches', addBranch:'New branch', editBranch:'Edit branch', noBranchesYet:'No branches',
+        confirmDelBranch:'Delete this branch? It may affect related data (products/sales). Disabling it is safer than deleting.',
         warehouse:'Warehouse', receive:'Receive goods', receiveQty:'Quantity received', newCost:'New unit cost',
         receiveDone:'Goods received', currentQty:'Current qty', afterReceive:'After receiving', selectProduct:'— select product —',
         physInv:'Physical inventory', countedQty:'Counted qty', systemQty:'System qty', diff:'Difference',
@@ -270,7 +299,16 @@ const firebaseConfig = {
         invReport:'Inventory report', adjustNote:'System quantities will be adjusted to match the physical count', confirmApplyInv:'Apply inventory? Stock will be adjusted.',
         receiveTab:'Receive', invTab:'Count', print:'Print', download:'Download', noChanges:'No changes',
         valueImpact:'Value impact', invDate:'Inventory date', totalItems:'Items', enterCount:'Enter count',
-        leaveBlank:'(leave blank to skip item)', receiveHint:'Add received quantity to stock', skipped:'Not counted'
+        leaveBlank:'(leave blank to skip item)', receiveHint:'Add received quantity to stock', skipped:'Not counted',
+        shifts:'Shift', openShift:'Open shift', closeShift:'Close shift', startCash:'Cash in drawer (start)',
+        countedCash:'Counted cash (end)', shiftOpen:'Shift open', noOpenShift:'No open shift',
+        startedAt:'Started', elapsed:'Elapsed', worked:'Worked hours', onBreak:'On break', pause:'Break', resume:'Resume',
+        breaks:'Breaks', breakTime:'Break time', shiftClosed:'Shift closed', confirmCloseShift:'Confirm close shift?',
+        cashSales:'Shift sales', expectedCash:'Expected cash', cashDiff:'Difference', over:'Over', short:'Short', balanced:'Balanced',
+        openShiftHint:'Enter the cash in the drawer and open your shift', enterStartCash:'Enter starting cash',
+        shiftReport:'Shift report', allShifts:'All shifts', myShift:'My shift', cashier:'Cashier', date:'Date',
+        duration:'Duration', status:'Status', closed:'Closed', open2:'Open', shiftsList:'Shifts log', noShifts:'No shifts',
+        hrs:'h', mins:'m', breakNote:'Break time is not counted in worked hours', resumeFirst:'Resume the break first before closing'
       }
     };
     let lang = localStorage.getItem('lecoin_lang') || 'ar';
@@ -286,8 +324,13 @@ const firebaseConfig = {
     // ============ STATE ============
     let user=null, profile=null, branches=[], currentBranchId=null;
     let categories=[], products=[], inventory={}, users=[], activeTab='products';
+    let myShift=null, shifts=[]; // myShift = vacanza... turno aperto del cassiere; shifts = storico
+    let currentShift=null; // {id, ...} la vacanza... il turno aperto del cassiere
+    let shiftTimer=null;
 
     const $ = id => document.getElementById(id);
+    // assegna il logo (base64) alle immagini
+    (function setLogos(){ const a=$('login-logo'),b=$('header-logo'); if(a)a.src=LOGO; if(b)b.src=LOGO; })();
     const fmt = n => Math.abs(n||0).toLocaleString('en-US',{maximumFractionDigits:0});
     function toast(m, err=false){ $('toast-root').innerHTML=`<div class="toast ${err?'err':''}">${err?'⚠':'✓'} ${m}</div>`; setTimeout(()=>$('toast-root').innerHTML='',2400); }
     function closeSheet(){ $('sheet-root').innerHTML=''; }
@@ -364,6 +407,7 @@ const firebaseConfig = {
       // nav depends on role
       const tabs=[];
       tabs.push({k:'cassa',ico:'🛒',l:t('cashier_tab')});
+      tabs.push({k:'shift',ico:'🕐',l:t('shift_tab')});
       if(profile.role==='admin'||profile.role==='manager'){
         tabs.push({k:'products',ico:'📦',l:t('products')});
         tabs.push({k:'categories',ico:'🏷️',l:t('categories')});
@@ -371,6 +415,7 @@ const firebaseConfig = {
         tabs.push({k:'users',ico:'👥',l:t('users')});
         tabs.push({k:'reports',ico:'📊',l:t('reports')});
       }
+      if(profile.role==='admin') tabs.push({k:'branches',ico:'🏢',l:t('branches_tab')});
       if(profile.role==='cashier') activeTab='cassa';
       $('nav-inner').style.gridTemplateColumns=`repeat(${tabs.length},1fr)`;
       $('nav-inner').innerHTML=tabs.map(x=>`<button class="nav-btn ${x.k===activeTab?'active':''}" data-tab="${x.k}"><span class="ico">${x.ico}</span><span class="lbl2">${x.l}</span></button>`).join('');
@@ -380,14 +425,16 @@ const firebaseConfig = {
     function render(){
       // refresh nav labels & branch names for language
       const bs=$('branch-select'); if(bs){const cur=bs.value;bs.innerHTML=branches.map(b=>`<option value="${b.id}">${lang==='ar'?b.nameAr:b.nameEn}</option>`).join('');bs.value=cur;}
-      document.querySelectorAll('.nav-btn').forEach(b=>{const k=b.dataset.tab;b.querySelector('.lbl2').textContent=k==='cassa'?t('cashier_tab'):k==='products'?t('products'):k==='categories'?t('categories'):k==='warehouse'?t('warehouse'):k==='users'?t('users'):k==='reports'?t('reports'):t('cashier_tab');});
+      document.querySelectorAll('.nav-btn').forEach(b=>{const k=b.dataset.tab;b.querySelector('.lbl2').textContent=k==='cassa'?t('cashier_tab'):k==='shift'?t('shift_tab'):k==='products'?t('products'):k==='categories'?t('categories'):k==='warehouse'?t('warehouse'):k==='users'?t('users'):k==='reports'?t('reports'):k==='branches'?t('branches_tab'):t('cashier_tab');});
       if(activeTab==='cassa') renderCassa();
       else { const cb=$('cart-bar-root'); if(cb) cb.innerHTML=''; 
         if(activeTab==='products') renderProducts();
         else if(activeTab==='categories') renderCategories();
         else if(activeTab==='warehouse') renderWarehouse();
+        else if(activeTab==='shift') renderShift();
         else if(activeTab==='users') renderUsers();
         else if(activeTab==='reports') renderReports();
+        else if(activeTab==='branches') renderBranches();
         else renderCassa();
       }
     }
@@ -539,6 +586,55 @@ const firebaseConfig = {
           categories.sort((a,b)=>(a.order||0)-(b.order||0));
           closeSheet();renderCategories();toast(t('saved'));
         }catch(e){console.error(e);toast(t('errorGen'),true);$('c-save').textContent='✓ '+t('save');}
+      };
+    }
+
+    // ============ BRANCHES (الفروع - solo admin) ============
+    let allBranches=[]; // tutte (attive+inattive) per la gestione
+    async function renderBranches(){
+      $('content').innerHTML=`<div class="empty">…</div>`;
+      allBranches=[];
+      const qs=await getDocs(collection(db,'branches'));
+      qs.forEach(d=>allBranches.push({id:d.id,...d.data()}));
+      allBranches.sort((a,b)=>(a.nameAr||'').localeCompare(b.nameAr||''));
+      let html=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><div style="font-size:11px;letter-spacing:1px;color:var(--forest);font-weight:700;">${t('branches_tab').toUpperCase()}</div><button class="btn-gold" id="add-br" style="padding:8px 14px;">+ ${t('addBranch')}</button></div>`;
+      if(allBranches.length===0) html+=`<div class="card"><div class="empty">${t('noBranchesYet')}</div></div>`;
+      else html+=allBranches.map(b=>`<div class="cat-row" data-id="${b.id}" style="opacity:${b.active===false?0.5:1}">
+        <div class="cat-names"><div style="font-weight:600;font-size:15px;">${b.nameAr||''}</div><div style="font-size:12px;color:rgba(26,26,26,0.6);" class="fr" dir="ltr">${b.nameEn||''}</div></div>
+        <span style="color:rgba(26,26,26,0.4);margin-inline-start:auto;">✎</span>
+      </div>`).join('');
+      $('content').innerHTML=html;
+      $('add-br')&&($('add-br').onclick=()=>branchForm(null));
+      document.querySelectorAll('.cat-row').forEach(r=>r.onclick=()=>branchForm(allBranches.find(b=>b.id===r.dataset.id)));
+    }
+    async function refreshBranchSelector(){
+      await loadBranches();
+      if(branches.length && !branches.find(b=>b.id===currentBranchId)) currentBranchId=branches[0].id;
+      const bs=$('branch-select'); if(bs){ bs.innerHTML=branches.map(b=>`<option value="${b.id}">${lang==='ar'?b.nameAr:b.nameEn}</option>`).join(''); bs.value=currentBranchId; }
+    }
+    function branchForm(br){
+      const f=br||{nameAr:'',nameEn:'',active:true};
+      let act=f.active!==false;
+      $('sheet-root').innerHTML=`<div class="overlay" id="ov"><div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-head"><div><div class="sheet-sub">${br?t('edit'):t('create')}</div><div class="sheet-title">${br?t('editBranch'):t('addBranch')}</div></div><button class="close-x" id="cx">×</button></div>
+        <div class="field"><label class="lbl">${t('nameAr')}</label><input class="input" id="b-ar" value="${f.nameAr||''}" dir="rtl"></div>
+        <div class="field"><label class="lbl">${t('nameEn')}</label><input class="input fr" id="b-en" value="${f.nameEn||''}" dir="ltr"></div>
+        <div style="background:white;border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--ivory-dark);margin-bottom:12px;"><span style="font-size:13px;font-weight:600;">${t('active')}</span><button class="toggle" id="b-act" style="background:${act?'var(--forest)':'rgba(26,26,26,0.2)'}"><span class="thumb"></span></button></div>
+        ${br?`<button class="btn-secondary btn-wide" id="b-del" style="margin-bottom:10px;color:var(--red);border-color:rgba(192,72,72,0.3);">${t('delete')}</button>`:''}
+        <button class="btn-forest btn-wide" id="b-save">✓ ${t('save')}</button>
+      </div></div>`;
+      setToggle('b-act',act,v=>act=v);
+      $('ov').onclick=closeSheet;$('cx').onclick=closeSheet;
+      if(br)$('b-del').onclick=async()=>{ if(!confirm(t('confirmDelBranch')))return; try{await deleteDoc(doc(db,'branches',br.id)); closeSheet(); await refreshBranchSelector(); renderBranches(); toast(t('deleted'));}catch(e){console.error(e);toast(t('errorGen'),true);} };
+      $('b-save').onclick=async()=>{
+        const nameAr=$('b-ar').value.trim(),nameEn=$('b-en').value.trim();
+        if(!nameAr||!nameEn){toast(t('required'),true);return;}
+        $('b-save').textContent='...';
+        try{
+          if(br){ await updateDoc(doc(db,'branches',br.id),{nameAr,nameEn,active:act}); }
+          else{ await addDoc(collection(db,'branches'),{nameAr,nameEn,active:act,createdAt:Date.now()}); }
+          closeSheet(); await refreshBranchSelector(); renderBranches(); toast(t('saved'));
+        }catch(e){console.error(e);toast(t('errorGen'),true);$('b-save').textContent='✓ '+t('save');}
       };
     }
 
@@ -877,6 +973,189 @@ const firebaseConfig = {
         rows.push([t('last7'),weekSales.length,weekRev,'']);
         downloadCSV(`report_${new Date().toISOString().slice(0,10)}.csv`,header,rows);
       });
+    }
+
+    // ============ TURNO / الوردية (shift) ============
+    // shifts/{id}: branchId,userId,userName,openAt,closeAt,openCash,closeCash,
+    //   pauses:[{start,end}], status:'open'|'closed', salesTotal, expectedCash, diff,
+    //   workedMs, pausedMs, createdAt   (i dati servono poi per il salario)
+    function fmtDur(ms){ if(!ms||ms<0)ms=0; const tot=Math.floor(ms/60000); const h=Math.floor(tot/60), m=tot%60; return `${h}${t('hShort')} ${m}${t('mShort')}`; }
+    function pausedMsOf(sh, until){ const end=until||Date.now(); return (sh.pauses||[]).reduce((a,p)=>a+((p.end||end)-p.start),0); }
+    function workedMsOf(sh, until){ const end=until||sh.closeAt||Date.now(); return Math.max(0,(end-sh.openAt)-pausedMsOf(sh,end)); }
+    function isOnPause(sh){ const ps=sh.pauses||[]; return ps.length>0 && !ps[ps.length-1].end; }
+    function fmtTime(ts){ return new Date(ts).toLocaleString(lang==='ar'?'ar-EG':'en-US',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'}); }
+
+    async function loadShifts(){
+      myShift=null; shifts=[];
+      // turno aperto di questo utente in questo branch
+      const qOpen=await getDocs(query(collection(db,'shifts'),where('branchId','==',currentBranchId),where('userId','==',user.uid),where('status','==','open')));
+      qOpen.forEach(d=>{ myShift={id:d.id,...d.data()}; });
+      // storico: admin/manager => tutti del branch; cassiere => i suoi
+      let qs;
+      if(profile.role==='admin'||profile.role==='manager') qs=await getDocs(query(collection(db,'shifts'),where('branchId','==',currentBranchId)));
+      else qs=await getDocs(query(collection(db,'shifts'),where('branchId','==',currentBranchId),where('userId','==',user.uid)));
+      qs.forEach(d=>shifts.push({id:d.id,...d.data()}));
+      shifts.sort((a,b)=>(b.openAt||0)-(a.openAt||0));
+    }
+
+    async function shiftSalesTotal(sh){
+      // somma vendite di questo utente nel branch tra openAt e closeAt
+      const qs=await getDocs(query(collection(db,'sales'),where('branchId','==',sh.branchId),where('userId','==',sh.userId)));
+      let tot=0; const end=sh.closeAt||Date.now();
+      qs.forEach(d=>{ const s=d.data(); if(s.createdAt>=sh.openAt && s.createdAt<=end) tot+=(s.total||0); });
+      return tot;
+    }
+
+    async function renderShift(){
+      const cb=$('cart-bar-root'); if(cb) cb.innerHTML='';
+      $('content').innerHTML=`<div class="empty">…</div>`;
+      await loadShifts();
+      let html=`<div style="font-size:11px;letter-spacing:1px;color:var(--forest);font-weight:700;margin-bottom:12px;">${t('shift').toUpperCase()}</div>`;
+
+      if(!myShift){
+        // nessun turno aperto -> form apertura
+        html+=`<div class="card">
+          <div class="card-title">🕐 ${t('openShift')}</div>
+          <div style="font-size:12px;color:rgba(26,26,26,0.55);margin-bottom:12px;">${t('openCashHint')}</div>
+          <div class="field"><label class="lbl">${t('openCash')}</label><input class="input num" id="sh-open-cash" type="number" min="0" step="0.01" dir="ltr" placeholder="0"></div>
+          <button class="btn-gold btn-wide" id="sh-open-btn">🕐 ${t('openShift')}</button>
+        </div>`;
+      } else {
+        // turno aperto -> stato + pausa + chiusura
+        const onP=isOnPause(myShift);
+        html+=`<div class="card">
+          <div class="card-title">🟢 ${t('shiftOpen')}</div>
+          <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:90px;background:rgba(31,58,46,0.05);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;color:rgba(26,26,26,0.55);font-weight:700;">${t('openedAt')}</div><div class="num" style="font-size:14px;font-weight:700;margin-top:3px;">${fmtTime(myShift.openAt)}</div></div>
+            <div style="flex:1;min-width:90px;background:rgba(31,58,46,0.05);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;color:rgba(26,26,26,0.55);font-weight:700;">${t('worked')}</div><div class="num" id="sh-worked" style="font-size:14px;font-weight:700;margin-top:3px;color:var(--forest);">${fmtDur(workedMsOf(myShift))}</div></div>
+            <div style="flex:1;min-width:90px;background:rgba(216,142,42,0.1);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;color:rgba(26,26,26,0.55);font-weight:700;">${t('pausedTime')}</div><div class="num" id="sh-paused" style="font-size:14px;font-weight:700;margin-top:3px;color:var(--amber);">${fmtDur(pausedMsOf(myShift))}</div></div>
+          </div>
+          <div style="font-size:12px;color:rgba(26,26,26,0.55);margin-bottom:10px;">${t('openCash')}: <span class="num" style="font-weight:700;">${fmt(myShift.openCash||0)}</span> ${t('currency')}</div>
+          ${onP?`<div style="background:rgba(216,142,42,0.12);border-radius:10px;padding:8px 12px;margin-bottom:12px;text-align:center;font-weight:700;color:var(--amber);">⏸️ ${t('onPause')}</div>`:''}
+          <button class="${onP?'btn-gold':'btn-secondary'} btn-wide" id="sh-pause-btn" style="margin-bottom:10px;">${onP?'▶️ '+t('resume'):'⏸️ '+t('pause')}</button>
+        </div>
+        <div class="card">
+          <div class="card-title">🔴 ${t('closeShift')}</div>
+          <div style="font-size:12px;color:rgba(26,26,26,0.55);margin-bottom:12px;">${t('countedCashHint')}</div>
+          <div class="field"><label class="lbl">${t('countedCash')}</label><input class="input num" id="sh-close-cash" type="number" min="0" step="0.01" dir="ltr" placeholder="0"></div>
+          <button class="btn-forest btn-wide" id="sh-close-btn">🔴 ${t('closeShift')}</button>
+        </div>`;
+      }
+
+      // storico
+      const closed=shifts.filter(s=>s.status==='closed');
+      html+=`<div class="card"><div class="card-title">📚 ${t('shiftHistory')}</div>`;
+      if(closed.length===0) html+=`<div class="empty">${t('noShiftsYet')}</div>`;
+      else html+=closed.map(s=>{
+        const diff=s.diff||0; const dc=diff>0?'var(--amber)':diff<0?'var(--red)':'var(--green)';
+        const sg=diff>0?'+':diff<0?'−':'';
+        return `<div style="padding:10px 0;border-bottom:1px solid var(--ivory-dark);">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-weight:700;font-size:13px;">${s.userName||''}</div>
+            <div class="num" style="font-size:11px;color:rgba(26,26,26,0.5);">${fmtTime(s.openAt)}</div>
+          </div>
+          <div style="display:flex;gap:12px;margin-top:4px;font-size:11px;flex-wrap:wrap;">
+            <span>${t('worked')}: <b class="num">${fmtDur(s.workedMs)}</b></span>
+            <span>${t('shiftSales')}: <b class="num">${fmt(s.salesTotal||0)}</b></span>
+            <span>${t('cashDiff')}: <b class="num" style="color:${dc};">${sg}${fmt(diff)}</b></span>
+          </div>
+          <button class="lnk-btn" data-sh="${s.id}" style="margin-top:6px;background:none;border:none;color:var(--forest);font-weight:700;font-size:12px;cursor:pointer;font-family:inherit;padding:0;">📄 ${t('shiftReport')}</button>
+        </div>`;
+      }).join('');
+      html+=`</div>`;
+      $('content').innerHTML=html;
+
+      // binding
+      if(!myShift){
+        $('sh-open-btn').onclick=async()=>{
+          const oc=parseFloat($('sh-open-cash').value)||0;
+          const b=$('sh-open-btn'); b.disabled=true; b.textContent='...';
+          try{
+            const data={branchId:currentBranchId,userId:user.uid,userName:profile.name||user.email,openAt:Date.now(),closeAt:null,openCash:oc,closeCash:null,pauses:[],status:'open',createdAt:Date.now()};
+            await addDoc(collection(db,'shifts'),data);
+            toast(t('shiftOpened')); renderShift();
+          }catch(e){ console.error(e); toast(t('errorGen'),true); b.disabled=false; b.textContent='🕐 '+t('openShift'); }
+        };
+      } else {
+        $('sh-pause-btn').onclick=async()=>{
+          const ps=myShift.pauses?[...myShift.pauses]:[];
+          if(isOnPause(myShift)) ps[ps.length-1].end=Date.now(); else ps.push({start:Date.now(),end:null});
+          try{ await updateDoc(doc(db,'shifts',myShift.id),{pauses:ps}); myShift.pauses=ps; renderShift(); }
+          catch(e){ console.error(e); toast(t('errorGen'),true); }
+        };
+        $('sh-close-btn').onclick=async()=>{
+          if(!confirm(t('confirmCloseShift'))) return;
+          const cc=parseFloat($('sh-close-cash').value)||0;
+          const b=$('sh-close-btn'); b.disabled=true; b.textContent='...';
+          try{
+            const ps=myShift.pauses?[...myShift.pauses]:[];
+            if(isOnPause(myShift)) ps[ps.length-1].end=Date.now(); // chiudi pausa aperta
+            const closeAt=Date.now();
+            const shTmp={...myShift,pauses:ps,closeAt};
+            const salesTotal=await shiftSalesTotal(shTmp);
+            const workedMs=workedMsOf(shTmp,closeAt);
+            const pausedMs=pausedMsOf(shTmp,closeAt);
+            const expectedCash=(myShift.openCash||0)+salesTotal;
+            const diff=cc-expectedCash;
+            await updateDoc(doc(db,'shifts',myShift.id),{pauses:ps,closeAt,closeCash:cc,status:'closed',salesTotal,workedMs,pausedMs,expectedCash,diff});
+            toast(t('shiftClosed'));
+            const full={...shTmp,closeCash:cc,status:'closed',salesTotal,workedMs,pausedMs,expectedCash,diff};
+            myShift=null;
+            showShiftReport(full);
+          }catch(e){ console.error(e); toast(t('errorGen'),true); b.disabled=false; b.textContent='🔴 '+t('closeShift'); }
+        };
+      }
+      document.querySelectorAll('.lnk-btn[data-sh]').forEach(btn=>btn.onclick=()=>{ const s=shifts.find(x=>x.id===btn.dataset.sh); if(s) showShiftReport(s); });
+
+      // timer live (aggiorna ore lavorate ogni 30s se turno aperto)
+      if(myShift){ clearInterval(window.__shTimer); window.__shTimer=setInterval(()=>{ const w=$('sh-worked'),p=$('sh-paused'); if(!w){clearInterval(window.__shTimer);return;} if(myShift){ w.textContent=fmtDur(workedMsOf(myShift)); p.textContent=fmtDur(pausedMsOf(myShift)); } },30000); }
+    }
+
+    function showShiftReport(s){
+      const dc=(s.diff||0)>0?'var(--amber)':(s.diff||0)<0?'var(--red)':'var(--green)';
+      const sg=(s.diff||0)>0?'+':(s.diff||0)<0?'−':'';
+      const bn=(()=>{const b=branches.find(x=>x.id===s.branchId);return b?(lang==='ar'?b.nameAr:b.nameEn):'';})();
+      const kv=(k,v,c)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--ivory-dark);"><span style="font-size:13px;color:rgba(26,26,26,0.7);">${k}</span><span class="num" style="font-weight:700;${c?'color:'+c:''}">${v}</span></div>`;
+      let html=`<div style="font-size:11px;letter-spacing:1px;color:var(--forest);font-weight:700;margin-bottom:12px;">${t('shiftReport').toUpperCase()}</div>
+        <div class="card"><div class="card-title">📄 ${t('shiftReport')} · ${bn}</div>
+        ${kv(t('byUser'),s.userName||'')}
+        ${kv(t('openedAt'),fmtTime(s.openAt))}
+        ${kv(t('closedAt'),fmtTime(s.closeAt))}
+        ${kv(t('worked'),fmtDur(s.workedMs),'var(--forest)')}
+        ${kv(t('pausedTime'),fmtDur(s.pausedMs),'var(--amber)')}
+        ${kv(t('openCash'),fmt(s.openCash||0)+' '+t('currency'))}
+        ${kv(t('shiftSales'),fmt(s.salesTotal||0)+' '+t('currency'))}
+        ${kv(t('expectedCash'),fmt(s.expectedCash||0)+' '+t('currency'),'var(--forest)')}
+        ${kv(t('countedCash'),fmt(s.closeCash||0)+' '+t('currency'))}
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0 4px;"><span style="font-size:14px;font-weight:700;">${t('cashDiff')}</span><span class="num" style="font-weight:700;font-size:18px;color:${dc};">${sg}${fmt(s.diff||0)} ${t('currency')} ${(s.diff||0)>0?'('+t('cashOver')+')':(s.diff||0)<0?'('+t('cashShort')+')':''}</span></div>
+        <div style="display:flex;gap:8px;margin-top:14px;">
+          <button class="btn-forest btn-wide" id="sh-print">🖨️ ${t('print')}</button>
+          <button class="btn-secondary btn-wide" id="sh-dl">⬇️ ${t('download')}</button>
+        </div></div>
+        <button class="btn-secondary btn-wide" id="sh-back" style="margin-top:4px;">← ${t('shift')}</button>`;
+      $('content').innerHTML=html;
+      const title=`${t('shiftReport')} · ${bn} · ${s.userName||''}`;
+      $('sh-print').onclick=()=>{
+        const body=`<table><tbody>
+          <tr><td>${t('byUser')}</td><td>${s.userName||''}</td></tr>
+          <tr><td>${t('openedAt')}</td><td>${fmtTime(s.openAt)}</td></tr>
+          <tr><td>${t('closedAt')}</td><td>${fmtTime(s.closeAt)}</td></tr>
+          <tr><td>${t('worked')}</td><td>${fmtDur(s.workedMs)}</td></tr>
+          <tr><td>${t('pausedTime')}</td><td>${fmtDur(s.pausedMs)}</td></tr>
+          <tr><td>${t('openCash')}</td><td>${fmt(s.openCash||0)} ${t('currency')}</td></tr>
+          <tr><td>${t('shiftSales')}</td><td>${fmt(s.salesTotal||0)} ${t('currency')}</td></tr>
+          <tr><td>${t('expectedCash')}</td><td>${fmt(s.expectedCash||0)} ${t('currency')}</td></tr>
+          <tr><td>${t('countedCash')}</td><td>${fmt(s.closeCash||0)} ${t('currency')}</td></tr>
+          <tr class="tot"><td>${t('cashDiff')}</td><td>${sg}${fmt(s.diff||0)} ${t('currency')}</td></tr>
+        </tbody></table>`;
+        printDoc(title,body);
+      };
+      $('sh-dl').onclick=()=>{
+        const header=[t('byUser'),t('openedAt'),t('closedAt'),t('worked'),t('pausedTime'),t('openCash'),t('shiftSales'),t('expectedCash'),t('countedCash'),t('cashDiff')];
+        const rows=[[s.userName||'',fmtTime(s.openAt),fmtTime(s.closeAt),fmtDur(s.workedMs),fmtDur(s.pausedMs),s.openCash||0,s.salesTotal||0,s.expectedCash||0,s.closeCash||0,s.diff||0]];
+        downloadCSV(`shift_${new Date(s.openAt).toISOString().slice(0,10)}.csv`,header,rows);
+      };
+      $('sh-back').onclick=()=>renderShift();
     }
 
     // ============ MAGAZZINO (المخزن: استلام + جرد) ============
