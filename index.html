@@ -92,8 +92,30 @@
     .toggle .thumb { position:absolute; top:3px; width:20px; height:20px; background:var(--ivory); border-radius:50%; transition:all 0.2s; }
     body[dir=rtl] .toggle .thumb { right:3px; }
     body[dir=ltr] .toggle .thumb { left:3px; }
-  </style>
-</head>
+
+    /* CASSA / CASHIER */
+    .pos-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:10px; margin-bottom:120px; }
+    .pos-card { background:white; border-radius:14px; overflow:hidden; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.04),0 4px 12px rgba(0,0,0,0.05); border:2px solid transparent; transition:border-color 0.15s; text-align:start; display:flex; flex-direction:column; }
+    .pos-card:active { border-color:var(--gold); }
+    .pos-card .pc-photo { width:100%; aspect-ratio:1/1; object-fit:cover; background:var(--ivory-dark); display:flex; align-items:center; justify-content:center; font-size:34px; color:rgba(26,26,26,0.3); }
+    .pos-card .pc-body { padding:8px 10px 10px; }
+    .pos-card .pc-name { font-size:14px; font-weight:500; line-height:1.2; }
+    .pos-card .pc-desc { font-size:11px; color:rgba(26,26,26,0.55); margin-top:2px; min-height:14px; line-height:1.3; }
+    .pos-card .pc-price { font-weight:700; color:var(--forest); margin-top:5px; }
+    .pos-card .pc-badge { display:inline-block; margin-top:4px; font-size:10px; padding:1px 6px; border-radius:6px; background:rgba(192,72,72,0.12); color:var(--red); }
+    /* CART bar */
+    .cart-bar { position:fixed; bottom:62px; left:0; right:0; z-index:35; padding:0 12px; pointer-events:none; }
+    .cart-inner { max-width:900px; margin:0 auto; background:var(--forest); color:var(--ivory); border-radius:14px; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 8px 28px rgba(0,0,0,0.28); pointer-events:auto; cursor:pointer; }
+    .cart-count { background:var(--gold); color:var(--forest-dark); border-radius:999px; min-width:24px; height:24px; padding:0 7px; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; }
+    /* cart sheet rows */
+    .cart-line { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--ivory-dark); }
+    .cart-line .cl-photo { width:44px; height:44px; border-radius:8px; object-fit:cover; background:var(--ivory-dark); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:18px; }
+    .qty-ctrl { display:flex; align-items:center; gap:8px; }
+    .qty-btn { width:30px; height:30px; border-radius:8px; border:1px solid var(--ivory-dark); background:white; font-size:18px; font-weight:700; cursor:pointer; color:var(--forest); display:flex; align-items:center; justify-content:center; }
+    .pos-cat-bar { display:flex; gap:8px; overflow-x:auto; padding-bottom:8px; margin-bottom:10px; -webkit-overflow-scrolling:touch; }
+    .pos-cat-chip { white-space:nowrap; padding:7px 14px; border-radius:999px; border:1px solid var(--ivory-dark); background:white; font-size:13px; font-weight:600; cursor:pointer; color:rgba(26,26,26,0.6); font-family:inherit; }
+    .pos-cat-chip.active { background:var(--forest); color:var(--ivory); border-color:var(--forest); }
+  </style></head>
 <body>
   <!-- LOGIN -->
   <div class="login-wrap" id="login-screen">
@@ -132,26 +154,28 @@
 
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
     import { getFirestore, collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
     // ============================================================
-   // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyBPasx-SbUqik32aA6tYSJCF7_XQgolh04",
-  authDomain: "lecoin-1f8a5.firebaseapp.com",
-  databaseURL: "https://lecoin-1f8a5-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "lecoin-1f8a5",
-  storageBucket: "lecoin-1f8a5.firebasestorage.app",
-  messagingSenderId: "671148497332",
-  appId: "1:671148497332:web:a9307722d7ad1857ac3ae1",
-  measurementId: "G-93XD4LFQ3K"
-};
+    // ⚠️ INCOLLA QUI LA TUA CONFIGURAZIONE FIREBASE (vedi FIREBASE-SETUP.md Parte 2)
+    // ============================================================
+    const firebaseConfig = {
+      apiKey: "INCOLLA_QUI",
+      authDomain: "INCOLLA_QUI.firebaseapp.com",
+      projectId: "INCOLLA_QUI",
+      storageBucket: "INCOLLA_QUI.appspot.com",
+      messagingSenderId: "INCOLLA_QUI",
+      appId: "INCOLLA_QUI"
+    };
     // ============================================================
 
     const fbApp = initializeApp(firebaseConfig);
     const auth = getAuth(fbApp);
     const db = getFirestore(fbApp);
+    // Seconda istanza: serve a creare nuovi utenti SENZA sloggare l'admin corrente
+    const fbApp2 = initializeApp(firebaseConfig, 'secondary');
+    const auth2 = getAuth(fbApp2);
     // NB: Storage non usato — le foto sono salvate in Firestore come base64 (piano gratuito, niente Blaze)
 
     // ============ i18n ============
@@ -171,7 +195,19 @@ const firebaseConfig = {
         margin:'الربح', search:'بحث...', noCategories:'لا توجد فئات بعد', noProducts:'لا توجد منتجات بعد',
         selectCat:'— اختر فئة —', saved:'تم الحفظ', deleted:'تم الحذف', errorGen:'حدث خطأ',
         required:'الحقول المطلوبة ناقصة', branchStock:'مخزون هذا الفرع', uploading:'جارٍ الرفع...',
-        currency:'ج.م', loadingPhoto:'صورة', admin:'مسؤول', manager:'مدير', cashier:'كاشير', role:'الدور'
+        currency:'ج.م', loadingPhoto:'صورة', admin:'مسؤول', manager:'مدير', cashier:'كاشير', role:'الدور',
+        users:'المستخدمون', addUser:'مستخدم جديد', editUser:'تعديل المستخدم', branchesField:'الفروع',
+        noUsers:'لا يوجد مستخدمون بعد', userEmail:'البريد الإلكتروني', userPass:'كلمة المرور',
+        passHint:'٦ أحرف على الأقل', selectBranch:'اختر فرعاً واحداً على الأقل', you:'(أنت)',
+        confirmDisable:'تعطيل هذا المستخدم؟', confirmEnable:'تفعيل هذا المستخدم؟',
+        disabled:'موقوف', userCreated:'تم إنشاء المستخدم', emailInUse:'البريد مستخدم بالفعل',
+        weakPass:'كلمة المرور ضعيفة (٦ أحرف على الأقل)', invalidEmail:'بريد إلكتروني غير صالح',
+        cannotEditEmail:'لا يمكن تغيير البريد بعد الإنشاء', noEditSelf:'لا يمكنك تعطيل حسابك',
+        reloginNeeded:'تم إنشاء المستخدم. سجّل دخولك من جديد.', passOnlyNew:'كلمة المرور تُحدّد عند الإنشاء فقط',
+        cashier_tab:'الكاشير', allCats:'الكل', cart:'السلة', cartEmpty:'السلة فارغة', total:'الإجمالي',
+        checkout:'إتمام البيع', clearCart:'تفريغ السلة', sale:'فاتورة', qty:'الكمية', outOfStock:'نفد المخزون',
+        lowStock:'منخفض', saleDone:'تم البيع', confirmClear:'تفريغ السلة؟', items:'صنف', noProdYet:'لا توجد منتجات. أضِف منتجات أولاً.',
+        addToCart:'أُضيف', removeItem:'حذف', selectBranchFirst:'اختر فرعاً', whatsapp:'إرسال واتساب', receipt:'إيصال'
       },
       en: {
         dir:'ltr', langBtn:'ع', email:'Email', pass:'Password', login:'Sign in',
@@ -188,7 +224,19 @@ const firebaseConfig = {
         margin:'Margin', search:'Search...', noCategories:'No categories yet', noProducts:'No products yet',
         selectCat:'— select category —', saved:'Saved', deleted:'Deleted', errorGen:'An error occurred',
         required:'Required fields missing', branchStock:'Stock for this branch', uploading:'Uploading...',
-        currency:'EGP', loadingPhoto:'photo', admin:'Admin', manager:'Manager', cashier:'Cashier', role:'Role'
+        currency:'EGP', loadingPhoto:'photo', admin:'Admin', manager:'Manager', cashier:'Cashier', role:'Role',
+        users:'Users', addUser:'New user', editUser:'Edit user', branchesField:'Branches',
+        noUsers:'No users yet', userEmail:'Email', userPass:'Password',
+        passHint:'At least 6 characters', selectBranch:'Select at least one branch', you:'(you)',
+        confirmDisable:'Disable this user?', confirmEnable:'Enable this user?',
+        disabled:'Disabled', userCreated:'User created', emailInUse:'Email already in use',
+        weakPass:'Weak password (min 6 characters)', invalidEmail:'Invalid email',
+        cannotEditEmail:'Email cannot be changed after creation', noEditSelf:'You cannot disable your own account',
+        reloginNeeded:'User created. Please sign in again.', passOnlyNew:'Password is set only at creation',
+        cashier_tab:'Cashier', allCats:'All', cart:'Cart', cartEmpty:'Cart is empty', total:'Total',
+        checkout:'Checkout', clearCart:'Clear cart', sale:'Sale', qty:'Qty', outOfStock:'Out of stock',
+        lowStock:'Low', saleDone:'Sale completed', confirmClear:'Clear the cart?', items:'items', noProdYet:'No products yet. Add products first.',
+        addToCart:'Added', removeItem:'Remove', selectBranchFirst:'Select a branch', whatsapp:'Send WhatsApp', receipt:'Receipt'
       }
     };
     let lang = localStorage.getItem('lecoin_lang') || 'ar';
@@ -203,7 +251,7 @@ const firebaseConfig = {
 
     // ============ STATE ============
     let user=null, profile=null, branches=[], currentBranchId=null;
-    let categories=[], products=[], inventory={}, activeTab='products';
+    let categories=[], products=[], inventory={}, users=[], activeTab='products';
 
     const $ = id => document.getElementById(id);
     const fmt = n => Math.abs(n||0).toLocaleString('en-US',{maximumFractionDigits:0});
@@ -281,33 +329,138 @@ const firebaseConfig = {
       $('user-btn').onclick=openSettings;
       // nav depends on role
       const tabs=[];
+      tabs.push({k:'cassa',ico:'🛒',l:t('cashier_tab')});
       if(profile.role==='admin'||profile.role==='manager'){
         tabs.push({k:'products',ico:'📦',l:t('products')});
         tabs.push({k:'categories',ico:'🏷️',l:t('categories')});
-      } else {
-        tabs.push({k:'cashier',ico:'🛒',l:t('cashierSoon')});
+        tabs.push({k:'users',ico:'👥',l:t('users')});
       }
+      if(profile.role==='cashier') activeTab='cassa';
       $('nav-inner').style.gridTemplateColumns=`repeat(${tabs.length},1fr)`;
       $('nav-inner').innerHTML=tabs.map(x=>`<button class="nav-btn ${x.k===activeTab?'active':''}" data-tab="${x.k}"><span class="ico">${x.ico}</span><span class="lbl2">${x.l}</span></button>`).join('');
       document.querySelectorAll('.nav-btn').forEach(b=>b.onclick=()=>{activeTab=b.dataset.tab;document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x===b));render();});
-      if(profile.role==='cashier') activeTab='cashier';
     }
 
     function render(){
       // refresh nav labels & branch names for language
       const bs=$('branch-select'); if(bs){const cur=bs.value;bs.innerHTML=branches.map(b=>`<option value="${b.id}">${lang==='ar'?b.nameAr:b.nameEn}</option>`).join('');bs.value=cur;}
-      document.querySelectorAll('.nav-btn').forEach(b=>{const k=b.dataset.tab;b.querySelector('.lbl2').textContent=k==='products'?t('products'):k==='categories'?t('categories'):t('cashierSoon');});
-      if(activeTab==='products') renderProducts();
-      else if(activeTab==='categories') renderCategories();
-      else renderCashierPlaceholder();
+      document.querySelectorAll('.nav-btn').forEach(b=>{const k=b.dataset.tab;b.querySelector('.lbl2').textContent=k==='cassa'?t('cashier_tab'):k==='products'?t('products'):k==='categories'?t('categories'):k==='users'?t('users'):t('cashier_tab');});
+      if(activeTab==='cassa') renderCassa();
+      else { const cb=$('cart-bar-root'); if(cb) cb.innerHTML=''; 
+        if(activeTab==='products') renderProducts();
+        else if(activeTab==='categories') renderCategories();
+        else if(activeTab==='users') renderUsers();
+        else renderCassa();
+      }
     }
 
-    function renderCashierPlaceholder(){
-      $('content').innerHTML=`<div class="card" style="text-align:center;padding:30px 20px;margin-top:20px;">
-        <div style="font-size:40px;margin-bottom:12px;">🛒</div>
-        <div class="sheet-title">${t('cashierSoon')}</div>
-        <div style="font-size:13px;color:rgba(26,26,26,0.7);margin-top:8px;line-height:1.6;">${t('cashierSoonMsg')}</div>
-      </div>`;
+    // ============ CASSA / CASHIER (vendita) ============
+    let cart=[]; // {id,name,price,photoUrl,qty}
+    let posCatFilter='all';
+    function cartCount(){ return cart.reduce((s,i)=>s+i.qty,0); }
+    function cartTotal(){ return cart.reduce((s,i)=>s+i.price*i.qty,0); }
+    function addToCart(p){
+      const inv=inventory[p.id]||{qty:0};
+      const existing=cart.find(i=>i.id===p.id);
+      const inCart=existing?existing.qty:0;
+      if(inCart+1>(inv.qty||0)){ toast(t('outOfStock'),true); return; }
+      if(existing) existing.qty++;
+      else cart.push({id:p.id,name:p.name,price:p.price,photoUrl:p.photoUrl||'',qty:1});
+      renderCartBar();
+      toast(t('addToCart'));
+    }
+    function setQty(id,delta){
+      const it=cart.find(i=>i.id===id); if(!it)return;
+      const inv=inventory[id]||{qty:0};
+      const nv=it.qty+delta;
+      if(nv<=0){ cart=cart.filter(i=>i.id!==id); }
+      else if(nv>(inv.qty||0)){ toast(t('outOfStock'),true); return; }
+      else it.qty=nv;
+      // ridisegna sia la barra che lo sheet se aperto
+      renderCartBar();
+      if($('cart-sheet-body')) renderCartSheet();
+    }
+    function renderCartBar(){
+      const root=$('cart-bar-root'); if(!root) return;
+      if(cart.length===0){ root.innerHTML=''; return; }
+      root.innerHTML=`<div class="cart-bar"><div class="cart-inner" id="open-cart">
+        <span style="display:flex;align-items:center;gap:10px;"><span class="cart-count">${cartCount()}</span><span style="font-size:13px;">${t('cart')}</span></span>
+        <span class="num" style="font-weight:700;font-size:16px;">${fmt(cartTotal())} ${t('currency')}</span>
+      </div></div>`;
+      $('open-cart').onclick=openCartSheet;
+    }
+    function renderCassa(){
+      $('cart-bar-root')||$('content').insertAdjacentHTML('afterend','<div id="cart-bar-root"></div>');
+      const actives=products.filter(p=>p.active!==false);
+      if(actives.length===0){ $('content').innerHTML=`<div class="card"><div class="empty">${t('noProdYet')}</div></div>`; renderCartBar(); return; }
+      const cats=categories.filter(c=>c.active!==false);
+      const chips=`<button class="pos-cat-chip ${posCatFilter==='all'?'active':''}" data-cat="all">${t('allCats')}</button>`+
+        cats.map(c=>`<button class="pos-cat-chip ${posCatFilter===c.id?'active':''}" data-cat="${c.id}">${lang==='ar'?c.nameAr:c.nameEn}</button>`).join('');
+      let list=actives.filter(p=>posCatFilter==='all'||p.categoryId===posCatFilter);
+      const grid=list.map(p=>{
+        const inv=inventory[p.id]||{qty:0,threshold:20};
+        const out=(inv.qty||0)<=0; const low=!out&&inv.qty<=(inv.threshold||20);
+        const desc=lang==='ar'?(p.descAr||''):(p.descEn||'');
+        return `<button class="pos-card" data-id="${p.id}" ${out?'disabled style="opacity:0.45;"':''}>
+          ${p.photoUrl?`<img class="pc-photo" src="${p.photoUrl}">`:`<div class="pc-photo">🍽️</div>`}
+          <div class="pc-body">
+            <div class="pc-name fr" dir="ltr">${p.name}</div>
+            ${desc?`<div class="pc-desc">${desc}</div>`:`<div class="pc-desc"></div>`}
+            <div class="pc-price num">${fmt(p.price)} ${t('currency')}</div>
+            ${out?`<span class="pc-badge">${t('outOfStock')}</span>`:low?`<span class="pc-badge" style="background:rgba(216,142,42,0.15);color:var(--amber);">${t('lowStock')}: ${inv.qty}</span>`:''}
+          </div>
+        </button>`;
+      }).join('');
+      $('content').innerHTML=`<div class="pos-cat-bar">${chips}</div><div class="pos-grid">${grid}</div>`;
+      document.querySelectorAll('.pos-cat-chip').forEach(ch=>ch.onclick=()=>{posCatFilter=ch.dataset.cat;renderCassa();});
+      document.querySelectorAll('.pos-card').forEach(c=>c.onclick=()=>{ if(c.disabled)return; addToCart(products.find(p=>p.id===c.dataset.id)); });
+      renderCartBar();
+    }
+    function openCartSheet(){
+      $('sheet-root').innerHTML=`<div class="overlay" id="ov"><div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-head"><div><div class="sheet-sub">${t('sale')}</div><div class="sheet-title">${t('cart')}</div></div><button class="close-x" id="cx">×</button></div>
+        <div id="cart-sheet-body"></div>
+      </div></div>`;
+      $('ov').onclick=closeSheet;$('cx').onclick=closeSheet;
+      renderCartSheet();
+    }
+    function renderCartSheet(){
+      const body=$('cart-sheet-body'); if(!body)return;
+      if(cart.length===0){ body.innerHTML=`<div class="empty">${t('cartEmpty')}</div>`; return; }
+      const lines=cart.map(i=>`<div class="cart-line">
+        ${i.photoUrl?`<img class="cl-photo" src="${i.photoUrl}">`:`<div class="cl-photo">🍽️</div>`}
+        <div style="flex:1;min-width:0;"><div class="fr" dir="ltr" style="font-size:14px;font-weight:500;">${i.name}</div><div class="num" style="font-size:12px;color:var(--forest);font-weight:700;">${fmt(i.price)} ${t('currency')}</div></div>
+        <div class="qty-ctrl"><button class="qty-btn" data-dec="${i.id}">−</button><span class="num" style="min-width:20px;text-align:center;font-weight:700;">${i.qty}</span><button class="qty-btn" data-inc="${i.id}">+</button></div>
+      </div>`).join('');
+      body.innerHTML=`${lines}
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0 4px;"><span style="font-size:14px;font-weight:600;">${t('total')}</span><span class="num" style="font-size:22px;font-weight:700;color:var(--forest);">${fmt(cartTotal())} ${t('currency')}</span></div>
+        <button class="btn-forest btn-wide" id="do-checkout" style="margin-top:8px;">✓ ${t('checkout')}</button>
+        <button class="btn-secondary btn-wide" id="clear-cart" style="margin-top:8px;color:var(--red);border-color:rgba(192,72,72,0.3);">${t('clearCart')}</button>`;
+      body.querySelectorAll('[data-inc]').forEach(b=>b.onclick=()=>setQty(b.dataset.inc,1));
+      body.querySelectorAll('[data-dec]').forEach(b=>b.onclick=()=>setQty(b.dataset.dec,-1));
+      $('clear-cart').onclick=()=>{ if(!confirm(t('confirmClear')))return; cart=[]; closeSheet(); renderCassa(); };
+      $('do-checkout').onclick=doCheckout;
+    }
+    async function doCheckout(){
+      if(cart.length===0)return;
+      const btn=$('do-checkout'); btn.textContent='...'; btn.disabled=true;
+      try{
+        const items=cart.map(i=>({productId:i.id,name:i.name,price:i.price,qty:i.qty,subtotal:i.price*i.qty}));
+        const total=cartTotal();
+        // 1) registra la vendita
+        await addDoc(collection(db,'sales'),{
+          branchId:currentBranchId, userId:user.uid, userName:profile.name||user.email,
+          items, total, count:cartCount(), createdAt:Date.now()
+        });
+        // 2) scala l'inventario di questo branch
+        for(const i of cart){
+          const cur=inventory[i.id]||{qty:0,threshold:20,lastCost:0};
+          const nq=Math.max(0,(cur.qty||0)-i.qty);
+          await setDoc(doc(db,'inventory',`${currentBranchId}_${i.id}`),{branchId:currentBranchId,productId:i.id,qty:nq,threshold:cur.threshold||20,lastCost:cur.lastCost||0},{merge:true});
+          inventory[i.id]={qty:nq,threshold:cur.threshold||20,lastCost:cur.lastCost||0};
+        }
+        cart=[]; closeSheet(); renderCassa(); toast(t('saleDone'));
+      }catch(e){ console.error(e); toast(t('errorGen'),true); btn.textContent='✓ '+t('checkout'); btn.disabled=false; }
     }
 
     // ============ CATEGORIES ============
@@ -439,6 +592,107 @@ const firebaseConfig = {
           else products.push({id:prodId,...data});
           closeSheet();renderProducts();toast(t('saved'));
         }catch(e){console.error(e);toast(t('errorGen'),true);$('p-save').textContent='✓ '+t('save');}
+      };
+    }
+
+    // ============ USERS (gestione utenti) ============
+    async function loadUsers(){
+      users=[];
+      try{
+        const us=await getDocs(collection(db,'users'));
+        us.forEach(d=>users.push({uid:d.id,...d.data()}));
+        // manager vede solo i cashier dei propri branch + se stesso
+        if(profile.role==='manager'){
+          const myB=profile.branchIds||[];
+          users=users.filter(u=> u.uid===user.uid || (u.role==='cashier' && (u.branchIds||[]).some(b=>myB.includes(b))) );
+        }
+        users.sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+      }catch(e){console.error(e);}
+    }
+    async function renderUsers(){
+      await loadUsers();
+      const roleColor={admin:'var(--gold)',manager:'var(--green)',cashier:'var(--forest)'};
+      let html=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><div style="font-size:11px;letter-spacing:1px;color:var(--forest);font-weight:700;">${t('users').toUpperCase()}</div><button class="btn-gold" id="add-user" style="padding:8px 14px;">+ ${t('addUser')}</button></div>`;
+      if(users.length===0) html+=`<div class="card"><div class="empty">${t('noUsers')}</div></div>`;
+      else html+=users.map(u=>{
+        const isSelf=u.uid===user.uid; const inactive=u.active===false;
+        const bnames=(u.branchIds||[]).map(id=>{const b=branches.find(x=>x.id===id);return b?(lang==='ar'?b.nameAr:b.nameEn):id;}).join('، ');
+        return `<div class="cat-row" data-uid="${u.uid}" style="opacity:${inactive?0.5:1}">
+          <div style="width:40px;height:40px;border-radius:50%;background:rgba(31,58,46,0.08);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">👤</div>
+          <div class="cat-names" style="flex:1;">
+            <div style="font-weight:600;font-size:15px;">${u.name||'—'} ${isSelf?`<span style="font-size:11px;color:var(--gold);">${t('you')}</span>`:''}</div>
+            <div class="num" style="font-size:12px;color:rgba(26,26,26,0.6);" dir="ltr">${u.email||''}</div>
+            <div style="font-size:11px;margin-top:2px;"><span style="color:${roleColor[u.role]||'#888'};font-weight:700;">${t(u.role)||u.role}</span>${bnames?` · <span style="color:rgba(26,26,26,0.5);">${bnames}</span>`:''}${inactive?` · <span style="color:var(--red);">${t('disabled')}</span>`:''}</div>
+          </div>
+          <span style="color:rgba(26,26,26,0.4);">✎</span>
+        </div>`;
+      }).join('');
+      $('content').innerHTML=html;
+      $('add-user')&&($('add-user').onclick=()=>userForm(null));
+      document.querySelectorAll('.cat-row[data-uid]').forEach(r=>r.onclick=()=>userForm(users.find(u=>u.uid===r.dataset.uid)));
+    }
+    function userForm(u){
+      const isEdit=!!u; const isSelf=u&&u.uid===user.uid;
+      // ruoli che l'utente corrente può assegnare
+      let roleOpts;
+      if(profile.role==='admin') roleOpts=['admin','manager','cashier'];
+      else roleOpts=['cashier']; // manager crea solo cashier
+      const f=u||{name:'',email:'',role:roleOpts[0],branchIds:[],active:true};
+      let act=f.active!==false;
+      let selRole=f.role||roleOpts[0];
+      let selBranches=[...(f.branchIds||[])];
+      // i branch selezionabili: admin tutti, manager solo i suoi
+      const availBranches = profile.role==='admin'?branches:branches.filter(b=>(profile.branchIds||[]).includes(b.id));
+      const roleSelHtml=roleOpts.map(r=>`<option value="${r}" ${selRole===r?'selected':''}>${t(r)}</option>`).join('');
+      const branchChecks=availBranches.map(b=>`<label style="display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;"><input type="checkbox" class="b-chk" value="${b.id}" ${selBranches.includes(b.id)?'checked':''} style="width:18px;height:18px;accent-color:var(--forest);"><span style="font-size:14px;">${lang==='ar'?b.nameAr:b.nameEn}</span></label>`).join('');
+      $('sheet-root').innerHTML=`<div class="overlay" id="ov"><div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-head"><div><div class="sheet-sub">${isEdit?t('edit'):t('create')}</div><div class="sheet-title">${isEdit?t('editUser'):t('addUser')}</div></div><button class="close-x" id="cx">×</button></div>
+        <div class="field"><label class="lbl">${t('name')}</label><input class="input" id="u-name" value="${f.name||''}"></div>
+        <div class="field"><label class="lbl">${t('userEmail')}</label><input class="input num" id="u-email" type="email" value="${f.email||''}" dir="ltr" ${isEdit?'disabled style="opacity:0.6;"':''}>${isEdit?`<div style="font-size:11px;color:rgba(26,26,26,0.5);margin-top:4px;">${t('cannotEditEmail')}</div>`:''}</div>
+        ${isEdit?'':`<div class="field"><label class="lbl">${t('userPass')}</label><input class="input num" id="u-pass" type="text" dir="ltr" placeholder="${t('passHint')}"></div>`}
+        <div class="field"><label class="lbl">${t('role')}</label><select class="input" id="u-role">${roleSelHtml}</select></div>
+        <div class="field"><label class="lbl">${t('branchesField')}</label><div style="background:white;border:1px solid var(--ivory-dark);border-radius:10px;padding:8px 12px;">${branchChecks||`<div style="font-size:12px;color:rgba(26,26,26,0.5);padding:6px 0;">—</div>`}</div></div>
+        <div style="background:white;border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--ivory-dark);margin-bottom:12px;"><span style="font-size:13px;font-weight:600;">${t('active')}</span><button class="toggle" id="u-act" style="background:${act?'var(--forest)':'rgba(26,26,26,0.2)'}" ${isSelf?'disabled':''}><span class="thumb"></span></button></div>
+        ${isSelf?`<div style="font-size:11px;color:var(--red);margin-bottom:10px;text-align:center;">${t('noEditSelf')}</div>`:''}
+        <button class="btn-forest btn-wide" id="u-save">✓ ${t('save')}</button>
+      </div></div>`;
+      if(!isSelf) setToggle('u-act',act,v=>act=v);
+      $('u-role').onchange=()=>{selRole=$('u-role').value;};
+      $('ov').onclick=closeSheet;$('cx').onclick=closeSheet;
+      $('u-save').onclick=async()=>{
+        const name=$('u-name').value.trim();
+        const email=isEdit?f.email:($('u-email').value.trim());
+        const role=$('u-role').value;
+        const chosen=Array.from(document.querySelectorAll('.b-chk:checked')).map(c=>c.value);
+        if(!name){toast(t('required'),true);return;}
+        if(!isEdit && !email){toast(t('required'),true);return;}
+        if(chosen.length===0){toast(t('selectBranch'),true);return;}
+        $('u-save').textContent='...';
+        try{
+          if(isEdit){
+            // aggiorna solo il documento Firestore (email e password non si cambiano qui)
+            await updateDoc(doc(db,'users',u.uid),{name,role,branchIds:chosen,active:isSelf?true:act});
+            closeSheet(); renderUsers(); toast(t('saved'));
+          } else {
+            const pass=$('u-pass').value;
+            if(!pass||pass.length<6){toast(t('weakPass'),true);$('u-save').textContent='✓ '+t('save');return;}
+            // crea l'utente nell'istanza secondaria per NON sloggare l'admin
+            let cred;
+            try{ cred=await createUserWithEmailAndPassword(auth2,email,pass); }
+            catch(err){
+              const code=err.code||'';
+              if(code.includes('email-already-in-use')) toast(t('emailInUse'),true);
+              else if(code.includes('invalid-email')) toast(t('invalidEmail'),true);
+              else if(code.includes('weak-password')) toast(t('weakPass'),true);
+              else toast(t('errorGen'),true);
+              $('u-save').textContent='✓ '+t('save'); return;
+            }
+            const newUid=cred.user.uid;
+            await setDoc(doc(db,'users',newUid),{name,email,role,branchIds:chosen,active:true,createdAt:Date.now()});
+            await signOut(auth2); // chiude la sessione secondaria
+            closeSheet(); renderUsers(); toast(t('userCreated'));
+          }
+        }catch(e){console.error(e);toast(t('errorGen'),true);$('u-save').textContent='✓ '+t('save');}
       };
     }
 
