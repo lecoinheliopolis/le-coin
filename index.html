@@ -160,17 +160,14 @@
     // ============================================================
     // ⚠️ INCOLLA QUI LA TUA CONFIGURAZIONE FIREBASE (vedi FIREBASE-SETUP.md Parte 2)
     // ============================================================
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyBPasx-SbUqik32aA6tYSJCF7_XQgolh04",
-  authDomain: "lecoin-1f8a5.firebaseapp.com",
-  databaseURL: "https://lecoin-1f8a5-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "lecoin-1f8a5",
-  storageBucket: "lecoin-1f8a5.firebasestorage.app",
-  messagingSenderId: "671148497332",
-  appId: "1:671148497332:web:a9307722d7ad1857ac3ae1",
-  measurementId: "G-93XD4LFQ3K"
-};
+    const firebaseConfig = {
+      apiKey: "INCOLLA_QUI",
+      authDomain: "INCOLLA_QUI.firebaseapp.com",
+      projectId: "INCOLLA_QUI",
+      storageBucket: "INCOLLA_QUI.appspot.com",
+      messagingSenderId: "INCOLLA_QUI",
+      appId: "INCOLLA_QUI"
+    };
     // ============================================================
 
     const fbApp = initializeApp(firebaseConfig);
@@ -217,7 +214,15 @@ const firebaseConfig = {
         unitsSold:'وحدة', thisBranch:'هذا الفرع', revenueByDay:'الإيراد اليومي',
         thisMonth:'هذا الشهر', monthRev:'إيراد الشهر', stockValue:'قيمة المخزون', atCost:'بالتكلفة',
         atPrice:'بسعر البيع', totalStockCost:'إجمالي التكلفة', totalStockPrice:'إجمالي البيع المتوقع',
-        potentialProfit:'الربح المتوقع', units:'الكمية', noStock:'لا يوجد مخزون', stockReport:'تقرير المخزون'
+        potentialProfit:'الربح المتوقع', units:'الكمية', noStock:'لا يوجد مخزون', stockReport:'تقرير المخزون',
+        warehouse:'المخزن', receive:'استلام بضاعة', receiveQty:'الكمية المستلمة', newCost:'التكلفة الجديدة (للوحدة)',
+        receiveDone:'تم الاستلام', currentQty:'الكمية الحالية', afterReceive:'بعد الاستلام', selectProduct:'— اختر المنتج —',
+        physInv:'الجرد الفعلي', countedQty:'الكمية المعدودة', systemQty:'كمية النظام', diff:'الفرق',
+        surplus:'زيادة', shortage:'عجز', match:'مطابق', applyInv:'تطبيق الجرد', invApplied:'تم تطبيق الجرد',
+        invReport:'تقرير الجرد', adjustNote:'سيتم تعديل كميات النظام لتطابق العدّ الفعلي', confirmApplyInv:'تأكيد تطبيق الجرد؟ سيتم تعديل المخزون.',
+        receiveTab:'استلام', invTab:'جرد', print:'طباعة', download:'تحميل', noChanges:'لا توجد تغييرات',
+        valueImpact:'أثر القيمة', invDate:'تاريخ الجرد', totalItems:'عدد الأصناف', enterCount:'أدخل العدد',
+        leaveBlank:'(اتركه فارغاً لتجاهل الصنف)', receiveHint:'أضف الكمية اللي وصلتك للمخزون', skipped:'لم يُعدّ'
       },
       en: {
         dir:'ltr', langBtn:'ع', email:'Email', pass:'Password', login:'Sign in',
@@ -253,7 +258,15 @@ const firebaseConfig = {
         unitsSold:'units', thisBranch:'This branch', revenueByDay:'Daily revenue',
         thisMonth:'This month', monthRev:'Month revenue', stockValue:'Stock value', atCost:'At cost',
         atPrice:'At sale price', totalStockCost:'Total cost', totalStockPrice:'Expected sales',
-        potentialProfit:'Potential profit', units:'Qty', noStock:'No stock', stockReport:'Stock report'
+        potentialProfit:'Potential profit', units:'Qty', noStock:'No stock', stockReport:'Stock report',
+        warehouse:'Warehouse', receive:'Receive goods', receiveQty:'Quantity received', newCost:'New unit cost',
+        receiveDone:'Goods received', currentQty:'Current qty', afterReceive:'After receiving', selectProduct:'— select product —',
+        physInv:'Physical inventory', countedQty:'Counted qty', systemQty:'System qty', diff:'Difference',
+        surplus:'Surplus', shortage:'Shortage', match:'Match', applyInv:'Apply inventory', invApplied:'Inventory applied',
+        invReport:'Inventory report', adjustNote:'System quantities will be adjusted to match the physical count', confirmApplyInv:'Apply inventory? Stock will be adjusted.',
+        receiveTab:'Receive', invTab:'Count', print:'Print', download:'Download', noChanges:'No changes',
+        valueImpact:'Value impact', invDate:'Inventory date', totalItems:'Items', enterCount:'Enter count',
+        leaveBlank:'(leave blank to skip item)', receiveHint:'Add received quantity to stock', skipped:'Not counted'
       }
     };
     let lang = localStorage.getItem('lecoin_lang') || 'ar';
@@ -350,6 +363,7 @@ const firebaseConfig = {
       if(profile.role==='admin'||profile.role==='manager'){
         tabs.push({k:'products',ico:'📦',l:t('products')});
         tabs.push({k:'categories',ico:'🏷️',l:t('categories')});
+        tabs.push({k:'warehouse',ico:'🏬',l:t('warehouse')});
         tabs.push({k:'users',ico:'👥',l:t('users')});
         tabs.push({k:'reports',ico:'📊',l:t('reports')});
       }
@@ -362,11 +376,12 @@ const firebaseConfig = {
     function render(){
       // refresh nav labels & branch names for language
       const bs=$('branch-select'); if(bs){const cur=bs.value;bs.innerHTML=branches.map(b=>`<option value="${b.id}">${lang==='ar'?b.nameAr:b.nameEn}</option>`).join('');bs.value=cur;}
-      document.querySelectorAll('.nav-btn').forEach(b=>{const k=b.dataset.tab;b.querySelector('.lbl2').textContent=k==='cassa'?t('cashier_tab'):k==='products'?t('products'):k==='categories'?t('categories'):k==='users'?t('users'):k==='reports'?t('reports'):t('cashier_tab');});
+      document.querySelectorAll('.nav-btn').forEach(b=>{const k=b.dataset.tab;b.querySelector('.lbl2').textContent=k==='cassa'?t('cashier_tab'):k==='products'?t('products'):k==='categories'?t('categories'):k==='warehouse'?t('warehouse'):k==='users'?t('users'):k==='reports'?t('reports'):t('cashier_tab');});
       if(activeTab==='cassa') renderCassa();
       else { const cb=$('cart-bar-root'); if(cb) cb.innerHTML=''; 
         if(activeTab==='products') renderProducts();
         else if(activeTab==='categories') renderCategories();
+        else if(activeTab==='warehouse') renderWarehouse();
         else if(activeTab==='users') renderUsers();
         else if(activeTab==='reports') renderReports();
         else renderCassa();
@@ -825,7 +840,241 @@ const firebaseConfig = {
         </div>`).join('');
       }
       html+=`</div>`;
+      // pulsanti stampa / download
+      html+=`<div style="display:flex;gap:8px;margin-bottom:20px;">
+        <button class="btn-forest btn-wide" id="rep-print">🖨️ ${t('print')}</button>
+        <button class="btn-secondary btn-wide" id="rep-dl">⬇️ ${t('download')}</button>
+      </div>`;
       $('content').innerHTML=html;
+      // bind stampa/download report vendite
+      const repTitle=t('reports');
+      $('rep-print') && ($('rep-print').onclick=()=>{
+        let body=`<h2>${t('revenue')}</h2><table><tr><th></th><th>${t('revenue')} (${t('currency')})</th><th>${t('salesCount')}</th></tr>
+          <tr><td>${t('today')}</td><td>${fmt(todayRev)}</td><td>${todaySales.length}</td></tr>
+          <tr><td>${t('thisMonth')}</td><td>${fmt(monthRev)}</td><td>${monthSales.length}</td></tr>
+          <tr><td>${t('last7')}</td><td>${fmt(weekRev)}</td><td>${weekSales.length}</td></tr>
+          <tr><td>${t('avgSale')}</td><td>${fmt(avg)}</td><td>—</td></tr></table>`;
+        body+=`<h2>${t('topProducts')} · ${t('last7')}</h2><table><tr><th>${t('name')}</th><th>${t('unitsSold')}</th><th>${t('revenue')} (${t('currency')})</th></tr>
+          ${top.map(p=>`<tr><td>${p.name}</td><td>${p.qty}</td><td>${fmt(p.rev)}</td></tr>`).join('')||`<tr><td colspan="3">${t('noSales')}</td></tr>`}</table>`;
+        body+=`<h2>${t('stockValue')} · ${curBranchName}</h2><table><tr><th>${t('name')}</th><th>${t('units')}</th><th>${t('atCost')} (${t('currency')})</th><th>${t('atPrice')} (${t('currency')})</th></tr>
+          ${stockRows.map(r=>`<tr><td>${r.name}</td><td>${r.qty}</td><td>${fmt(r.cost)}</td><td>${fmt(r.price)}</td></tr>`).join('')}
+          <tr class="tot"><td>${t('total')}</td><td></td><td>${fmt(totCost)}</td><td>${fmt(totPrice)}</td></tr>
+          <tr class="tot"><td>${t('potentialProfit')}</td><td></td><td colspan="2">${fmt(totPrice-totCost)}</td></tr></table>`;
+        printDoc(repTitle,body);
+      });
+      $('rep-dl') && ($('rep-dl').onclick=()=>{
+        const header=[t('stockReport'),t('units'),t('atCost'),t('atPrice')];
+        const rows=stockRows.map(r=>[r.name,r.qty,r.cost,r.price]);
+        rows.push([t('total'),'',totCost,totPrice]);
+        rows.push([t('potentialProfit'),'',totPrice-totCost,'']);
+        rows.push([]);
+        rows.push([t('today'),todaySales.length,todayRev,'']);
+        rows.push([t('thisMonth'),monthSales.length,monthRev,'']);
+        rows.push([t('last7'),weekSales.length,weekRev,'']);
+        downloadCSV(`report_${new Date().toISOString().slice(0,10)}.csv`,header,rows);
+      });
+    }
+
+    // ============ MAGAZZINO (المخزن: استلام + جرد) ============
+    let whSubTab='receive';
+    let invCounts={}; // productId -> counted (string)
+
+    function renderWarehouse(){
+      const cb=$('cart-bar-root'); if(cb) cb.innerHTML='';
+      const actives=products.filter(p=>p.active!==false);
+      const onSt='background:var(--forest);color:var(--ivory);border:1px solid var(--forest);';
+      const offSt='background:white;color:var(--charcoal);border:1px solid var(--ivory-dark);';
+      const btn='padding:9px 16px;border-radius:10px;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit;';
+      let html=`<div style="font-size:11px;letter-spacing:1px;color:var(--forest);font-weight:700;margin-bottom:12px;">${t('warehouse').toUpperCase()}</div>
+        <div style="display:flex;gap:8px;margin-bottom:14px;">
+          <button id="wh-receive" style="${btn}${whSubTab==='receive'?onSt:offSt}">📥 ${t('receiveTab')}</button>
+          <button id="wh-count" style="${btn}${whSubTab==='count'?onSt:offSt}">📋 ${t('invTab')}</button>
+        </div>`;
+      html += whSubTab==='receive' ? whReceiveView(actives) : whCountView(actives);
+      $('content').innerHTML=html;
+      $('wh-receive').onclick=()=>{whSubTab='receive';renderWarehouse();};
+      $('wh-count').onclick=()=>{whSubTab='count';renderWarehouse();};
+      if(whSubTab==='receive') bindReceive(); else bindCount(actives);
+    }
+
+    function whReceiveView(actives){
+      if(actives.length===0) return `<div class="card"><div class="empty">${t('noProdYet')}</div></div>`;
+      return `<div class="card">
+        <div class="card-title">📥 ${t('receive')}</div>
+        <div style="font-size:12px;color:rgba(26,26,26,0.55);margin-bottom:12px;">${t('receiveHint')}</div>
+        <div class="field"><label class="lbl">${t('selectProduct')}</label>
+          <select class="input" id="rc-prod"><option value="">${t('selectProduct')}</option>
+          ${actives.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}</select></div>
+        <div id="rc-cur" style="font-size:12px;color:rgba(26,26,26,0.55);margin:4px 0 10px;"></div>
+        <div class="row2">
+          <div class="field"><label class="lbl">${t('receiveQty')}</label><input class="input num" id="rc-qty" type="number" min="1" dir="ltr" placeholder="0"></div>
+          <div class="field"><label class="lbl">${t('newCost')}</label><input class="input num" id="rc-cost" type="number" min="0" step="0.01" dir="ltr" placeholder="0"></div>
+        </div>
+        <div id="rc-after" style="font-size:13px;color:var(--forest);font-weight:600;margin:6px 0 12px;min-height:18px;"></div>
+        <button class="btn-gold btn-wide" id="rc-save">📥 ${t('receive')}</button>
+      </div>`;
+    }
+
+    function bindReceive(){
+      const sel=$('rc-prod'), qEl=$('rc-qty'), cEl=$('rc-cost');
+      const refresh=()=>{
+        const p=products.find(x=>x.id===sel.value);
+        if(!p){ $('rc-cur').textContent=''; $('rc-after').textContent=''; return; }
+        const inv=inventory[p.id]||{qty:0,lastCost:0};
+        $('rc-cur').innerHTML=`${t('currentQty')}: <span class="num" style="font-weight:700;">${inv.qty||0}</span> · ${t('cost')}: <span class="num">${fmt(inv.lastCost||0)}</span> ${t('currency')}`;
+        if(!cEl.value && inv.lastCost) cEl.placeholder=String(inv.lastCost);
+        const add=parseInt(qEl.value)||0;
+        $('rc-after').textContent = add>0 ? `${t('afterReceive')}: ${(inv.qty||0)+add}` : '';
+      };
+      sel.onchange=refresh; qEl.oninput=refresh; cEl.oninput=refresh;
+      $('rc-save').onclick=async()=>{
+        const p=products.find(x=>x.id===sel.value);
+        const add=parseInt(qEl.value)||0;
+        if(!p){ toast(t('selectProduct'),true); return; }
+        if(add<=0){ toast(t('required'),true); return; }
+        const inv=inventory[p.id]||{qty:0,threshold:20,lastCost:0};
+        const newCost = cEl.value!=='' ? parseFloat(cEl.value) : (inv.lastCost||0);
+        const newQty=(inv.qty||0)+add;
+        const b=$('rc-save'); b.disabled=true; b.textContent='...';
+        try{
+          await setDoc(doc(db,'inventory',`${currentBranchId}_${p.id}`),{branchId:currentBranchId,productId:p.id,qty:newQty,threshold:inv.threshold||20,lastCost:newCost},{merge:true});
+          inventory[p.id]={qty:newQty,threshold:inv.threshold||20,lastCost:newCost};
+          await addDoc(collection(db,'loads'),{branchId:currentBranchId,productId:p.id,name:p.name,qty:add,unitCost:newCost,total:add*newCost,userId:user.uid,userName:profile.name||user.email,createdAt:Date.now()});
+          toast(t('receiveDone')); renderWarehouse();
+        }catch(e){ console.error(e); toast(t('errorGen'),true); b.disabled=false; b.textContent='📥 '+t('receive'); }
+      };
+    }
+
+    function whCountView(actives){
+      if(actives.length===0) return `<div class="card"><div class="empty">${t('noProdYet')}</div></div>`;
+      const rows=actives.map(p=>{
+        const inv=inventory[p.id]||{qty:0,lastCost:0};
+        const cv=invCounts[p.id]!==undefined?invCounts[p.id]:'';
+        return `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--ivory-dark);">
+          <div style="flex:1;min-width:0;"><div class="fr" dir="ltr" style="font-size:14px;">${p.name}</div>
+            <div style="font-size:11px;color:rgba(26,26,26,0.5);">${t('systemQty')}: <span class="num">${inv.qty||0}</span></div></div>
+          <input class="input num" id="cnt-${p.id}" data-pid="${p.id}" type="number" min="0" dir="ltr" value="${cv}" placeholder="${t('enterCount')}" style="width:90px;padding:8px;">
+          <div id="d-${p.id}" class="num" style="width:64px;text-align:end;font-weight:700;font-size:13px;">—</div>
+        </div>`;
+      }).join('');
+      return `<div class="card">
+        <div class="card-title">📋 ${t('physInv')}</div>
+        <div style="font-size:12px;color:rgba(26,26,26,0.55);margin-bottom:6px;">${t('adjustNote')}</div>
+        <div style="font-size:11px;color:rgba(26,26,26,0.45);margin-bottom:10px;">${t('leaveBlank')}</div>
+        ${rows}
+        <div id="cnt-sum" style="margin-top:12px;font-size:12px;color:rgba(26,26,26,0.6);"></div>
+        <button class="btn-gold btn-wide" id="cnt-apply" style="margin-top:12px;">⚖️ ${t('applyInv')}</button>
+      </div>`;
+    }
+
+    function bindCount(actives){
+      const upd=(pid)=>{
+        const el=$('cnt-'+pid); const inv=inventory[pid]||{qty:0};
+        const dEl=$('d-'+pid);
+        if(el.value===''){ invCounts[pid]=undefined; delete invCounts[pid]; dEl.textContent='—'; dEl.style.color='rgba(26,26,26,0.4)'; recompSum(); return; }
+        invCounts[pid]=el.value;
+        const diff=(parseInt(el.value)||0)-(inv.qty||0);
+        dEl.textContent=(diff>0?'+':diff<0?'−':'')+fmt(diff);
+        dEl.style.color=diff>0?'var(--amber)':diff<0?'var(--red)':'var(--green)';
+        recompSum();
+      };
+      const recompSum=()=>{
+        let counted=0,surplus=0,shortage=0,valImpact=0;
+        actives.forEach(p=>{ if(invCounts[p.id]===undefined)return; counted++;
+          const inv=inventory[p.id]||{qty:0,lastCost:0}; const diff=(parseInt(invCounts[p.id])||0)-(inv.qty||0);
+          if(diff>0)surplus++; else if(diff<0)shortage++; valImpact+=diff*(inv.lastCost||0); });
+        $('cnt-sum').innerHTML=`${t('totalItems')}: <b>${counted}</b> · ${t('surplus')}: <b style="color:var(--amber);">${surplus}</b> · ${t('shortage')}: <b style="color:var(--red);">${shortage}</b><br>${t('valueImpact')}: <b class="num" style="color:${valImpact<0?'var(--red)':'var(--green)'};">${valImpact>0?'+':valImpact<0?'−':''}${fmt(valImpact)} ${t('currency')}</b>`;
+      };
+      actives.forEach(p=>{ const el=$('cnt-'+p.id); el.oninput=()=>upd(p.id); if(invCounts[p.id]!==undefined) upd(p.id); });
+      recompSum();
+      $('cnt-apply').onclick=async()=>{
+        const lines=[];
+        actives.forEach(p=>{ if(invCounts[p.id]===undefined)return;
+          const inv=inventory[p.id]||{qty:0,lastCost:0}; const counted=parseInt(invCounts[p.id])||0;
+          lines.push({pid:p.id,name:p.name,system:inv.qty||0,counted,diff:counted-(inv.qty||0),cost:inv.lastCost||0,threshold:inv.threshold||20}); });
+        if(lines.length===0){ toast(t('noChanges'),true); return; }
+        if(!confirm(t('confirmApplyInv'))) return;
+        const b=$('cnt-apply'); b.disabled=true; b.textContent='...';
+        try{
+          for(const ln of lines){
+            await setDoc(doc(db,'inventory',`${currentBranchId}_${ln.pid}`),{branchId:currentBranchId,productId:ln.pid,qty:ln.counted,threshold:ln.threshold,lastCost:ln.cost},{merge:true});
+            inventory[ln.pid]={qty:ln.counted,threshold:ln.threshold,lastCost:ln.cost};
+          }
+          await addDoc(collection(db,'inventories'),{branchId:currentBranchId,userId:user.uid,userName:profile.name||user.email,createdAt:Date.now(),
+            lines:lines.map(l=>({productId:l.pid,name:l.name,system:l.system,counted:l.counted,diff:l.diff,cost:l.cost}))});
+          invCounts={};
+          toast(t('invApplied'));
+          showInvReport(lines);
+        }catch(e){ console.error(e); toast(t('errorGen'),true); b.disabled=false; b.textContent='⚖️ '+t('applyInv'); }
+      };
+    }
+
+    function showInvReport(lines){
+      const dt=new Date();
+      let counted=lines.length,surplus=0,shortage=0,valImpact=0;
+      lines.forEach(l=>{ if(l.diff>0)surplus++; else if(l.diff<0)shortage++; valImpact+=l.diff*l.cost; });
+      const bn=(()=>{const b=branches.find(x=>x.id===currentBranchId);return b?(lang==='ar'?b.nameAr:b.nameEn):'';})();
+      const sgn=n=>(n>0?'+':n<0?'−':'')+fmt(n);
+      const rowsHtml=lines.map(l=>`<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--ivory-dark);">
+        <div style="flex:1;min-width:0;"><div class="fr" dir="ltr" style="font-size:14px;">${l.name}</div></div>
+        <div class="num" style="width:50px;text-align:center;font-size:12px;color:rgba(26,26,26,0.55);">${l.system}</div>
+        <div class="num" style="width:50px;text-align:center;font-size:13px;font-weight:700;">${l.counted}</div>
+        <div class="num" style="width:56px;text-align:end;font-weight:700;font-size:13px;color:${l.diff>0?'var(--amber)':l.diff<0?'var(--red)':'var(--green)'};">${sgn(l.diff)}</div>
+      </div>`).join('');
+      let html=`<div style="font-size:11px;letter-spacing:1px;color:var(--forest);font-weight:700;margin-bottom:12px;">${t('invReport').toUpperCase()}</div>
+        <div class="card"><div class="card-title">📄 ${t('invReport')} · ${bn}</div>
+        <div style="font-size:12px;color:rgba(26,26,26,0.55);margin-bottom:10px;">${t('invDate')}: <span class="num">${dt.toLocaleString(lang==='ar'?'ar-EG':'en-US')}</span></div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <div style="flex:1;background:rgba(31,58,46,0.05);border-radius:10px;padding:9px;text-align:center;min-width:70px;"><div style="font-size:10px;color:rgba(26,26,26,0.55);font-weight:700;">${t('totalItems')}</div><div class="num" style="font-size:17px;font-weight:700;">${counted}</div></div>
+          <div style="flex:1;background:rgba(216,142,42,0.1);border-radius:10px;padding:9px;text-align:center;min-width:70px;"><div style="font-size:10px;color:rgba(26,26,26,0.55);font-weight:700;">${t('surplus')}</div><div class="num" style="font-size:17px;font-weight:700;color:var(--amber);">${surplus}</div></div>
+          <div style="flex:1;background:rgba(192,72,72,0.08);border-radius:10px;padding:9px;text-align:center;min-width:70px;"><div style="font-size:10px;color:rgba(26,26,26,0.55);font-weight:700;">${t('shortage')}</div><div class="num" style="font-size:17px;font-weight:700;color:var(--red);">${shortage}</div></div>
+        </div>
+        <div style="background:rgba(61,115,85,0.1);border-radius:10px;padding:8px 12px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:12px;font-weight:600;">${t('valueImpact')}</span><span class="num" style="font-weight:700;color:${valImpact<0?'var(--red)':'var(--green)'};">${sgn(valImpact)} ${t('currency')}</span></div>
+        <div style="display:flex;gap:8px;padding:6px 0;border-bottom:2px solid var(--ivory-dark);font-size:10px;font-weight:700;color:rgba(26,26,26,0.5);">
+          <div style="flex:1;">${t('name')}</div><div style="width:50px;text-align:center;">${t('systemQty')}</div><div style="width:50px;text-align:center;">${t('countedQty')}</div><div style="width:56px;text-align:end;">${t('diff')}</div></div>
+        ${rowsHtml}
+        <div style="display:flex;gap:8px;margin-top:14px;">
+          <button class="btn-forest btn-wide" id="inv-print">🖨️ ${t('print')}</button>
+          <button class="btn-secondary btn-wide" id="inv-dl">⬇️ ${t('download')}</button>
+        </div></div>`;
+      $('content').innerHTML=html;
+      const title=`${t('invReport')} · ${bn} · ${dt.toLocaleDateString(lang==='ar'?'ar-EG':'en-US')}`;
+      $('inv-print').onclick=()=>{
+        const body=`<table><thead><tr><th>${t('name')}</th><th>${t('systemQty')}</th><th>${t('countedQty')}</th><th>${t('diff')}</th><th>${t('valueImpact')} (${t('currency')})</th></tr></thead><tbody>
+          ${lines.map(l=>`<tr><td>${l.name}</td><td>${l.system}</td><td>${l.counted}</td><td class="${l.diff<0?'neg':'pos'}">${sgn(l.diff)}</td><td>${sgn(l.diff*l.cost)}</td></tr>`).join('')}
+          <tr class="tot"><td>${t('totalItems')}: ${counted}</td><td></td><td></td><td>${t('surplus')}:${surplus} / ${t('shortage')}:${shortage}</td><td>${sgn(valImpact)}</td></tr>
+          </tbody></table>`;
+        printDoc(title,body);
+      };
+      $('inv-dl').onclick=()=>{
+        const header=[t('name'),t('systemQty'),t('countedQty'),t('diff'),t('cost'),t('valueImpact')];
+        const rows=lines.map(l=>[l.name,l.system,l.counted,l.diff,l.cost,l.diff*l.cost]);
+        downloadCSV(`inventory_${dt.toISOString().slice(0,10)}.csv`,header,rows);
+      };
+    }
+
+    // ============ STAMPA / DOWNLOAD (rapporti) ============
+    function printDoc(title, bodyHtml){
+      const dir=T[lang].dir, align=dir==='rtl'?'right':'left';
+      const w=window.open('','_blank');
+      if(!w){ toast(t('errorGen'),true); return; }
+      w.document.write(`<!doctype html><html dir="${dir}" lang="${lang}"><head><meta charset="utf-8"><title>${title}</title>
+        <style>body{font-family:Arial,Tahoma,sans-serif;padding:28px;color:#1A1A1A;}
+        h1{color:#1F3A2E;font-size:22px;margin:0 0 2px;}.sub{color:#888;font-size:12px;margin-bottom:18px;}
+        table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:18px;}
+        th,td{border:1px solid #ddd;padding:7px 9px;text-align:${align};}
+        th{background:#1F3A2E;color:#fff;font-weight:600;}.tot{font-weight:700;background:#F0EADC;}
+        .pos{color:#C04848;}.neg{color:#3D7355;}h2{color:#1F3A2E;font-size:15px;margin:18px 0 8px;}</style></head>
+        <body><h1>Le Coin</h1><div class="sub">${title} — ${new Date().toLocaleString(lang==='ar'?'ar-EG':'en-US')}</div>${bodyHtml}</body></html>`);
+      w.document.close(); w.focus(); setTimeout(()=>{ try{w.print();}catch(e){} },400);
+    }
+    function downloadCSV(filename, header, rows){
+      const esc=c=>`"${String(c==null?'':c).replace(/"/g,'""')}"`;
+      const csv=[header].concat(rows).map(r=>r.map(esc).join(',')).join('\r\n');
+      const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});
+      const url=URL.createObjectURL(blob); const a=document.createElement('a');
+      a.href=url; a.download=filename; document.body.appendChild(a); a.click();
+      setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); },800);
     }
 
     // ============ HELPERS ============
