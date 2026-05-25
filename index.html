@@ -360,24 +360,25 @@
     // assegna il logo (base64) alle immagini
     (function setLogos(){ const a=$('login-logo'),b=$('header-logo'); if(a)a.src=LOGO; if(b)b.src=LOGO; })();
     const fmt = n => Math.abs(n||0).toLocaleString('en-US',{maximumFractionDigits:0});
-    // Orario sempre su fuso del Cairo (Egitto), 24h, cifre occidentali — non dipende dal fuso del dispositivo
+    // Orario sempre su fuso del Cairo (Egitto), 24h, cifre occidentali — calcolato da noi, NON dipende dal browser
     const TZ='Africa/Cairo';
-    // calcola l'offset (minuti) che il Cairo aveva in un dato istante — tiene conto di ora legale/solare di quel momento
+    // ultimo <weekday> del mese (per le regole DST egiziane)
+    function _lastWeekday(y,month,wd){ const last=new Date(Date.UTC(y,month+1,0)); const ld=last.getUTCDay(); const diff=(ld-wd+7)%7; return last.getUTCDate()-diff; }
+    // offset Egitto (minuti) calcolato da noi: DST (+3) dall'ultimo venerdì di aprile all'ultimo giovedì di ottobre; altrimenti +2
     function tzOffsetMin(ts){
-      try{
-        const dtf=new Intl.DateTimeFormat('en-US',{timeZone:TZ,hour12:false,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'});
-        const m={}; dtf.formatToParts(new Date(ts)).forEach(p=>m[p.type]=p.value);
-        let hh=m.hour==='24'?0:m.hour;
-        const asUTC=Date.UTC(+m.year,+m.month-1,+m.day,+hh,+m.minute,+m.second);
-        return Math.round((asUTC-ts)/60000);
-      }catch(e){ return 120; } // fallback +02:00
+      const d=new Date(ts), y=d.getUTCFullYear();
+      const aprDay=_lastWeekday(y,3,5);   // ultimo venerdì di aprile
+      const octDay=_lastWeekday(y,9,4);   // ultimo giovedì di ottobre
+      const dstStart=Date.UTC(y,3,aprDay,0,0,0)-120*60000;
+      const dstEnd=Date.UTC(y,9,octDay,24,0,0)-180*60000;
+      return (ts>=dstStart && ts<dstEnd)?180:120;
     }
     const _p2=n=>String(n).padStart(2,'0');
     // formatta usando un offset CONGELATO (salvato al momento della fattura) — così l'ora resta corretta per sempre
     function fmtFromOff(ts, off){ const d=new Date(ts+off*60000); return `${_p2(d.getUTCDate())}/${_p2(d.getUTCMonth()+1)}/${d.getUTCFullYear()}, ${_p2(d.getUTCHours())}:${_p2(d.getUTCMinutes())}`; }
     function fmtFromOffShort(ts, off){ const d=new Date(ts+off*60000); return `${_p2(d.getUTCHours())}:${_p2(d.getUTCMinutes())} · ${_p2(d.getUTCDate())}/${_p2(d.getUTCMonth()+1)}`; }
     // se è disponibile l'offset congelato (tzo) lo usa, altrimenti calcola il fuso del Cairo per quell'istante
-    const fmtDT = (ts, tzo) => (tzo!=null) ? fmtFromOff(ts,tzo) : fmtFromOff(ts, tzOffsetMin(ts));
+    const fmtDT = (ts, tzo) => fmtFromOff(ts, (tzo!=null)?tzo:tzOffsetMin(ts));
     const fmtDate = (ts, tzo) => { const off=(tzo!=null)?tzo:tzOffsetMin(ts); const d=new Date(ts+off*60000); return `${_p2(d.getUTCDate())}/${_p2(d.getUTCMonth()+1)}/${d.getUTCFullYear()}`; };
     function toast(m, err=false){ $('toast-root').innerHTML=`<div class="toast ${err?'err':''}">${err?'⚠':'✓'} ${m}</div>`; setTimeout(()=>$('toast-root').innerHTML='',2400); }
     function closeSheet(){ $('sheet-root').innerHTML=''; }
