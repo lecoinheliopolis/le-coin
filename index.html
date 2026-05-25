@@ -157,16 +157,17 @@
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
     import { getFirestore, collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBPasx-SbUqik32aA6tYSJCF7_XQgolh04",
-  authDomain: "lecoin-1f8a5.firebaseapp.com",
-  databaseURL: "https://lecoin-1f8a5-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "lecoin-1f8a5",
-  storageBucket: "lecoin-1f8a5.firebasestorage.app",
-  messagingSenderId: "671148497332",
-  appId: "1:671148497332:web:a9307722d7ad1857ac3ae1",
-  measurementId: "G-93XD4LFQ3K"
-};
+    // ============================================================
+    // ⚠️ INCOLLA QUI LA TUA CONFIGURAZIONE FIREBASE (vedi FIREBASE-SETUP.md Parte 2)
+    // ============================================================
+    const firebaseConfig = {
+      apiKey: "INCOLLA_QUI",
+      authDomain: "INCOLLA_QUI.firebaseapp.com",
+      projectId: "INCOLLA_QUI",
+      storageBucket: "INCOLLA_QUI.appspot.com",
+      messagingSenderId: "INCOLLA_QUI",
+      appId: "INCOLLA_QUI"
+    };
     // ============================================================
 
     const fbApp = initializeApp(firebaseConfig);
@@ -206,7 +207,14 @@ const firebaseConfig = {
         cashier_tab:'الكاشير', allCats:'الكل', cart:'السلة', cartEmpty:'السلة فارغة', total:'الإجمالي',
         checkout:'إتمام البيع', clearCart:'تفريغ السلة', sale:'فاتورة', qty:'الكمية', outOfStock:'نفد المخزون',
         lowStock:'منخفض', saleDone:'تم البيع', confirmClear:'تفريغ السلة؟', items:'صنف', noProdYet:'لا توجد منتجات. أضِف منتجات أولاً.',
-        addToCart:'أُضيف', removeItem:'حذف', selectBranchFirst:'اختر فرعاً', whatsapp:'إرسال واتساب', receipt:'إيصال'
+        addToCart:'أُضيف', removeItem:'حذف', selectBranchFirst:'اختر فرعاً', whatsapp:'إرسال واتساب', receipt:'إيصال',
+        reports:'التقارير', today:'اليوم', last7:'آخر ٧ أيام', salesCount:'عدد الفواتير', revenue:'الإيرادات',
+        avgSale:'متوسط الفاتورة', topProducts:'أكثر المنتجات مبيعاً', branchCompare:'مقارنة الفروع',
+        noSales:'لا توجد مبيعات بعد', loadingReports:'جارٍ تحميل التقارير...', sold:'مُباع', allBranches:'كل الفروع',
+        unitsSold:'وحدة', thisBranch:'هذا الفرع', revenueByDay:'الإيراد اليومي',
+        thisMonth:'هذا الشهر', monthRev:'إيراد الشهر', stockValue:'قيمة المخزون', atCost:'بالتكلفة',
+        atPrice:'بسعر البيع', totalStockCost:'إجمالي التكلفة', totalStockPrice:'إجمالي البيع المتوقع',
+        potentialProfit:'الربح المتوقع', units:'الكمية', noStock:'لا يوجد مخزون', stockReport:'تقرير المخزون'
       },
       en: {
         dir:'ltr', langBtn:'ع', email:'Email', pass:'Password', login:'Sign in',
@@ -235,7 +243,14 @@ const firebaseConfig = {
         cashier_tab:'Cashier', allCats:'All', cart:'Cart', cartEmpty:'Cart is empty', total:'Total',
         checkout:'Checkout', clearCart:'Clear cart', sale:'Sale', qty:'Qty', outOfStock:'Out of stock',
         lowStock:'Low', saleDone:'Sale completed', confirmClear:'Clear the cart?', items:'items', noProdYet:'No products yet. Add products first.',
-        addToCart:'Added', removeItem:'Remove', selectBranchFirst:'Select a branch', whatsapp:'Send WhatsApp', receipt:'Receipt'
+        addToCart:'Added', removeItem:'Remove', selectBranchFirst:'Select a branch', whatsapp:'Send WhatsApp', receipt:'Receipt',
+        reports:'Reports', today:'Today', last7:'Last 7 days', salesCount:'Sales', revenue:'Revenue',
+        avgSale:'Avg sale', topProducts:'Top products', branchCompare:'Branch comparison',
+        noSales:'No sales yet', loadingReports:'Loading reports...', sold:'sold', allBranches:'All branches',
+        unitsSold:'units', thisBranch:'This branch', revenueByDay:'Daily revenue',
+        thisMonth:'This month', monthRev:'Month revenue', stockValue:'Stock value', atCost:'At cost',
+        atPrice:'At sale price', totalStockCost:'Total cost', totalStockPrice:'Expected sales',
+        potentialProfit:'Potential profit', units:'Qty', noStock:'No stock', stockReport:'Stock report'
       }
     };
     let lang = localStorage.getItem('lecoin_lang') || 'ar';
@@ -333,6 +348,7 @@ const firebaseConfig = {
         tabs.push({k:'products',ico:'📦',l:t('products')});
         tabs.push({k:'categories',ico:'🏷️',l:t('categories')});
         tabs.push({k:'users',ico:'👥',l:t('users')});
+        tabs.push({k:'reports',ico:'📊',l:t('reports')});
       }
       if(profile.role==='cashier') activeTab='cassa';
       $('nav-inner').style.gridTemplateColumns=`repeat(${tabs.length},1fr)`;
@@ -343,12 +359,13 @@ const firebaseConfig = {
     function render(){
       // refresh nav labels & branch names for language
       const bs=$('branch-select'); if(bs){const cur=bs.value;bs.innerHTML=branches.map(b=>`<option value="${b.id}">${lang==='ar'?b.nameAr:b.nameEn}</option>`).join('');bs.value=cur;}
-      document.querySelectorAll('.nav-btn').forEach(b=>{const k=b.dataset.tab;b.querySelector('.lbl2').textContent=k==='cassa'?t('cashier_tab'):k==='products'?t('products'):k==='categories'?t('categories'):k==='users'?t('users'):t('cashier_tab');});
+      document.querySelectorAll('.nav-btn').forEach(b=>{const k=b.dataset.tab;b.querySelector('.lbl2').textContent=k==='cassa'?t('cashier_tab'):k==='products'?t('products'):k==='categories'?t('categories'):k==='users'?t('users'):k==='reports'?t('reports'):t('cashier_tab');});
       if(activeTab==='cassa') renderCassa();
       else { const cb=$('cart-bar-root'); if(cb) cb.innerHTML=''; 
         if(activeTab==='products') renderProducts();
         else if(activeTab==='categories') renderCategories();
         else if(activeTab==='users') renderUsers();
+        else if(activeTab==='reports') renderReports();
         else renderCassa();
       }
     }
@@ -693,6 +710,119 @@ const firebaseConfig = {
           }
         }catch(e){console.error(e);toast(t('errorGen'),true);$('u-save').textContent='✓ '+t('save');}
       };
+    }
+
+    // ============ REPORTS (تقارير) ============
+    function dayStart( d){ const x=new Date(d); x.setHours(0,0,0,0); return x.getTime(); }
+    async function renderReports(){
+      $('content').innerHTML=`<div class="spinner"></div><div style="text-align:center;color:rgba(26,26,26,0.5);font-size:13px;">${t('loadingReports')}</div>`;
+      // quali branch può vedere
+      const visibleBranchIds = profile.role==='admin' ? branches.map(b=>b.id) : (profile.branchIds||[]);
+      let sales=[];
+      try{
+        // admin: tutte le vendite; manager: solo i suoi branch (query per branch)
+        if(profile.role==='admin'){
+          const qs=await getDocs(collection(db,'sales'));
+          qs.forEach(d=>sales.push(d.data()));
+        } else {
+          for(const bid of visibleBranchIds){
+            const qs=await getDocs(query(collection(db,'sales'),where('branchId','==',bid)));
+            qs.forEach(d=>sales.push(d.data()));
+          }
+        }
+      }catch(e){ console.error(e); $('content').innerHTML=`<div class="card"><div class="empty">${t('errorGen')}</div></div>`; return; }
+
+      if(sales.length===0){ $('content').innerHTML=`<div class="card"><div class="empty">${t('noSales')}</div></div>`; return; }
+
+      const now=Date.now(); const todayStart=dayStart(now); const weekStart=todayStart-6*86400000;
+      const monthD=new Date(now); const monthStart=new Date(monthD.getFullYear(),monthD.getMonth(),1).getTime();
+      const todaySales=sales.filter(s=>s.createdAt>=todayStart);
+      const weekSales=sales.filter(s=>s.createdAt>=weekStart);
+      const monthSales=sales.filter(s=>s.createdAt>=monthStart);
+      const sum=arr=>arr.reduce((a,s)=>a+(s.total||0),0);
+      const todayRev=sum(todaySales), weekRev=sum(weekSales), monthRev=sum(monthSales);
+      const avg=todaySales.length?Math.round(todayRev/todaySales.length):0;
+
+      // top prodotti (ultimi 7 giorni)
+      const prodMap={};
+      weekSales.forEach(s=>(s.items||[]).forEach(it=>{ if(!prodMap[it.productId])prodMap[it.productId]={name:it.name,qty:0,rev:0}; prodMap[it.productId].qty+=it.qty; prodMap[it.productId].rev+=it.subtotal||0; }));
+      const top=Object.values(prodMap).sort((a,b)=>b.qty-a.qty).slice(0,5);
+      const maxQty=top.length?top[0].qty:1;
+
+      // ricavo per giorno (ultimi 7)
+      const days=[]; for(let i=6;i>=0;i--){ const ds=todayStart-i*86400000; const de=ds+86400000; const r=sum(sales.filter(s=>s.createdAt>=ds&&s.createdAt<de)); const dd=new Date(ds); days.push({label:`${dd.getDate()}/${dd.getMonth()+1}`,rev:r}); }
+      const maxDay=Math.max(1,...days.map(d=>d.rev));
+
+      // confronto filiali (ultimi 7 giorni)
+      const branchMap={};
+      weekSales.forEach(s=>{ branchMap[s.branchId]=(branchMap[s.branchId]||0)+(s.total||0); });
+      const branchRows=branches.filter(b=>visibleBranchIds.includes(b.id)).map(b=>({name:lang==='ar'?b.nameAr:b.nameEn,rev:branchMap[b.id]||0})).sort((a,b)=>b.rev-a.rev);
+      const maxBranch=Math.max(1,...branchRows.map(b=>b.rev));
+
+      const kpi=(label,val,sub)=>`<div class="card" style="margin-bottom:0;flex:1;min-width:0;padding:14px;"><div style="font-size:10px;letter-spacing:0.5px;color:rgba(26,26,26,0.55);font-weight:700;">${label}</div><div class="num" style="font-size:22px;font-weight:700;color:var(--forest);margin-top:4px;">${val}</div><div style="font-size:11px;color:rgba(26,26,26,0.5);">${sub}</div></div>`;
+
+      let html=`<div style="font-size:11px;letter-spacing:1px;color:var(--forest);font-weight:700;margin-bottom:12px;">${t('reports').toUpperCase()}</div>`;
+      // KPI oggi vs mese
+      html+=`<div style="display:flex;gap:10px;margin-bottom:14px;">
+        ${kpi(t('today'),fmt(todayRev)+' '+t('currency'),todaySales.length+' '+t('salesCount'))}
+        ${kpi(t('thisMonth'),fmt(monthRev)+' '+t('currency'),monthSales.length+' '+t('salesCount'))}
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:14px;">
+        ${kpi(t('avgSale'),fmt(avg)+' '+t('currency'),t('today'))}
+        ${kpi(t('last7'),fmt(weekRev)+' '+t('currency'),weekSales.length+' '+t('salesCount'))}
+      </div>`;
+      // ricavo 7 giorni (barre)
+      html+=`<div class="card"><div class="card-title">📈 ${t('revenueByDay')} · ${t('last7')}</div>
+        <div style="display:flex;align-items:flex-end;gap:6px;height:110px;">
+        ${days.map(d=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end;">
+          <div style="width:100%;background:var(--gold);border-radius:6px 6px 0 0;height:${Math.round(d.rev/maxDay*80)||2}px;min-height:2px;"></div>
+          <div class="num" style="font-size:9px;color:rgba(26,26,26,0.5);">${d.label}</div>
+        </div>`).join('')}
+        </div>
+        <div style="text-align:center;margin-top:10px;font-size:12px;color:rgba(26,26,26,0.6);">${t('revenue')} ${t('last7')}: <span class="num" style="font-weight:700;color:var(--forest);">${fmt(weekRev)} ${t('currency')}</span></div>
+      </div>`;
+      // top prodotti
+      html+=`<div class="card"><div class="card-title">🏆 ${t('topProducts')} · ${t('last7')}</div>`;
+      if(top.length===0) html+=`<div class="empty">${t('noSales')}</div>`;
+      else html+=top.map(p=>`<div style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px;"><span class="fr" dir="ltr">${p.name}</span><span class="num" style="color:rgba(26,26,26,0.6);">${p.qty} ${t('unitsSold')} · ${fmt(p.rev)} ${t('currency')}</span></div>
+        <div style="background:var(--ivory-dark);border-radius:6px;height:7px;overflow:hidden;"><div style="background:var(--forest);height:100%;width:${Math.round(p.qty/maxQty*100)}%;"></div></div>
+      </div>`).join('');
+      html+=`</div>`;
+      // confronto filiali (solo se >1 visibile)
+      if(branchRows.length>1){
+        html+=`<div class="card"><div class="card-title">🏬 ${t('branchCompare')} · ${t('last7')}</div>`;
+        html+=branchRows.map(b=>`<div style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px;"><span>${b.name}</span><span class="num" style="font-weight:700;color:var(--forest);">${fmt(b.rev)} ${t('currency')}</span></div>
+          <div style="background:var(--ivory-dark);border-radius:6px;height:7px;overflow:hidden;"><div style="background:var(--gold);height:100%;width:${Math.round(b.rev/maxBranch*100)}%;"></div></div>
+        </div>`).join('');
+        html+=`</div>`;
+      }
+      // قيمة المخزون (للفرع الحالي) — بالتكلفة وبسعر البيع
+      let totCost=0, totPrice=0; const stockRows=[];
+      products.filter(p=>p.active!==false).forEach(p=>{
+        const inv=inventory[p.id]||{qty:0}; const q=inv.qty||0; if(q<=0)return;
+        const cost=(p.cost||0)*q, price=(p.price||0)*q;
+        totCost+=cost; totPrice+=price;
+        stockRows.push({name:p.name,qty:q,cost,price});
+      });
+      stockRows.sort((a,b)=>b.cost-a.cost);
+      const curBranchName=(()=>{const b=branches.find(x=>x.id===currentBranchId);return b?(lang==='ar'?b.nameAr:b.nameEn):'';})();
+      html+=`<div class="card"><div class="card-title">📦 ${t('stockValue')} · ${curBranchName}</div>`;
+      if(stockRows.length===0) html+=`<div class="empty">${t('noStock')}</div>`;
+      else{
+        html+=`<div style="display:flex;gap:10px;margin-bottom:12px;">
+          <div style="flex:1;background:rgba(31,58,46,0.05);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;color:rgba(26,26,26,0.55);font-weight:700;">${t('totalStockCost')}</div><div class="num" style="font-size:18px;font-weight:700;color:var(--forest);margin-top:3px;">${fmt(totCost)} ${t('currency')}</div></div>
+          <div style="flex:1;background:rgba(201,168,76,0.12);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;color:rgba(26,26,26,0.55);font-weight:700;">${t('totalStockPrice')}</div><div class="num" style="font-size:18px;font-weight:700;color:var(--amber);margin-top:3px;">${fmt(totPrice)} ${t('currency')}</div></div>
+        </div>
+        <div style="background:rgba(61,115,85,0.1);border-radius:10px;padding:8px 12px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:12px;font-weight:600;color:var(--green);">${t('potentialProfit')}</span><span class="num" style="font-weight:700;color:var(--green);">${fmt(totPrice-totCost)} ${t('currency')}</span></div>`;
+        html+=stockRows.map(r=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--ivory-dark);">
+          <div style="min-width:0;"><div class="fr" dir="ltr" style="font-size:14px;">${r.name}</div><div class="num" style="font-size:11px;color:rgba(26,26,26,0.5);">${r.qty} ${t('units')}</div></div>
+          <div style="text-align:end;"><div class="num" style="font-size:13px;font-weight:700;color:var(--forest);">${fmt(r.cost)} ${t('currency')}</div><div class="num" style="font-size:11px;color:var(--amber);">${fmt(r.price)} ${t('currency')}</div></div>
+        </div>`).join('');
+      }
+      html+=`</div>`;
+      $('content').innerHTML=html;
     }
 
     // ============ HELPERS ============
