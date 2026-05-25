@@ -362,8 +362,23 @@
     const fmt = n => Math.abs(n||0).toLocaleString('en-US',{maximumFractionDigits:0});
     // Orario sempre su fuso del Cairo (Egitto), 24h, cifre occidentali — non dipende dal fuso del dispositivo
     const TZ='Africa/Cairo';
-    const fmtDT = ts => new Date(ts).toLocaleString('en-GB',{timeZone:TZ,day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false});
-    const fmtDate = ts => new Date(ts).toLocaleDateString('en-GB',{timeZone:TZ,day:'2-digit',month:'2-digit',year:'numeric'});
+    // calcola l'offset (minuti) che il Cairo aveva in un dato istante — tiene conto di ora legale/solare di quel momento
+    function tzOffsetMin(ts){
+      try{
+        const dtf=new Intl.DateTimeFormat('en-US',{timeZone:TZ,hour12:false,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+        const m={}; dtf.formatToParts(new Date(ts)).forEach(p=>m[p.type]=p.value);
+        let hh=m.hour==='24'?0:m.hour;
+        const asUTC=Date.UTC(+m.year,+m.month-1,+m.day,+hh,+m.minute,+m.second);
+        return Math.round((asUTC-ts)/60000);
+      }catch(e){ return 120; } // fallback +02:00
+    }
+    const _p2=n=>String(n).padStart(2,'0');
+    // formatta usando un offset CONGELATO (salvato al momento della fattura) — così l'ora resta corretta per sempre
+    function fmtFromOff(ts, off){ const d=new Date(ts+off*60000); return `${_p2(d.getUTCDate())}/${_p2(d.getUTCMonth()+1)}/${d.getUTCFullYear()}, ${_p2(d.getUTCHours())}:${_p2(d.getUTCMinutes())}`; }
+    function fmtFromOffShort(ts, off){ const d=new Date(ts+off*60000); return `${_p2(d.getUTCHours())}:${_p2(d.getUTCMinutes())} · ${_p2(d.getUTCDate())}/${_p2(d.getUTCMonth()+1)}`; }
+    // se è disponibile l'offset congelato (tzo) lo usa, altrimenti calcola il fuso del Cairo per quell'istante
+    const fmtDT = (ts, tzo) => (tzo!=null) ? fmtFromOff(ts,tzo) : fmtFromOff(ts, tzOffsetMin(ts));
+    const fmtDate = (ts, tzo) => { const off=(tzo!=null)?tzo:tzOffsetMin(ts); const d=new Date(ts+off*60000); return `${_p2(d.getUTCDate())}/${_p2(d.getUTCMonth()+1)}/${d.getUTCFullYear()}`; };
     function toast(m, err=false){ $('toast-root').innerHTML=`<div class="toast ${err?'err':''}">${err?'⚠':'✓'} ${m}</div>`; setTimeout(()=>$('toast-root').innerHTML='',2400); }
     function closeSheet(){ $('sheet-root').innerHTML=''; }
 
@@ -602,13 +617,14 @@
         const items=cart.map(i=>({productId:i.id,name:i.name,price:i.price,qty:i.qty,subtotal:i.price*i.qty}));
         const total=cartTotal();
         const createdAt=Date.now();
+        const tzo=tzOffsetMin(createdAt); // congela l'offset (estate/inverno) al momento della fattura
         const receiptNo=Number(String(createdAt).slice(-6)); // numero fattura stabile
         const paidAmt=(paid==null||isNaN(paid))?total:paid;
         const change=Math.max(0,paidAmt-total);
         // 1) registra la vendita
         const ref=await addDoc(collection(db,'sales'),{
           branchId:currentBranchId, userId:user.uid, userName:profile.name||user.email,
-          items, total, count:cartCount(), receiptNo, paid:paidAmt, change, createdAt
+          items, total, count:cartCount(), receiptNo, paid:paidAmt, change, createdAt, tzo
         });
         // 2) scala l'inventario di questo branch
         for(const i of cart){
@@ -617,7 +633,7 @@
           await setDoc(doc(db,'inventory',`${currentBranchId}_${i.id}`),{branchId:currentBranchId,productId:i.id,qty:nq,threshold:cur.threshold||20,lastCost:cur.lastCost||0},{merge:true});
           inventory[i.id]={qty:nq,threshold:cur.threshold||20,lastCost:cur.lastCost||0};
         }
-        const sale={id:ref.id,branchId:currentBranchId,userName:profile.name||user.email,items,total,count:cartCount(),receiptNo,paid:paidAmt,change,createdAt};
+        const sale={id:ref.id,branchId:currentBranchId,userName:profile.name||user.email,items,total,count:cartCount(),receiptNo,paid:paidAmt,change,createdAt,tzo};
         cart=[]; closeSheet(); renderCassa(); toast(t('saleDone'));
         showReceipt(sale); // mostra la fattura automaticamente
       }catch(e){ console.error(e); toast(t('errorGen'),true); if(cb){ cb.textContent='✓ '+t('confirmPay'); cb.disabled=false; } }
@@ -627,7 +643,7 @@
     function receiptBranchName(bid){ const b=branches.find(x=>x.id===bid); return b?(lang==='ar'?b.nameAr:b.nameEn):''; }
     function showReceipt(sale){
       const bn=receiptBranchName(sale.branchId);
-      const dt=fmtDT(sale.createdAt);
+      const dt=fmtDT(sale.createdAt,sale.tzo);
       const rows=(sale.items||[]).map(i=>`<div style="display:flex;gap:8px;align-items:center;padding:7px 0;border-bottom:1px dashed var(--ivory-dark);">
         <div style="flex:1;min-width:0;"><div class="fr" dir="ltr" style="font-size:14px;font-weight:500;">${i.name}</div><div class="num" style="font-size:11px;color:rgba(26,26,26,0.55);">${i.qty} × ${fmt(i.price)}</div></div>
         <div class="num" style="font-weight:700;font-size:14px;">${fmt(i.subtotal)} ${t('currency')}</div>
@@ -749,7 +765,7 @@
     }
     function printReceipt(sale){
       const bn=receiptBranchName(sale.branchId);
-      const dt=fmtDT(sale.createdAt);
+      const dt=fmtDT(sale.createdAt,sale.tzo);
       const dir=T[lang].dir;
       const w=window.open('','_blank'); if(!w){ toast(t('errorGen'),true); return; }
       const rows=(sale.items||[]).map(i=>`<tr><td style="text-align:start;">${i.name}</td><td>${i.qty}</td><td>${fmt(i.price)}</td><td>${fmt(i.subtotal)}</td></tr>`).join('');
@@ -847,7 +863,7 @@
         return `<div class="rcpt-row" data-id="${s.id}" style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:11px 0;border-bottom:1px solid var(--ivory-dark);cursor:pointer;">
         <div style="min-width:0;">
           <div style="font-weight:700;font-size:14px;">#${s.receiptNo||'—'} <span style="font-weight:400;font-size:11px;color:rgba(26,26,26,0.5);">· ${(s.count||(s.items?s.items.length:0))} ${t('items_n')}</span> ${badge}</div>
-          <div class="num" style="font-size:11px;color:rgba(26,26,26,0.55);">${fmtDT(s.createdAt)} · ${s.userName||''}</div>
+          <div class="num" style="font-size:11px;color:rgba(26,26,26,0.55);">${fmtDT(s.createdAt,s.tzo)} · ${s.userName||''}</div>
         </div>
         <div style="text-align:end;white-space:nowrap;"><div class="num" style="font-weight:700;font-size:15px;color:${s.voided?'rgba(26,26,26,0.4)':'var(--forest)'};${s.voided?'text-decoration:line-through;':''}">${fmt(s.total||0)} ${t('currency')}</div>${s.refundTotal>0&&!s.voided?`<div class="num" style="font-size:11px;color:var(--red);">${t('netTotal')}: ${fmt(net)}</div>`:''}</div>
       </div>`;}).join('')+`</div>`;
@@ -1294,7 +1310,7 @@
     function pausedMsOf(sh, until){ const end=until||Date.now(); return (sh.pauses||[]).reduce((a,p)=>a+((p.end||end)-p.start),0); }
     function workedMsOf(sh, until){ const end=until||sh.closeAt||Date.now(); return Math.max(0,(end-sh.openAt)-pausedMsOf(sh,end)); }
     function isOnPause(sh){ const ps=sh.pauses||[]; return ps.length>0 && !ps[ps.length-1].end; }
-    function fmtTime(ts){ return new Date(ts).toLocaleString('en-GB',{timeZone:TZ,hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit',hour12:false}); }
+    function fmtTime(ts, tzo){ const off=(tzo!=null)?tzo:tzOffsetMin(ts); return fmtFromOffShort(ts,off); }
 
     async function loadShifts(){
       myShift=null; shifts=[];
