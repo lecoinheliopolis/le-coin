@@ -360,6 +360,10 @@
     // assegna il logo (base64) alle immagini
     (function setLogos(){ const a=$('login-logo'),b=$('header-logo'); if(a)a.src=LOGO; if(b)b.src=LOGO; })();
     const fmt = n => Math.abs(n||0).toLocaleString('en-US',{maximumFractionDigits:0});
+    // Orario sempre su fuso del Cairo (Egitto), 24h, cifre occidentali — non dipende dal fuso del dispositivo
+    const TZ='Africa/Cairo';
+    const fmtDT = ts => new Date(ts).toLocaleString('en-GB',{timeZone:TZ,day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false});
+    const fmtDate = ts => new Date(ts).toLocaleDateString('en-GB',{timeZone:TZ,day:'2-digit',month:'2-digit',year:'numeric'});
     function toast(m, err=false){ $('toast-root').innerHTML=`<div class="toast ${err?'err':''}">${err?'⚠':'✓'} ${m}</div>`; setTimeout(()=>$('toast-root').innerHTML='',2400); }
     function closeSheet(){ $('sheet-root').innerHTML=''; }
 
@@ -623,7 +627,7 @@
     function receiptBranchName(bid){ const b=branches.find(x=>x.id===bid); return b?(lang==='ar'?b.nameAr:b.nameEn):''; }
     function showReceipt(sale){
       const bn=receiptBranchName(sale.branchId);
-      const dt=new Date(sale.createdAt).toLocaleString(lang==='ar'?'ar-EG':'en-US');
+      const dt=fmtDT(sale.createdAt);
       const rows=(sale.items||[]).map(i=>`<div style="display:flex;gap:8px;align-items:center;padding:7px 0;border-bottom:1px dashed var(--ivory-dark);">
         <div style="flex:1;min-width:0;"><div class="fr" dir="ltr" style="font-size:14px;font-weight:500;">${i.name}</div><div class="num" style="font-size:11px;color:rgba(26,26,26,0.55);">${i.qty} × ${fmt(i.price)}</div></div>
         <div class="num" style="font-weight:700;font-size:14px;">${fmt(i.subtotal)} ${t('currency')}</div>
@@ -745,7 +749,7 @@
     }
     function printReceipt(sale){
       const bn=receiptBranchName(sale.branchId);
-      const dt=new Date(sale.createdAt).toLocaleString(lang==='ar'?'ar-EG':'en-US');
+      const dt=fmtDT(sale.createdAt);
       const dir=T[lang].dir;
       const w=window.open('','_blank'); if(!w){ toast(t('errorGen'),true); return; }
       const rows=(sale.items||[]).map(i=>`<tr><td style="text-align:start;">${i.name}</td><td>${i.qty}</td><td>${fmt(i.price)}</td><td>${fmt(i.subtotal)}</td></tr>`).join('');
@@ -843,7 +847,7 @@
         return `<div class="rcpt-row" data-id="${s.id}" style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:11px 0;border-bottom:1px solid var(--ivory-dark);cursor:pointer;">
         <div style="min-width:0;">
           <div style="font-weight:700;font-size:14px;">#${s.receiptNo||'—'} <span style="font-weight:400;font-size:11px;color:rgba(26,26,26,0.5);">· ${(s.count||(s.items?s.items.length:0))} ${t('items_n')}</span> ${badge}</div>
-          <div class="num" style="font-size:11px;color:rgba(26,26,26,0.55);">${new Date(s.createdAt).toLocaleString(lang==='ar'?'ar-EG':'en-US')} · ${s.userName||''}</div>
+          <div class="num" style="font-size:11px;color:rgba(26,26,26,0.55);">${fmtDT(s.createdAt)} · ${s.userName||''}</div>
         </div>
         <div style="text-align:end;white-space:nowrap;"><div class="num" style="font-weight:700;font-size:15px;color:${s.voided?'rgba(26,26,26,0.4)':'var(--forest)'};${s.voided?'text-decoration:line-through;':''}">${fmt(s.total||0)} ${t('currency')}</div>${s.refundTotal>0&&!s.voided?`<div class="num" style="font-size:11px;color:var(--red);">${t('netTotal')}: ${fmt(net)}</div>`:''}</div>
       </div>`;}).join('')+`</div>`;
@@ -1290,7 +1294,7 @@
     function pausedMsOf(sh, until){ const end=until||Date.now(); return (sh.pauses||[]).reduce((a,p)=>a+((p.end||end)-p.start),0); }
     function workedMsOf(sh, until){ const end=until||sh.closeAt||Date.now(); return Math.max(0,(end-sh.openAt)-pausedMsOf(sh,end)); }
     function isOnPause(sh){ const ps=sh.pauses||[]; return ps.length>0 && !ps[ps.length-1].end; }
-    function fmtTime(ts){ return new Date(ts).toLocaleString(lang==='ar'?'ar-EG':'en-US',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'}); }
+    function fmtTime(ts){ return new Date(ts).toLocaleString('en-GB',{timeZone:TZ,hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit',hour12:false}); }
 
     async function loadShifts(){
       myShift=null; shifts=[];
@@ -1613,7 +1617,7 @@
       </div>`).join('');
       let html=`<div style="font-size:11px;letter-spacing:1px;color:var(--forest);font-weight:700;margin-bottom:12px;">${t('invReport').toUpperCase()}</div>
         <div class="card"><div class="card-title">📄 ${t('invReport')} · ${bn}</div>
-        <div style="font-size:12px;color:rgba(26,26,26,0.55);margin-bottom:10px;">${t('invDate')}: <span class="num">${dt.toLocaleString(lang==='ar'?'ar-EG':'en-US')}</span></div>
+        <div style="font-size:12px;color:rgba(26,26,26,0.55);margin-bottom:10px;">${t('invDate')}: <span class="num">${fmtDT(dt.getTime())}</span></div>
         <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
           <div style="flex:1;background:rgba(31,58,46,0.05);border-radius:10px;padding:9px;text-align:center;min-width:70px;"><div style="font-size:10px;color:rgba(26,26,26,0.55);font-weight:700;">${t('totalItems')}</div><div class="num" style="font-size:17px;font-weight:700;">${counted}</div></div>
           <div style="flex:1;background:rgba(216,142,42,0.1);border-radius:10px;padding:9px;text-align:center;min-width:70px;"><div style="font-size:10px;color:rgba(26,26,26,0.55);font-weight:700;">${t('surplus')}</div><div class="num" style="font-size:17px;font-weight:700;color:var(--amber);">${surplus}</div></div>
@@ -1628,7 +1632,7 @@
           <button class="btn-secondary btn-wide" id="inv-dl">⬇️ ${t('download')}</button>
         </div></div>`;
       $('content').innerHTML=html;
-      const title=`${t('invReport')} · ${bn} · ${dt.toLocaleDateString(lang==='ar'?'ar-EG':'en-US')}`;
+      const title=`${t('invReport')} · ${bn} · ${fmtDate(dt.getTime())}`;
       $('inv-print').onclick=()=>{
         const body=`<table><thead><tr><th>${t('name')}</th><th>${t('systemQty')}</th><th>${t('countedQty')}</th><th>${t('diff')}</th><th>${t('valueImpact')} (${t('currency')})</th></tr></thead><tbody>
           ${lines.map(l=>`<tr><td>${l.name}</td><td>${l.system}</td><td>${l.counted}</td><td class="${l.diff<0?'neg':'pos'}">${sgn(l.diff)}</td><td>${sgn(l.diff*l.cost)}</td></tr>`).join('')}
@@ -1655,7 +1659,7 @@
         th,td{border:1px solid #ddd;padding:7px 9px;text-align:${align};}
         th{background:#1F3A2E;color:#fff;font-weight:600;}.tot{font-weight:700;background:#F0EADC;}
         .pos{color:#C04848;}.neg{color:#3D7355;}h2{color:#1F3A2E;font-size:15px;margin:18px 0 8px;}</style></head>
-        <body><h1>Le Coin</h1><div class="sub">${title} — ${new Date().toLocaleString(lang==='ar'?'ar-EG':'en-US')}</div>${bodyHtml}</body></html>`);
+        <body><h1>Le Coin</h1><div class="sub">${title} — ${fmtDT(Date.now())}</div>${bodyHtml}</body></html>`);
       w.document.close(); w.focus(); setTimeout(()=>{ try{w.print();}catch(e){} },400);
     }
     function downloadCSV(filename, header, rows){
