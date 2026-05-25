@@ -106,6 +106,10 @@
     /* CART bar */
     .cart-bar { position:fixed; bottom:62px; left:0; right:0; z-index:35; padding:0 12px; pointer-events:none; }
     .cart-inner { max-width:900px; margin:0 auto; background:var(--forest); color:var(--ivory); border-radius:14px; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 8px 28px rgba(0,0,0,0.28); pointer-events:auto; cursor:pointer; }
+    .cart-panel { max-width:900px; margin:0 auto; background:var(--ivory); border-radius:16px 16px 0 0; box-shadow:0 -8px 30px rgba(0,0,0,0.22); pointer-events:auto; overflow:hidden; border:1px solid var(--ivory-dark); }
+    .cart-panel-head { background:var(--forest); color:var(--ivory); padding:10px 16px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
+    .cart-panel-items { max-height:38vh; overflow-y:auto; padding:4px 14px; }
+    .cart-mini-line { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--ivory-dark); }
     .cart-count { background:var(--gold); color:var(--forest-dark); border-radius:999px; min-width:24px; height:24px; padding:0 7px; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; }
     /* cart sheet rows */
     .cart-line { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--ivory-dark); }
@@ -229,6 +233,18 @@
         noShiftsYet:'لا توجد ورديات بعد', hShort:'س', mShort:'د', byUser:'الكاشير', cashOver:'زيادة', cashShort:'عجز',
         branches_tab:'الفروع', addBranch:'فرع جديد', editBranch:'تعديل الفرع', noBranchesYet:'لا توجد فروع',
         confirmDelBranch:'متأكد إنك عايز تمسح الفرع؟ ممكن يأثر على بيانات مرتبطة بيه (منتجات/مبيعات). يُفضّل توقفه بدل ما تمسحه.',
+        receipts_tab:'الفواتير', receipt:'فاتورة', receiptNo:'رقم الفاتورة', thankYou:'شكراً لزيارتك · Merci · نسعد بعودتك',
+        itemCol:'الصنف', qtyCol:'الكمية', priceCol:'السعر', subtotalCol:'الإجمالي', cashierLbl:'الكاشير',
+        noSales:'لا توجد فواتير', viewReceipt:'عرض الفاتورة', saleTime:'التاريخ', items_n:'صنف', newSale:'بيعة جديدة',
+        refund:'استرداد', voidInvoice:'إلغاء الفاتورة', returnItems:'استرداد أصناف', returnedQty:'الكمية المرتجعة',
+        backToStock:'ترجع للمخزون؟', confirmVoid:'متأكد إنك عايز تلغي الفاتورة كلها؟ هترجع البضاعة المختارة للمخزون.',
+        voidedLbl:'ملغاة', refundedLbl:'استُرد جزئياً', refundedAmount:'المبلغ المسترد', netTotal:'الصافي',
+        returnDone:'تم الاسترداد', alreadyVoided:'الفاتورة ملغاة بالفعل', selectReturnQty:'اكتب الكمية المرتجعة لكل صنف',
+        nothingToReturn:'مفيش كمية متاحة للاسترداد', doReturn:'تنفيذ الاسترداد', returnedSoFar:'مرتجع',
+        payTitle:'الدفع', amountPaid:'المبلغ المدفوع', payExact:'دفع بالظبط', changeDue:'الباقي', enterAmount:'أدخل المبلغ',
+        confirmPay:'تأكيد الدفع', insufficient:'المبلغ أقل من المطلوب', received:'المستلم', collapse:'إخفاء',
+        fromDate:'من تاريخ', toDate:'إلى تاريخ', allCashiers:'كل الكاشيرز', minAmount:'أقل مبلغ', maxAmount:'أكبر مبلغ',
+        results:'النتائج', clearFilters:'مسح الفلاتر', searchByNo:'رقم الفاتورة', netSum:'إجمالي الصافي', filters:'بحث وفلترة',
         warehouse:'المخزن', receive:'استلام بضاعة', receiveQty:'الكمية المستلمة', newCost:'التكلفة الجديدة (للوحدة)',
         receiveDone:'تم الاستلام', currentQty:'الكمية الحالية', afterReceive:'بعد الاستلام', selectProduct:'— اختر المنتج —',
         physInv:'الجرد الفعلي', countedQty:'الكمية المعدودة', systemQty:'كمية النظام', diff:'الفرق',
@@ -292,6 +308,18 @@
         noShiftsYet:'No shifts yet', hShort:'h', mShort:'m', byUser:'Cashier', cashOver:'Over', cashShort:'Short',
         branches_tab:'Branches', addBranch:'New branch', editBranch:'Edit branch', noBranchesYet:'No branches',
         confirmDelBranch:'Delete this branch? It may affect related data (products/sales). Disabling it is safer than deleting.',
+        receipts_tab:'Receipts', receipt:'Receipt', receiptNo:'Receipt no.', thankYou:'Thank you · Merci · See you soon',
+        itemCol:'Item', qtyCol:'Qty', priceCol:'Price', subtotalCol:'Subtotal', cashierLbl:'Cashier',
+        noSales:'No receipts', viewReceipt:'View receipt', saleTime:'Date', items_n:'items', newSale:'New sale',
+        refund:'Refund', voidInvoice:'Void invoice', returnItems:'Return items', returnedQty:'Returned qty',
+        backToStock:'Return to stock?', confirmVoid:'Void the whole invoice? Selected goods will be restored to stock.',
+        voidedLbl:'Voided', refundedLbl:'Partially refunded', refundedAmount:'Refunded amount', netTotal:'Net',
+        returnDone:'Refund done', alreadyVoided:'Invoice already voided', selectReturnQty:'Enter returned qty per item',
+        nothingToReturn:'Nothing available to return', doReturn:'Process refund', returnedSoFar:'returned',
+        payTitle:'Payment', amountPaid:'Amount paid', payExact:'Exact amount', changeDue:'Change', enterAmount:'Enter amount',
+        confirmPay:'Confirm payment', insufficient:'Amount is less than total', received:'Received', collapse:'Hide',
+        fromDate:'From date', toDate:'To date', allCashiers:'All cashiers', minAmount:'Min', maxAmount:'Max',
+        results:'Results', clearFilters:'Clear filters', searchByNo:'Receipt no.', netSum:'Net total', filters:'Search & filter',
         warehouse:'Warehouse', receive:'Receive goods', receiveQty:'Quantity received', newCost:'New unit cost',
         receiveDone:'Goods received', currentQty:'Current qty', afterReceive:'After receiving', selectProduct:'— select product —',
         physInv:'Physical inventory', countedQty:'Counted qty', systemQty:'System qty', diff:'Difference',
@@ -408,6 +436,7 @@
       const tabs=[];
       tabs.push({k:'cassa',ico:'🛒',l:t('cashier_tab')});
       tabs.push({k:'shift',ico:'🕐',l:t('shift_tab')});
+      tabs.push({k:'receipts',ico:'🧾',l:t('receipts_tab')});
       if(profile.role==='admin'||profile.role==='manager'){
         tabs.push({k:'products',ico:'📦',l:t('products')});
         tabs.push({k:'categories',ico:'🏷️',l:t('categories')});
@@ -425,13 +454,14 @@
     function render(){
       // refresh nav labels & branch names for language
       const bs=$('branch-select'); if(bs){const cur=bs.value;bs.innerHTML=branches.map(b=>`<option value="${b.id}">${lang==='ar'?b.nameAr:b.nameEn}</option>`).join('');bs.value=cur;}
-      document.querySelectorAll('.nav-btn').forEach(b=>{const k=b.dataset.tab;b.querySelector('.lbl2').textContent=k==='cassa'?t('cashier_tab'):k==='shift'?t('shift_tab'):k==='products'?t('products'):k==='categories'?t('categories'):k==='warehouse'?t('warehouse'):k==='users'?t('users'):k==='reports'?t('reports'):k==='branches'?t('branches_tab'):t('cashier_tab');});
+      document.querySelectorAll('.nav-btn').forEach(b=>{const k=b.dataset.tab;b.querySelector('.lbl2').textContent=k==='cassa'?t('cashier_tab'):k==='shift'?t('shift_tab'):k==='receipts'?t('receipts_tab'):k==='products'?t('products'):k==='categories'?t('categories'):k==='warehouse'?t('warehouse'):k==='users'?t('users'):k==='reports'?t('reports'):k==='branches'?t('branches_tab'):t('cashier_tab');});
       if(activeTab==='cassa') renderCassa();
       else { const cb=$('cart-bar-root'); if(cb) cb.innerHTML=''; 
         if(activeTab==='products') renderProducts();
         else if(activeTab==='categories') renderCategories();
         else if(activeTab==='warehouse') renderWarehouse();
         else if(activeTab==='shift') renderShift();
+        else if(activeTab==='receipts') renderReceipts();
         else if(activeTab==='users') renderUsers();
         else if(activeTab==='reports') renderReports();
         else if(activeTab==='branches') renderBranches();
@@ -442,6 +472,7 @@
     // ============ CASSA / CASHIER (vendita) ============
     let cart=[]; // {id,name,price,photoUrl,qty}
     let posCatFilter='all';
+    let cartExpanded=true; // il pannello carrello si apre dal basso e cresce mentre aggiungi
     function cartCount(){ return cart.reduce((s,i)=>s+i.qty,0); }
     function cartTotal(){ return cart.reduce((s,i)=>s+i.price*i.qty,0); }
     function addToCart(p){
@@ -451,8 +482,8 @@
       if(inCart+1>(inv.qty||0)){ toast(t('outOfStock'),true); return; }
       if(existing) existing.qty++;
       else cart.push({id:p.id,name:p.name,price:p.price,photoUrl:p.photoUrl||'',qty:1});
+      cartExpanded=true; // si apre/cresce dal basso
       renderCartBar();
-      toast(t('addToCart'));
     }
     function setQty(id,delta){
       const it=cart.find(i=>i.id===id); if(!it)return;
@@ -461,18 +492,45 @@
       if(nv<=0){ cart=cart.filter(i=>i.id!==id); }
       else if(nv>(inv.qty||0)){ toast(t('outOfStock'),true); return; }
       else it.qty=nv;
-      // ridisegna sia la barra che lo sheet se aperto
       renderCartBar();
-      if($('cart-sheet-body')) renderCartSheet();
     }
     function renderCartBar(){
       const root=$('cart-bar-root'); if(!root) return;
       if(cart.length===0){ root.innerHTML=''; return; }
-      root.innerHTML=`<div class="cart-bar"><div class="cart-inner" id="open-cart">
-        <span style="display:flex;align-items:center;gap:10px;"><span class="cart-count">${cartCount()}</span><span style="font-size:13px;">${t('cart')}</span></span>
-        <span class="num" style="font-weight:700;font-size:16px;">${fmt(cartTotal())} ${t('currency')}</span>
+      if(!cartExpanded){
+        // barra sottile (cliccare per espandere)
+        root.innerHTML=`<div class="cart-bar"><div class="cart-inner" id="open-cart">
+          <span style="display:flex;align-items:center;gap:10px;"><span class="cart-count">${cartCount()}</span><span style="font-size:13px;">${t('cart')}</span></span>
+          <span class="num" style="font-weight:700;font-size:16px;">${fmt(cartTotal())} ${t('currency')}</span>
+        </div></div>`;
+        $('open-cart').onclick=()=>{ cartExpanded=true; renderCartBar(); };
+        return;
+      }
+      // pannello espanso con gli articoli (cresce mentre aggiungi)
+      const lines=cart.map(i=>`<div class="cart-mini-line">
+        ${i.photoUrl?`<img class="cl-photo" src="${i.photoUrl}" style="width:38px;height:38px;border-radius:8px;object-fit:cover;">`:`<div class="cl-photo" style="width:38px;height:38px;border-radius:8px;background:var(--ivory-dark);display:flex;align-items:center;justify-content:center;">🍽️</div>`}
+        <div style="flex:1;min-width:0;"><div class="fr" dir="ltr" style="font-size:13px;font-weight:500;">${i.name}</div><div class="num" style="font-size:11px;color:var(--forest);font-weight:700;">${fmt(i.price*i.qty)} ${t('currency')}</div></div>
+        <div class="qty-ctrl"><button class="qty-btn" data-dec="${i.id}">−</button><span class="num" style="min-width:18px;text-align:center;font-weight:700;">${i.qty}</span><button class="qty-btn" data-inc="${i.id}">+</button></div>
+      </div>`).join('');
+      root.innerHTML=`<div class="cart-bar" style="pointer-events:none;"><div class="cart-panel">
+        <div class="cart-panel-head" id="cart-collapse">
+          <span style="display:flex;align-items:center;gap:10px;"><span class="cart-count">${cartCount()}</span><span style="font-size:13px;">${t('cart')}</span></span>
+          <span style="display:flex;align-items:center;gap:12px;"><span class="num" style="font-weight:700;font-size:16px;">${fmt(cartTotal())} ${t('currency')}</span><span style="font-size:18px;">▾</span></span>
+        </div>
+        <div class="cart-panel-items">${lines}</div>
+        <div style="padding:10px 14px 12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><span style="font-size:14px;font-weight:600;">${t('total')}</span><span class="num" style="font-size:20px;font-weight:700;color:var(--forest);">${fmt(cartTotal())} ${t('currency')}</span></div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-forest" id="do-pay" style="flex:1;padding:13px;">✓ ${t('checkout')}</button>
+            <button class="btn-secondary" id="clear-cart" style="padding:13px 14px;color:var(--red);border-color:rgba(192,72,72,0.3);">🗑️</button>
+          </div>
+        </div>
       </div></div>`;
-      $('open-cart').onclick=openCartSheet;
+      $('cart-collapse').onclick=()=>{ cartExpanded=false; renderCartBar(); };
+      root.querySelectorAll('[data-inc]').forEach(b=>b.onclick=()=>setQty(b.dataset.inc,1));
+      root.querySelectorAll('[data-dec]').forEach(b=>b.onclick=()=>setQty(b.dataset.dec,-1));
+      $('do-pay').onclick=openPaymentSheet;
+      $('clear-cart').onclick=()=>{ if(!confirm(t('confirmClear')))return; cart=[]; renderCartBar(); };
     }
     function renderCassa(){
       $('cart-bar-root')||$('content').insertAdjacentHTML('afterend','<div id="cart-bar-root"></div>');
@@ -501,41 +559,52 @@
       document.querySelectorAll('.pos-card').forEach(c=>c.onclick=()=>{ if(c.disabled)return; addToCart(products.find(p=>p.id===c.dataset.id)); });
       renderCartBar();
     }
-    function openCartSheet(){
+    function openPaymentSheet(){
+      if(cart.length===0)return;
+      const total=cartTotal();
+      let paid=0;
       $('sheet-root').innerHTML=`<div class="overlay" id="ov"><div class="sheet" onclick="event.stopPropagation()">
-        <div class="sheet-head"><div><div class="sheet-sub">${t('sale')}</div><div class="sheet-title">${t('cart')}</div></div><button class="close-x" id="cx">×</button></div>
-        <div id="cart-sheet-body"></div>
+        <div class="sheet-head"><div><div class="sheet-sub">${t('payTitle')}</div><div class="sheet-title">${t('checkout')}</div></div><button class="close-x" id="cx">×</button></div>
+        <div style="text-align:center;margin-bottom:14px;"><div style="font-size:12px;color:rgba(26,26,26,0.55);">${t('total')}</div><div class="num" style="font-size:30px;font-weight:700;color:var(--forest);">${fmt(total)} ${t('currency')}</div></div>
+        <button class="btn-gold btn-wide" id="pay-exact" style="margin-bottom:12px;">✓ ${t('payExact')} (${fmt(total)})</button>
+        <div class="field"><label class="lbl">${t('amountPaid')}</label><input class="input num" id="pay-amount" type="number" min="0" step="0.01" dir="ltr" placeholder="${t('enterAmount')}"></div>
+        <div style="display:flex;gap:6px;margin-bottom:12px;">
+          ${[50,100,200,500].map(v=>`<button class="btn-secondary pay-quick" data-v="${v}" style="flex:1;padding:9px 0;">${v}</button>`).join('')}
+        </div>
+        <div id="pay-change" style="background:rgba(31,58,46,0.05);border-radius:12px;padding:12px;text-align:center;margin-bottom:14px;min-height:54px;display:flex;flex-direction:column;justify-content:center;">
+          <div style="font-size:12px;color:rgba(26,26,26,0.55);">${t('changeDue')}</div>
+          <div class="num" id="pay-change-val" style="font-size:24px;font-weight:700;color:var(--forest);">—</div>
+        </div>
+        <button class="btn-forest btn-wide" id="pay-confirm">✓ ${t('confirmPay')}</button>
       </div></div>`;
       $('ov').onclick=closeSheet;$('cx').onclick=closeSheet;
-      renderCartSheet();
+      const amtEl=$('pay-amount'), changeEl=$('pay-change-val'), confirmBtn=$('pay-confirm');
+      const recompute=()=>{
+        paid=parseFloat(amtEl.value)||0;
+        const change=paid-total;
+        if(amtEl.value===''){ changeEl.textContent='—'; changeEl.style.color='var(--forest)'; $('pay-change').style.background='rgba(31,58,46,0.05)'; confirmBtn.disabled=false; return; }
+        if(change<0){ changeEl.textContent=t('insufficient'); changeEl.style.fontSize='14px'; changeEl.style.color='var(--red)'; $('pay-change').style.background='rgba(192,72,72,0.08)'; confirmBtn.disabled=true; }
+        else { changeEl.style.fontSize='24px'; changeEl.textContent=fmt(change)+' '+t('currency'); changeEl.style.color='var(--forest)'; $('pay-change').style.background='rgba(61,115,85,0.1)'; confirmBtn.disabled=false; }
+      };
+      amtEl.oninput=recompute;
+      $('pay-exact').onclick=()=>{ amtEl.value=total; recompute(); };
+      $('sheet-root').querySelectorAll('.pay-quick').forEach(b=>b.onclick=()=>{ amtEl.value=(parseFloat(amtEl.value)||0)+Number(b.dataset.v); recompute(); });
+      confirmBtn.onclick=()=>{ const p=amtEl.value===''?total:(parseFloat(amtEl.value)||0); if(p<total){ toast(t('insufficient'),true); return; } doCheckout(p); };
     }
-    function renderCartSheet(){
-      const body=$('cart-sheet-body'); if(!body)return;
-      if(cart.length===0){ body.innerHTML=`<div class="empty">${t('cartEmpty')}</div>`; return; }
-      const lines=cart.map(i=>`<div class="cart-line">
-        ${i.photoUrl?`<img class="cl-photo" src="${i.photoUrl}">`:`<div class="cl-photo">🍽️</div>`}
-        <div style="flex:1;min-width:0;"><div class="fr" dir="ltr" style="font-size:14px;font-weight:500;">${i.name}</div><div class="num" style="font-size:12px;color:var(--forest);font-weight:700;">${fmt(i.price)} ${t('currency')}</div></div>
-        <div class="qty-ctrl"><button class="qty-btn" data-dec="${i.id}">−</button><span class="num" style="min-width:20px;text-align:center;font-weight:700;">${i.qty}</span><button class="qty-btn" data-inc="${i.id}">+</button></div>
-      </div>`).join('');
-      body.innerHTML=`${lines}
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0 4px;"><span style="font-size:14px;font-weight:600;">${t('total')}</span><span class="num" style="font-size:22px;font-weight:700;color:var(--forest);">${fmt(cartTotal())} ${t('currency')}</span></div>
-        <button class="btn-forest btn-wide" id="do-checkout" style="margin-top:8px;">✓ ${t('checkout')}</button>
-        <button class="btn-secondary btn-wide" id="clear-cart" style="margin-top:8px;color:var(--red);border-color:rgba(192,72,72,0.3);">${t('clearCart')}</button>`;
-      body.querySelectorAll('[data-inc]').forEach(b=>b.onclick=()=>setQty(b.dataset.inc,1));
-      body.querySelectorAll('[data-dec]').forEach(b=>b.onclick=()=>setQty(b.dataset.dec,-1));
-      $('clear-cart').onclick=()=>{ if(!confirm(t('confirmClear')))return; cart=[]; closeSheet(); renderCassa(); };
-      $('do-checkout').onclick=doCheckout;
-    }
-    async function doCheckout(){
+    async function doCheckout(paid){
       if(cart.length===0)return;
-      const btn=$('do-checkout'); btn.textContent='...'; btn.disabled=true;
+      const cb=$('pay-confirm'); if(cb){ cb.textContent='...'; cb.disabled=true; }
       try{
         const items=cart.map(i=>({productId:i.id,name:i.name,price:i.price,qty:i.qty,subtotal:i.price*i.qty}));
         const total=cartTotal();
+        const createdAt=Date.now();
+        const receiptNo=Number(String(createdAt).slice(-6)); // numero fattura stabile
+        const paidAmt=(paid==null||isNaN(paid))?total:paid;
+        const change=Math.max(0,paidAmt-total);
         // 1) registra la vendita
-        await addDoc(collection(db,'sales'),{
+        const ref=await addDoc(collection(db,'sales'),{
           branchId:currentBranchId, userId:user.uid, userName:profile.name||user.email,
-          items, total, count:cartCount(), createdAt:Date.now()
+          items, total, count:cartCount(), receiptNo, paid:paidAmt, change, createdAt
         });
         // 2) scala l'inventario di questo branch
         for(const i of cart){
@@ -544,8 +613,242 @@
           await setDoc(doc(db,'inventory',`${currentBranchId}_${i.id}`),{branchId:currentBranchId,productId:i.id,qty:nq,threshold:cur.threshold||20,lastCost:cur.lastCost||0},{merge:true});
           inventory[i.id]={qty:nq,threshold:cur.threshold||20,lastCost:cur.lastCost||0};
         }
+        const sale={id:ref.id,branchId:currentBranchId,userName:profile.name||user.email,items,total,count:cartCount(),receiptNo,paid:paidAmt,change,createdAt};
         cart=[]; closeSheet(); renderCassa(); toast(t('saleDone'));
-      }catch(e){ console.error(e); toast(t('errorGen'),true); btn.textContent='✓ '+t('checkout'); btn.disabled=false; }
+        showReceipt(sale); // mostra la fattura automaticamente
+      }catch(e){ console.error(e); toast(t('errorGen'),true); if(cb){ cb.textContent='✓ '+t('confirmPay'); cb.disabled=false; } }
+    }
+
+    // ============ RICEVUTE / الفواتير (receipts) ============
+    function receiptBranchName(bid){ const b=branches.find(x=>x.id===bid); return b?(lang==='ar'?b.nameAr:b.nameEn):''; }
+    function showReceipt(sale){
+      const bn=receiptBranchName(sale.branchId);
+      const dt=new Date(sale.createdAt).toLocaleString(lang==='ar'?'ar-EG':'en-US');
+      const rows=(sale.items||[]).map(i=>`<div style="display:flex;gap:8px;align-items:center;padding:7px 0;border-bottom:1px dashed var(--ivory-dark);">
+        <div style="flex:1;min-width:0;"><div class="fr" dir="ltr" style="font-size:14px;font-weight:500;">${i.name}</div><div class="num" style="font-size:11px;color:rgba(26,26,26,0.55);">${i.qty} × ${fmt(i.price)}</div></div>
+        <div class="num" style="font-weight:700;font-size:14px;">${fmt(i.subtotal)} ${t('currency')}</div>
+      </div>`).join('');
+      $('sheet-root').innerHTML=`<div class="overlay" id="ov"><div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-head"><div><div class="sheet-sub">${t('receipt')} · #${sale.receiptNo||''}</div><div class="sheet-title">${t('receipt')}</div></div><button class="close-x" id="cx">×</button></div>
+        <div style="text-align:center;margin-bottom:12px;"><img src="${LOGO}" alt="Le Coin" style="max-width:130px;width:55%;border-radius:12px;"></div>
+        <div style="text-align:center;font-size:12px;color:rgba(26,26,26,0.6);margin-bottom:12px;">
+          <div style="font-weight:700;color:var(--forest);font-size:13px;">${bn}</div>
+          <div class="num">${dt}</div>
+          <div>${t('receiptNo')}: <span class="num" style="font-weight:700;">#${sale.receiptNo||''}</span></div>
+          <div>${t('cashierLbl')}: ${sale.userName||''}</div>
+        </div>
+        <div style="border-top:1px solid var(--ivory-dark);padding-top:8px;">${rows}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0 4px;"><span style="font-size:15px;font-weight:700;">${t('total')}</span><span class="num" style="font-size:22px;font-weight:700;color:var(--forest);">${fmt(sale.total||0)} ${t('currency')}</span></div>
+        ${(sale.paid!=null)?`<div style="display:flex;justify-content:space-between;font-size:12px;color:rgba(26,26,26,0.6);padding:2px 0;"><span>${t('received')}</span><span class="num">${fmt(sale.paid)} ${t('currency')}</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:rgba(26,26,26,0.6);padding:2px 0;"><span>${t('changeDue')}</span><span class="num" style="font-weight:700;">${fmt(sale.change||0)} ${t('currency')}</span></div>`:''}
+        ${(sale.refundTotal>0||sale.voided)?`<div style="background:rgba(192,72,72,0.08);border-radius:10px;padding:8px 12px;margin:4px 0 8px;font-size:12px;">
+          <div style="display:flex;justify-content:space-between;"><span style="color:var(--red);font-weight:700;">${sale.voided?t('voidedLbl'):t('refundedLbl')}</span><span class="num" style="color:var(--red);font-weight:700;">− ${fmt(sale.refundTotal||0)} ${t('currency')}</span></div>
+          <div style="display:flex;justify-content:space-between;margin-top:3px;"><span style="font-weight:700;">${t('netTotal')}</span><span class="num" style="font-weight:700;color:var(--forest);">${fmt(Math.max(0,(sale.total||0)-(sale.refundTotal||0)))} ${t('currency')}</span></div>
+        </div>`:''}
+        <div style="text-align:center;font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--gold);font-size:16px;margin:14px 0;">${t('thankYou')}</div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-forest btn-wide" id="rc-print">🖨️ ${t('print')}</button>
+          <button class="btn-secondary btn-wide" id="rc-dl">⬇️ ${t('download')}</button>
+        </div>
+        ${canRefund()&&!sale.voided?`<div style="display:flex;gap:8px;margin-top:8px;">
+          <button class="btn-secondary btn-wide" id="rc-return" style="color:var(--amber);border-color:rgba(216,142,42,0.4);">↩️ ${t('returnItems')}</button>
+          <button class="btn-secondary btn-wide" id="rc-void" style="color:var(--red);border-color:rgba(192,72,72,0.3);">✖ ${t('voidInvoice')}</button>
+        </div>`:''}
+      </div></div>`;
+      $('ov').onclick=closeSheet;$('cx').onclick=closeSheet;
+      $('rc-print').onclick=()=>printReceipt(sale);
+      $('rc-dl').onclick=()=>{
+        const header=[t('receiptNo'),t('saleTime'),t('cashierLbl'),t('itemCol'),t('qtyCol'),t('priceCol'),t('subtotalCol')];
+        const rws=(sale.items||[]).map(i=>['#'+(sale.receiptNo||''),dt,sale.userName||'',i.name,i.qty,i.price,i.subtotal]);
+        rws.push(['','','','','','',t('total')+': '+fmt(sale.total||0)]);
+        downloadCSV(`receipt_${sale.receiptNo||''}.csv`,header,rws);
+      };
+      if(canRefund()&&!sale.voided){
+        $('rc-void')&&($('rc-void').onclick=()=>doVoid(sale));
+        $('rc-return')&&($('rc-return').onclick=()=>returnForm(sale));
+      }
+    }
+    function canRefund(){ return profile && (profile.role==='admin'||profile.role==='manager'); }
+    // quantità già resa per prodotto in questa vendita
+    function returnedQtyOf(sale,pid){ let q=0; (sale.returns||[]).forEach(r=>(r.lines||[]).forEach(l=>{ if(l.productId===pid)q+=l.qty; })); return q; }
+    async function restoreStock(pid,qty){
+      const cur=inventory[pid]||{qty:0,threshold:20,lastCost:0};
+      const nq=(cur.qty||0)+qty;
+      await setDoc(doc(db,'inventory',`${currentBranchId}_${pid}`),{branchId:currentBranchId,productId:pid,qty:nq,threshold:cur.threshold||20,lastCost:cur.lastCost||0},{merge:true});
+      inventory[pid]={qty:nq,threshold:cur.threshold||20,lastCost:cur.lastCost||0};
+    }
+    async function doVoid(sale){
+      if(sale.voided){ toast(t('alreadyVoided'),true); return; }
+      if(!confirm(t('confirmVoid'))) return;
+      try{
+        // rimetti in stock tutta la quantità non ancora resa
+        const lines=[];
+        for(const it of (sale.items||[])){
+          const remain=it.qty-returnedQtyOf(sale,it.productId);
+          if(remain>0){ await restoreStock(it.productId,remain); lines.push({productId:it.productId,name:it.name,qty:remain,price:it.price,amount:remain*it.price,toStock:true}); }
+        }
+        const ev={at:Date.now(),byName:profile.name||user.email,type:'void',lines,amount:lines.reduce((a,l)=>a+l.amount,0)};
+        const returns=[...(sale.returns||[]),ev];
+        const refundTotal=sale.total||0; // storno totale
+        await updateDoc(doc(db,'sales',sale.id),{voided:true,refundTotal,returns});
+        sale.voided=true; sale.refundTotal=refundTotal; sale.returns=returns;
+        toast(t('returnDone')); showReceipt(sale);
+      }catch(e){ console.error(e); toast(t('errorGen'),true); }
+    }
+    function returnForm(sale){
+      // righe con quantità ancora restituibile
+      const avail=(sale.items||[]).map(it=>({...it,remain:it.qty-returnedQtyOf(sale,it.productId)})).filter(it=>it.remain>0);
+      if(avail.length===0){ toast(t('nothingToReturn'),true); return; }
+      const toStock={}; avail.forEach(it=>toStock[it.productId]=true);
+      const rows=avail.map(it=>`<div style="padding:9px 0;border-bottom:1px solid var(--ivory-dark);">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+          <div style="flex:1;min-width:0;"><div class="fr" dir="ltr" style="font-size:14px;">${it.name}</div><div class="num" style="font-size:11px;color:rgba(26,26,26,0.5);">${fmt(it.price)} ${t('currency')} · ${t('returnedSoFar')}: ${returnedQtyOf(sale,it.productId)}/${it.qty}</div></div>
+          <input class="input num" id="rt-${it.productId}" data-pid="${it.productId}" type="number" min="0" max="${it.remain}" dir="ltr" value="0" style="width:70px;padding:7px;">
+        </div>
+        <label style="display:flex;align-items:center;gap:6px;margin-top:6px;font-size:11px;color:rgba(26,26,26,0.6);cursor:pointer;"><input type="checkbox" id="st-${it.productId}" data-pid="${it.productId}" checked> ${t('backToStock')}</label>
+      </div>`).join('');
+      $('sheet-root').innerHTML=`<div class="overlay" id="ov2"><div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-head"><div><div class="sheet-sub">#${sale.receiptNo||''}</div><div class="sheet-title">↩️ ${t('returnItems')}</div></div><button class="close-x" id="cx2">×</button></div>
+        <div style="font-size:12px;color:rgba(26,26,26,0.55);margin-bottom:8px;">${t('selectReturnQty')}</div>
+        ${rows}
+        <div id="rt-sum" style="margin:12px 0;font-size:14px;font-weight:700;text-align:center;"></div>
+        <button class="btn-forest btn-wide" id="rt-do">↩️ ${t('doReturn')}</button>
+      </div></div>`;
+      $('ov2').onclick=()=>showReceipt(sale); $('cx2').onclick=()=>showReceipt(sale);
+      const recompute=()=>{
+        let amt=0; avail.forEach(it=>{ const q=parseInt($('rt-'+it.productId).value)||0; amt+=q*it.price; });
+        $('rt-sum').innerHTML=`${t('refundedAmount')}: <span class="num" style="color:var(--red);">${fmt(amt)} ${t('currency')}</span>`;
+      };
+      avail.forEach(it=>$('rt-'+it.productId).oninput=recompute); recompute();
+      $('rt-do').onclick=async()=>{
+        const lines=[];
+        for(const it of avail){
+          let q=parseInt($('rt-'+it.productId).value)||0; if(q<=0)continue; if(q>it.remain)q=it.remain;
+          const back=$('st-'+it.productId).checked;
+          if(back) await restoreStock(it.productId,q);
+          lines.push({productId:it.productId,name:it.name,qty:q,price:it.price,amount:q*it.price,toStock:back});
+        }
+        if(lines.length===0){ toast(t('nothingToReturn'),true); return; }
+        const b=$('rt-do'); b.disabled=true; b.textContent='...';
+        try{
+          const ev={at:Date.now(),byName:profile.name||user.email,type:'return',lines,amount:lines.reduce((a,l)=>a+l.amount,0)};
+          const returns=[...(sale.returns||[]),ev];
+          const refundTotal=(sale.refundTotal||0)+ev.amount;
+          const totalQty=(sale.items||[]).reduce((a,i)=>a+i.qty,0);
+          const retQty=returns.reduce((a,r)=>a+r.lines.reduce((x,l)=>x+l.qty,0),0);
+          const voided=retQty>=totalQty; // se tutto reso => annullata
+          await updateDoc(doc(db,'sales',sale.id),{returns,refundTotal,voided});
+          sale.returns=returns; sale.refundTotal=refundTotal; sale.voided=voided;
+          toast(t('returnDone')); showReceipt(sale);
+        }catch(e){ console.error(e); toast(t('errorGen'),true); b.disabled=false; b.textContent='↩️ '+t('doReturn'); }
+      };
+    }
+    function printReceipt(sale){
+      const bn=receiptBranchName(sale.branchId);
+      const dt=new Date(sale.createdAt).toLocaleString(lang==='ar'?'ar-EG':'en-US');
+      const dir=T[lang].dir;
+      const w=window.open('','_blank'); if(!w){ toast(t('errorGen'),true); return; }
+      const rows=(sale.items||[]).map(i=>`<tr><td style="text-align:start;">${i.name}</td><td>${i.qty}</td><td>${fmt(i.price)}</td><td>${fmt(i.subtotal)}</td></tr>`).join('');
+      w.document.write(`<!doctype html><html dir="${dir}" lang="${lang}"><head><meta charset="utf-8"><title>${t('receipt')} #${sale.receiptNo||''}</title>
+        <style>
+          *{box-sizing:border-box;} body{font-family:Arial,Tahoma,sans-serif;color:#1A1A1A;max-width:300px;margin:0 auto;padding:14px;}
+          .logo{display:block;margin:0 auto 8px;width:120px;border-radius:10px;}
+          .ctr{text-align:center;} .muted{color:#777;font-size:12px;}
+          .br{font-weight:700;color:#1F3A2E;font-size:14px;}
+          table{width:100%;border-collapse:collapse;font-size:12px;margin:10px 0;}
+          th,td{padding:5px 4px;text-align:center;border-bottom:1px dashed #ccc;}
+          th{color:#1F3A2E;border-bottom:1px solid #1F3A2E;}
+          .tot{font-size:16px;font-weight:700;color:#1F3A2E;display:flex;justify-content:space-between;padding:8px 0;border-top:2px solid #1F3A2E;}
+          .thanks{text-align:center;font-style:italic;color:#C9A84C;font-size:15px;margin:12px 0;}
+        </style></head><body>
+        <img class="logo" src="${LOGO}">
+        <div class="ctr"><div class="br">${bn}</div>
+          <div class="muted">${dt}</div>
+          <div class="muted">${t('receiptNo')}: #${sale.receiptNo||''}</div>
+          <div class="muted">${t('cashierLbl')}: ${sale.userName||''}</div></div>
+        <table><thead><tr><th style="text-align:start;">${t('itemCol')}</th><th>${t('qtyCol')}</th><th>${t('priceCol')}</th><th>${t('subtotalCol')}</th></tr></thead>
+        <tbody>${rows}</tbody></table>
+        <div class="tot"><span>${t('total')}</span><span>${fmt(sale.total||0)} ${t('currency')}</span></div>
+        ${(sale.paid!=null)?`<div style="display:flex;justify-content:space-between;font-size:12px;color:#555;padding:3px 0;"><span>${t('received')}</span><span>${fmt(sale.paid)} ${t('currency')}</span></div><div style="display:flex;justify-content:space-between;font-size:12px;color:#555;padding:3px 0;"><span>${t('changeDue')}</span><span>${fmt(sale.change||0)} ${t('currency')}</span></div>`:''}
+        <div class="thanks">${t('thankYou')}</div>
+        </body></html>`);
+      w.document.close(); w.focus(); setTimeout(()=>{ try{w.print();}catch(e){} },400);
+    }
+    let receiptsCache=[]; // vendite caricate per il filtraggio
+    let rcFilter={q:'',from:'',to:'',cashier:'',min:'',max:''};
+    async function renderReceipts(){
+      const cb=$('cart-bar-root'); if(cb) cb.innerHTML='';
+      $('content').innerHTML=`<div class="empty">…</div>`;
+      receiptsCache=[];
+      let qs;
+      if(profile.role==='admin'||profile.role==='manager') qs=await getDocs(query(collection(db,'sales'),where('branchId','==',currentBranchId)));
+      else qs=await getDocs(query(collection(db,'sales'),where('branchId','==',currentBranchId),where('userId','==',user.uid)));
+      qs.forEach(d=>receiptsCache.push({id:d.id,...d.data()}));
+      receiptsCache.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+      const isStaff=(profile.role==='admin'||profile.role==='manager');
+      const cashiers=[...new Set(receiptsCache.map(s=>s.userName).filter(Boolean))];
+      // barra filtri
+      const f=rcFilter;
+      let html=`<div style="font-size:11px;letter-spacing:1px;color:var(--forest);font-weight:700;margin-bottom:12px;">${t('receipts_tab').toUpperCase()}</div>
+      <div class="card"><div class="card-title">🔍 ${t('filters')}</div>
+        <div class="field"><label class="lbl">${t('searchByNo')}</label><input class="input num" id="rcf-q" dir="ltr" value="${f.q}" placeholder="#"></div>
+        <div class="row2">
+          <div class="field"><label class="lbl">${t('fromDate')}</label><input class="input" id="rcf-from" type="date" dir="ltr" value="${f.from}"></div>
+          <div class="field"><label class="lbl">${t('toDate')}</label><input class="input" id="rcf-to" type="date" dir="ltr" value="${f.to}"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label class="lbl">${t('minAmount')}</label><input class="input num" id="rcf-min" type="number" dir="ltr" value="${f.min}" placeholder="0"></div>
+          <div class="field"><label class="lbl">${t('maxAmount')}</label><input class="input num" id="rcf-max" type="number" dir="ltr" value="${f.max}" placeholder="∞"></div>
+        </div>
+        ${isStaff?`<div class="field"><label class="lbl">${t('cashierLbl')}</label><select class="input" id="rcf-cashier"><option value="">${t('allCashiers')}</option>${cashiers.map(c=>`<option value="${c}" ${f.cashier===c?'selected':''}>${c}</option>`).join('')}</select></div>`:''}
+        <button class="btn-secondary btn-wide" id="rcf-clear" style="color:var(--forest);">✕ ${t('clearFilters')}</button>
+      </div>
+      <div id="rcpt-list"></div>`;
+      $('content').innerHTML=html;
+      const apply=()=>{
+        rcFilter={ q:$('rcf-q').value.trim(), from:$('rcf-from').value, to:$('rcf-to').value,
+          cashier:isStaff&&$('rcf-cashier')?$('rcf-cashier').value:'', min:$('rcf-min').value, max:$('rcf-max').value };
+        renderReceiptsList();
+      };
+      ['rcf-q','rcf-min','rcf-max'].forEach(id=>$(id)&&($(id).oninput=apply));
+      ['rcf-from','rcf-to'].forEach(id=>$(id)&&($(id).onchange=apply));
+      if(isStaff&&$('rcf-cashier')) $('rcf-cashier').onchange=apply;
+      $('rcf-clear').onclick=()=>{ rcFilter={q:'',from:'',to:'',cashier:'',min:'',max:''}; renderReceipts(); };
+      renderReceiptsList();
+    }
+    function renderReceiptsList(){
+      const f=rcFilter;
+      const fromTs=f.from?new Date(f.from+'T00:00:00').getTime():null;
+      const toTs=f.to?new Date(f.to+'T23:59:59').getTime():null;
+      const minV=f.min!==''?parseFloat(f.min):null;
+      const maxV=f.max!==''?parseFloat(f.max):null;
+      let list=receiptsCache.filter(s=>{
+        if(f.q && !String(s.receiptNo||'').includes(f.q.replace('#',''))) return false;
+        if(fromTs && (s.createdAt||0)<fromTs) return false;
+        if(toTs && (s.createdAt||0)>toTs) return false;
+        if(f.cashier && s.userName!==f.cashier) return false;
+        const net=Math.max(0,(s.total||0)-(s.refundTotal||0));
+        if(minV!=null && net<minV) return false;
+        if(maxV!=null && net>maxV) return false;
+        return true;
+      });
+      const totNet=list.reduce((a,s)=>a+Math.max(0,(s.total||0)-(s.refundTotal||0)),0);
+      const box=$('rcpt-list'); if(!box)return;
+      let html=`<div style="display:flex;justify-content:space-between;padding:6px 4px 10px;font-size:12px;color:rgba(26,26,26,0.6);"><span>${t('results')}: <b class="num">${list.length}</b></span><span>${t('netSum')}: <b class="num" style="color:var(--forest);">${fmt(totNet)} ${t('currency')}</b></span></div>`;
+      if(list.length===0) html+=`<div class="card"><div class="empty">${t('noSales')}</div></div>`;
+      else html+=`<div class="card">`+list.slice(0,200).map(s=>{
+        const net=Math.max(0,(s.total||0)-(s.refundTotal||0));
+        const badge = s.voided?`<span style="font-size:10px;color:var(--red);font-weight:700;border:1px solid rgba(192,72,72,0.4);border-radius:6px;padding:1px 6px;">${t('voidedLbl')}</span>`
+          : (s.refundTotal>0?`<span style="font-size:10px;color:var(--amber);font-weight:700;border:1px solid rgba(216,142,42,0.4);border-radius:6px;padding:1px 6px;">${t('refundedLbl')}</span>`:'');
+        return `<div class="rcpt-row" data-id="${s.id}" style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:11px 0;border-bottom:1px solid var(--ivory-dark);cursor:pointer;">
+        <div style="min-width:0;">
+          <div style="font-weight:700;font-size:14px;">#${s.receiptNo||'—'} <span style="font-weight:400;font-size:11px;color:rgba(26,26,26,0.5);">· ${(s.count||(s.items?s.items.length:0))} ${t('items_n')}</span> ${badge}</div>
+          <div class="num" style="font-size:11px;color:rgba(26,26,26,0.55);">${new Date(s.createdAt).toLocaleString(lang==='ar'?'ar-EG':'en-US')} · ${s.userName||''}</div>
+        </div>
+        <div style="text-align:end;white-space:nowrap;"><div class="num" style="font-weight:700;font-size:15px;color:${s.voided?'rgba(26,26,26,0.4)':'var(--forest)'};${s.voided?'text-decoration:line-through;':''}">${fmt(s.total||0)} ${t('currency')}</div>${s.refundTotal>0&&!s.voided?`<div class="num" style="font-size:11px;color:var(--red);">${t('netTotal')}: ${fmt(net)}</div>`:''}</div>
+      </div>`;}).join('')+`</div>`;
+      box.innerHTML=html;
+      box.querySelectorAll('.rcpt-row').forEach(r=>r.onclick=()=>{ const s=receiptsCache.find(x=>x.id===r.dataset.id); if(s) showReceipt(s); });
     }
 
     // ============ CATEGORIES ============
@@ -857,13 +1160,17 @@
       const todaySales=sales.filter(s=>s.createdAt>=todayStart);
       const weekSales=sales.filter(s=>s.createdAt>=weekStart);
       const monthSales=sales.filter(s=>s.createdAt>=monthStart);
-      const sum=arr=>arr.reduce((a,s)=>a+(s.total||0),0);
+      const effTotal=s=>Math.max(0,(s.total||0)-(s.refundTotal||0)); // netto dopo resi/storni
+      const sum=arr=>arr.reduce((a,s)=>a+effTotal(s),0);
+      const cnt=arr=>arr.filter(s=>!s.voided).length; // fatture (escluse le annullate)
       const todayRev=sum(todaySales), weekRev=sum(weekSales), monthRev=sum(monthSales);
-      const avg=todaySales.length?Math.round(todayRev/todaySales.length):0;
+      const avg=cnt(todaySales)?Math.round(todayRev/cnt(todaySales)):0;
+      // mappa quantità rese per prodotto in una vendita (storno totale = tutti gli articoli)
+      const returnedMap=s=>{ const m={}; if(s.voided)(s.items||[]).forEach(it=>m[it.productId]=(m[it.productId]||0)+it.qty); (s.returns||[]).forEach(r=>(r.lines||[]).forEach(l=>m[l.productId]=(m[l.productId]||0)+l.qty)); return m; };
 
-      // top prodotti (ultimi 7 giorni)
+      // top prodotti (ultimi 7 giorni) — al netto dei resi
       const prodMap={};
-      weekSales.forEach(s=>(s.items||[]).forEach(it=>{ if(!prodMap[it.productId])prodMap[it.productId]={name:it.name,qty:0,rev:0}; prodMap[it.productId].qty+=it.qty; prodMap[it.productId].rev+=it.subtotal||0; }));
+      weekSales.forEach(s=>{ const rm=returnedMap(s); (s.items||[]).forEach(it=>{ const net=Math.max(0,it.qty-(rm[it.productId]||0)); if(net<=0)return; if(!prodMap[it.productId])prodMap[it.productId]={name:it.name,qty:0,rev:0}; prodMap[it.productId].qty+=net; prodMap[it.productId].rev+=net*(it.price||0); }); });
       const top=Object.values(prodMap).sort((a,b)=>b.qty-a.qty).slice(0,5);
       const maxQty=top.length?top[0].qty:1;
 
@@ -882,12 +1189,12 @@
       let html=`<div style="font-size:11px;letter-spacing:1px;color:var(--forest);font-weight:700;margin-bottom:12px;">${t('reports').toUpperCase()}</div>`;
       // KPI oggi vs mese
       html+=`<div style="display:flex;gap:10px;margin-bottom:14px;">
-        ${kpi(t('today'),fmt(todayRev)+' '+t('currency'),todaySales.length+' '+t('salesCount'))}
-        ${kpi(t('thisMonth'),fmt(monthRev)+' '+t('currency'),monthSales.length+' '+t('salesCount'))}
+        ${kpi(t('today'),fmt(todayRev)+' '+t('currency'),cnt(todaySales)+' '+t('salesCount'))}
+        ${kpi(t('thisMonth'),fmt(monthRev)+' '+t('currency'),cnt(monthSales)+' '+t('salesCount'))}
       </div>
       <div style="display:flex;gap:10px;margin-bottom:14px;">
         ${kpi(t('avgSale'),fmt(avg)+' '+t('currency'),t('today'))}
-        ${kpi(t('last7'),fmt(weekRev)+' '+t('currency'),weekSales.length+' '+t('salesCount'))}
+        ${kpi(t('last7'),fmt(weekRev)+' '+t('currency'),cnt(weekSales)+' '+t('salesCount'))}
       </div>`;
       // ricavo 7 giorni (barre)
       html+=`<div class="card"><div class="card-title">📈 ${t('revenueByDay')} · ${t('last7')}</div>
@@ -950,9 +1257,9 @@
       const repTitle=t('reports');
       $('rep-print') && ($('rep-print').onclick=()=>{
         let body=`<h2>${t('revenue')}</h2><table><tr><th></th><th>${t('revenue')} (${t('currency')})</th><th>${t('salesCount')}</th></tr>
-          <tr><td>${t('today')}</td><td>${fmt(todayRev)}</td><td>${todaySales.length}</td></tr>
-          <tr><td>${t('thisMonth')}</td><td>${fmt(monthRev)}</td><td>${monthSales.length}</td></tr>
-          <tr><td>${t('last7')}</td><td>${fmt(weekRev)}</td><td>${weekSales.length}</td></tr>
+          <tr><td>${t('today')}</td><td>${fmt(todayRev)}</td><td>${cnt(todaySales)}</td></tr>
+          <tr><td>${t('thisMonth')}</td><td>${fmt(monthRev)}</td><td>${cnt(monthSales)}</td></tr>
+          <tr><td>${t('last7')}</td><td>${fmt(weekRev)}</td><td>${cnt(weekSales)}</td></tr>
           <tr><td>${t('avgSale')}</td><td>${fmt(avg)}</td><td>—</td></tr></table>`;
         body+=`<h2>${t('topProducts')} · ${t('last7')}</h2><table><tr><th>${t('name')}</th><th>${t('unitsSold')}</th><th>${t('revenue')} (${t('currency')})</th></tr>
           ${top.map(p=>`<tr><td>${p.name}</td><td>${p.qty}</td><td>${fmt(p.rev)}</td></tr>`).join('')||`<tr><td colspan="3">${t('noSales')}</td></tr>`}</table>`;
@@ -968,9 +1275,9 @@
         rows.push([t('total'),'',totCost,totPrice]);
         rows.push([t('potentialProfit'),'',totPrice-totCost,'']);
         rows.push([]);
-        rows.push([t('today'),todaySales.length,todayRev,'']);
-        rows.push([t('thisMonth'),monthSales.length,monthRev,'']);
-        rows.push([t('last7'),weekSales.length,weekRev,'']);
+        rows.push([t('today'),cnt(todaySales),todayRev,'']);
+        rows.push([t('thisMonth'),cnt(monthSales),monthRev,'']);
+        rows.push([t('last7'),cnt(weekSales),weekRev,'']);
         downloadCSV(`report_${new Date().toISOString().slice(0,10)}.csv`,header,rows);
       });
     }
