@@ -156,6 +156,8 @@
   <div id="sheet-root"></div>
   <div id="toast-root"></div>
 
+  <!-- libreria scanner barcode (camera) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
@@ -232,6 +234,8 @@
         noOpenShift:'لا توجد وردية مفتوحة', openedAt:'فُتحت', closedAt:'قُفلت', elapsed:'المدة', worked:'ساعات العمل',
         pause:'استراحة', resume:'استئناف', onPause:'في استراحة', pausedTime:'وقت الاستراحات', shiftSales:'مبيعات الوردية',
         expectedCash:'الكاش المتوقع', cashDiff:'فرق الدرج', shiftReport:'تقرير الوردية', shiftHistory:'سجل الورديات',
+        custodyTitle:'العُهدة (تسليم النقدية)', handOver:'تسليم العهدة', handTo:'تسليم لـ', handAmount:'المبلغ المسلَّم', custReceived:'مستلَم', custHanded:'مسلَّم', toDeliver:'المطلوب تسليمه', noOpenColleague:'مفيش زميل ورديته مفتوحة في نفس الفرع', handDone:'تم تسليم العهدة', noOpenShiftsBranch:'مفيش ورديات مفتوحة في الفرع', custFrom:'من', custTo:'إلى',
+        custPending:'في انتظار التأكيد', custSent:'اتبعت — مستني تأكيد الزميل', custConfirmReceipt:'تأكيد استلام النقدية', custConfirmMsg:'بيسلّمك المبلغ ده. اتأكد إنك استلمته وأكّد.', custCheckbox:'أنا أكّد إني استلمت المبلغ المذكور', custConfirmBtn:'تأكيد الاستلام', custConfirmed:'تم تأكيد الاستلام',
         confirmCloseShift:'متأكد إنك عايز تقفل الوردية؟', shiftOpened:'تم فتح الوردية', shiftClosed:'تم قفل الوردية',
         openCashHint:'اكتب الكاش اللي في الدرج وانت بتفتح الوردية', countedCashHint:'عُدّ الكاش في الدرج واكتب الرقم',
         noShiftsYet:'لا توجد ورديات بعد', hShort:'س', mShort:'د', byUser:'الكاشير', cashOver:'زيادة', cashShort:'عجز',
@@ -252,6 +256,8 @@
         showVoided:'إظهار الملغاة',
         warehouse:'المخزن', receive:'استلام بضاعة', receiveQty:'الكمية المستلمة', newCost:'التكلفة الجديدة (للوحدة)',
         receiveDone:'تم الاستلام', currentQty:'الكمية الحالية', afterReceive:'بعد الاستلام', selectProduct:'— اختر المنتج —',
+        addToList:'أضف للقائمة', recvList:'قائمة الاستلام', loadAll:'استلام الكل', listEmpty:'القائمة فاضية', itemsN:'صنف', removeRow:'حذف',
+        scanBarcode:'امسح الباركود', scanHint:'وجّه الكاميرا ناحية الباركود', camNoAccess:'مفيش وصول للكاميرا — اسمح بالكاميرا أو اكتب الباركود يدوي', scanNewProd:'باركود جديد — سجّل المنتج', howManyAdd:'كام واحد تضيف للمخزن؟', takePhoto:'صوّر', fromGallery:'من الجاليري', scanFound:'لقيت المنتج', scanClose:'إغلاق',
         physInv:'الجرد الفعلي', countedQty:'الكمية المعدودة', systemQty:'كمية النظام', diff:'الفرق',
         surplus:'زيادة', shortage:'عجز', match:'مطابق', applyInv:'تطبيق الجرد', invApplied:'تم تطبيق الجرد',
         invReport:'تقرير الجرد', adjustNote:'سيتم تعديل كميات النظام لتطابق العدّ الفعلي', confirmApplyInv:'تأكيد تطبيق الجرد؟ سيتم تعديل المخزون.',
@@ -271,7 +277,7 @@
         duration:'المدة', status:'الحالة', closed:'مقفولة', open2:'مفتوحة', shiftsList:'سجل الورديات', noShifts:'لا توجد ورديات',
         hrs:'س', mins:'د', breakNote:'الوقت في الاستراحة لا يُحسب من ساعات العمل', resumeFirst:'استأنف الاستراحة أولاً قبل القفل',
         shiftBranch:'فرع الوردية', pickBranch:'اختر الفرع اللي هتشتغل فيه', branchLocked:'الفرع مقفول على ورديتك المفتوحة',
-        needShiftToSell:'لازم تفتح وردية الأول عشان تبدأ البيع', openShiftNow:'افتح وردية دلوقتي', sellingIn:'بتبيع في'
+        needShiftToSell:'لازم تفتح وردية الأول عشان تبدأ البيع', openShiftNow:'افتح وردية دلوقتي', sellingIn:'بتبيع في', branchOfSale:'فرع البيع', confirmBranchHint:'اتأكد من الفرع قبل ما تكمّل الدفع'
       },
       en: {
         dir:'ltr', langBtn:'ع', email:'Email', pass:'Password', login:'Sign in',
@@ -317,6 +323,8 @@
         noOpenShift:'No open shift', openedAt:'Opened', closedAt:'Closed', elapsed:'Elapsed', worked:'Worked',
         pause:'Break', resume:'Resume', onPause:'On break', pausedTime:'Break time', shiftSales:'Shift sales',
         expectedCash:'Expected cash', cashDiff:'Drawer difference', shiftReport:'Shift report', shiftHistory:'Shift history',
+        custodyTitle:'Custody (cash handover)', handOver:'Hand over cash', handTo:'Hand over to', handAmount:'Amount handed', custReceived:'Received', custHanded:'Handed', toDeliver:'To deliver', noOpenColleague:'No colleague with an open shift in this branch', handDone:'Cash handed over', noOpenShiftsBranch:'No open shifts in this branch', custFrom:'From', custTo:'To',
+        custPending:'Awaiting confirmation', custSent:'Sent — awaiting colleague confirmation', custConfirmReceipt:'Confirm cash received', custConfirmMsg:'is handing you this amount. Make sure you received it and confirm.', custCheckbox:'I confirm I received the stated amount', custConfirmBtn:'Confirm receipt', custConfirmed:'Receipt confirmed',
         confirmCloseShift:'Confirm closing the shift?', shiftOpened:'Shift opened', shiftClosed:'Shift closed',
         openCashHint:'Enter the cash in the drawer when opening', countedCashHint:'Count the cash in the drawer and enter it',
         noShiftsYet:'No shifts yet', hShort:'h', mShort:'m', byUser:'Cashier', cashOver:'Over', cashShort:'Short',
@@ -337,6 +345,8 @@
         showVoided:'Show voided',
         warehouse:'Warehouse', receive:'Receive goods', receiveQty:'Quantity received', newCost:'New unit cost',
         receiveDone:'Goods received', currentQty:'Current qty', afterReceive:'After receiving', selectProduct:'— select product —',
+        addToList:'Add to list', recvList:'Receiving list', loadAll:'Receive all', listEmpty:'List is empty', itemsN:'items', removeRow:'Remove',
+        scanBarcode:'Scan barcode', scanHint:'Point the camera at the barcode', camNoAccess:'No camera access — allow camera or type the barcode manually', scanNewProd:'New barcode — register product', howManyAdd:'How many to add to stock?', takePhoto:'Take photo', fromGallery:'From gallery', scanFound:'Product found', scanClose:'Close',
         physInv:'Physical inventory', countedQty:'Counted qty', systemQty:'System qty', diff:'Difference',
         surplus:'Surplus', shortage:'Shortage', match:'Match', applyInv:'Apply inventory', invApplied:'Inventory applied',
         invReport:'Inventory report', adjustNote:'System quantities will be adjusted to match the physical count', confirmApplyInv:'Apply inventory? Stock will be adjusted.',
@@ -356,7 +366,7 @@
         duration:'Duration', status:'Status', closed:'Closed', open2:'Open', shiftsList:'Shifts log', noShifts:'No shifts',
         hrs:'h', mins:'m', breakNote:'Break time is not counted in worked hours', resumeFirst:'Resume the break first before closing',
         shiftBranch:'Shift branch', pickBranch:'Choose the branch you will work in', branchLocked:'Branch locked to your open shift',
-        needShiftToSell:'You must open a shift first to start selling', openShiftNow:'Open a shift now', sellingIn:'Selling in'
+        needShiftToSell:'You must open a shift first to start selling', openShiftNow:'Open a shift now', sellingIn:'Selling in', branchOfSale:'Sale branch', confirmBranchHint:'Confirm the branch before completing payment'
       }
     };
     let lang = localStorage.getItem('lecoin_lang') || 'ar';
@@ -371,8 +381,10 @@
 
     // ============ STATE ============
     let user=null, profile=null, branches=[], currentBranchId=null;
+    let saleBranchSel=null; // فرع البيع المختار للأدمن/المدير اللي بيبيع من غير وردية
     let categories=[], products=[], inventory={}, users=[], activeTab='products';
     let myShift=null, shifts=[]; // myShift = vacanza... turno aperto del cassiere; shifts = storico
+    let custodyTx=[]; // تحويلات العهدة (pending/confirmed) للفرع الحالي
     let currentShift=null; // {id, ...} la vacanza... il turno aperto del cassiere
     let shiftTimer=null;
 
@@ -421,7 +433,7 @@
 
     // ============ AUTH STATE ============
     onAuthStateChanged(auth, async u=>{
-      if(!u){ user=null; profile=null; $('login-screen').classList.remove('hidden'); $('app').classList.add('hidden'); return; }
+      if(!u){ user=null; profile=null; clearInterval(window.__custTimer); $('login-screen').classList.remove('hidden'); $('app').classList.add('hidden'); return; }
       user=u;
       try{
         const snap=await getDoc(doc(db,'users',u.uid));
@@ -437,6 +449,8 @@
         setupChrome();
         await loadCatalog();
         render();
+        checkPendingCustody(); // فحص فوري للعُهد المستنية
+        clearInterval(window.__custTimer); window.__custTimer=setInterval(checkPendingCustody,15000); // شبه فوري كل 15 ثانية
       }catch(e){ console.error(e); $('login-error').textContent=t('errorGen'); await signOut(auth); }
     });
 
@@ -593,8 +607,8 @@
     }
     function renderCassa(){
       $('cart-bar-root')||$('content').insertAdjacentHTML('afterend','<div id="cart-bar-root"></div>');
-      // niente vendita senza turno aperto (la vendita è legata al turno + filiale)
-      if(!myShift){
+      // الأدمن بس يقدر يبيع من غير وردية. الكاشير والمدير لازم يفتحوا وردية.
+      if(!myShift && profile.role!=='admin'){
         const cb=$('cart-bar-root'); if(cb) cb.innerHTML='';
         $('content').innerHTML=`<div class="card" style="text-align:center;padding:32px 18px;">
           <div style="font-size:40px;margin-bottom:10px;">🕐</div>
@@ -633,8 +647,19 @@
       if(cart.length===0)return;
       const total=cartTotal();
       let paid=0;
+      // لو مفيش وردية (الأدمن بس): يأكد فرع البيع
+      const noShift = !myShift && profile.role==='admin';
+      if(noShift && !saleBranchSel) saleBranchSel=currentBranchId;
+      const visIds = profile.role==='admin' ? branches.map(b=>b.id) : (profile.branchIds||[]);
+      const visB = branches.filter(b=>visIds.includes(b.id));
+      const branchRow = noShift ? `<div style="background:rgba(216,142,42,0.1);border:1px solid rgba(216,142,42,0.35);border-radius:12px;padding:12px;margin-bottom:14px;">
+        <div style="font-size:12px;color:var(--amber);font-weight:700;margin-bottom:6px;">🏢 ${t('branchOfSale')}</div>
+        <select class="input" id="pay-branch">${visB.map(b=>`<option value="${b.id}" ${saleBranchSel===b.id?'selected':''}>${lang==='ar'?b.nameAr:b.nameEn}</option>`).join('')}</select>
+        <div style="font-size:11px;color:rgba(26,26,26,0.55);margin-top:6px;">${t('confirmBranchHint')}</div>
+      </div>` : '';
       $('sheet-root').innerHTML=`<div class="overlay" id="ov"><div class="sheet" onclick="event.stopPropagation()">
         <div class="sheet-head"><div><div class="sheet-sub">${t('payTitle')}</div><div class="sheet-title">${t('checkout')}</div></div><button class="close-x" id="cx">×</button></div>
+        ${branchRow}
         <div style="text-align:center;margin-bottom:14px;"><div style="font-size:12px;color:rgba(26,26,26,0.55);">${t('total')}</div><div class="num" style="font-size:30px;font-weight:700;color:var(--forest);">${fmt(total)} ${t('currency')}</div></div>
         <button class="btn-gold btn-wide" id="pay-exact" style="margin-bottom:12px;">✓ ${t('payExact')} (${fmt(total)})</button>
         <div class="field"><label class="lbl">${t('amountPaid')}</label><input class="input num" id="pay-amount" type="number" min="0" step="0.01" dir="ltr" placeholder="${t('enterAmount')}"></div>
@@ -648,6 +673,7 @@
         <button class="btn-forest btn-wide" id="pay-confirm">✓ ${t('confirmPay')}</button>
       </div></div>`;
       $('ov').onclick=closeSheet;$('cx').onclick=closeSheet;
+      const pb=$('pay-branch'); if(pb) pb.onchange=()=>{ saleBranchSel=pb.value; };
       const amtEl=$('pay-amount'), changeEl=$('pay-change-val'), confirmBtn=$('pay-confirm');
       const recompute=()=>{
         paid=parseFloat(amtEl.value)||0;
@@ -663,8 +689,9 @@
     }
     async function doCheckout(paid){
       if(cart.length===0)return;
-      if(!myShift){ toast(t('needShiftToSell'),true); closeSheet(); return; } // لازم وردية مفتوحة
-      const saleBranchId=myShift.branchId||currentBranchId; // البيع يتسجّل على فرع الوردية
+      if(!myShift && profile.role!=='admin'){ toast(t('needShiftToSell'),true); closeSheet(); return; } // الأدمن بس يبيع من غير وردية
+      const saleBranchId = myShift ? (myShift.branchId||currentBranchId) : (saleBranchSel||currentBranchId); // فرع الوردية أو الفرع المؤكَّد
+      const saleShiftId = myShift ? myShift.id : null;
       const cb=$('pay-confirm'); if(cb){ cb.textContent='...'; cb.disabled=true; }
       try{
         const items=cart.map(i=>({productId:i.id,name:i.name,price:i.price,qty:i.qty,subtotal:i.price*i.qty}));
@@ -676,17 +703,20 @@
         const change=Math.max(0,paidAmt-total);
         // 1) registra la vendita (legata al turno + filiale del turno)
         const ref=await addDoc(collection(db,'sales'),{
-          branchId:saleBranchId, shiftId:myShift.id, userId:user.uid, userName:profile.name||user.email,
+          branchId:saleBranchId, shiftId:saleShiftId, userId:user.uid, userName:profile.name||user.email,
           items, total, count:cartCount(), receiptNo, paid:paidAmt, change, createdAt, tzo
         });
-        // 2) scala l'inventario di questo branch
+        // 2) scala l'inventario del branch di vendita
+        const sameBranch = (saleBranchId===currentBranchId);
         for(const i of cart){
-          const cur=inventory[i.id]||{qty:0,threshold:20,lastCost:0};
+          let cur;
+          if(sameBranch){ cur=inventory[i.id]||{qty:0,threshold:20,lastCost:0}; }
+          else { const snap=await getDoc(doc(db,'inventory',`${saleBranchId}_${i.id}`)); cur=snap.exists()?snap.data():{qty:0,threshold:20,lastCost:0}; }
           const nq=Math.max(0,(cur.qty||0)-i.qty);
-          await setDoc(doc(db,'inventory',`${currentBranchId}_${i.id}`),{branchId:currentBranchId,productId:i.id,qty:nq,threshold:cur.threshold||20,lastCost:cur.lastCost||0},{merge:true});
-          inventory[i.id]={qty:nq,threshold:cur.threshold||20,lastCost:cur.lastCost||0};
+          await setDoc(doc(db,'inventory',`${saleBranchId}_${i.id}`),{branchId:saleBranchId,productId:i.id,qty:nq,threshold:cur.threshold||20,lastCost:cur.lastCost||0},{merge:true});
+          if(sameBranch) inventory[i.id]={qty:nq,threshold:cur.threshold||20,lastCost:cur.lastCost||0};
         }
-        const sale={id:ref.id,branchId:saleBranchId,shiftId:myShift.id,userName:profile.name||user.email,items,total,count:cartCount(),receiptNo,paid:paidAmt,change,createdAt,tzo};
+        const sale={id:ref.id,branchId:saleBranchId,shiftId:saleShiftId,userName:profile.name||user.email,items,total,count:cartCount(),receiptNo,paid:paidAmt,change,createdAt,tzo};
         cart=[]; closeSheet(); renderCassa(); toast(t('saleDone'));
         showReceipt(sale); // mostra la fattura automaticamente
       }catch(e){ console.error(e); toast(t('errorGen'),true); if(cb){ cb.textContent='✓ '+t('confirmPay'); cb.disabled=false; } }
@@ -1049,9 +1079,9 @@
     }
 
     let pendingPhoto=null;
-    function prodForm(prod){
+    function prodForm(prod, presetBarcode){
       pendingPhoto=null;
-      const f=prod||{barcode:'',name:'',descAr:'',descEn:'',categoryId:'',price:'',cost:'',active:true,photoUrl:''};
+      const f=prod||{barcode:presetBarcode||'',name:'',descAr:'',descEn:'',categoryId:'',price:'',cost:'',active:true,photoUrl:''};
       const inv=prod?(inventory[prod.id]||{qty:0,threshold:20}):{qty:0,threshold:20};
       let act=f.active!==false;
       const opts=categories.filter(c=>c.active!==false).map(c=>`<option value="${c.id}" ${f.categoryId===c.id?'selected':''}>${lang==='ar'?c.nameAr:c.nameEn}</option>`).join('');
@@ -1059,7 +1089,12 @@
         <div class="sheet-head"><div><div class="sheet-sub">${prod?t('edit'):t('create')}</div><div class="sheet-title">${prod?t('editProduct'):t('addProduct')}</div></div><button class="close-x" id="cx">×</button></div>
         <label class="lbl">${t('photo')}</label>
         <div class="photo-upload" id="photo-box">${f.photoUrl?`<img src="${f.photoUrl}" id="photo-prev">`:`<span style="font-size:30px;">📷</span><span style="font-size:12px;">${t('addPhoto')}</span>`}</div>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button class="btn-secondary" id="photo-cam" style="flex:1;">📷 ${t('takePhoto')}</button>
+          <button class="btn-secondary" id="photo-gal" style="flex:1;">🖼️ ${t('fromGallery')}</button>
+        </div>
         <input type="file" id="photo-input" accept="image/*" class="hidden">
+        <input type="file" id="photo-cam-input" accept="image/*" capture="environment" class="hidden">
         <div class="field" style="margin-top:12px;"><label class="lbl">${t('barcode')}</label><input class="input num" id="p-bc" value="${f.barcode}" dir="ltr"></div>
         <div class="field"><label class="lbl">${t('name')}</label><input class="input fr" id="p-name" value="${f.name}" dir="ltr"></div>
         <div class="field"><label class="lbl">${t('category')}</label><select class="input" id="p-cat"><option value="">${t('selectCat')}</option>${opts}</select></div>
@@ -1078,7 +1113,11 @@
       setToggle('p-act',act,v=>act=v);
       $('ov').onclick=closeSheet;$('cx').onclick=closeSheet;
       $('photo-box').onclick=()=>$('photo-input').click();
-      $('photo-input').onchange=async e=>{ const file=e.target.files[0]; if(!file)return; const b64=await compress(file); if(b64.length>900000){ toast(lang==='ar'?'الصورة كبيرة جداً':'Image too large',true); return; } pendingPhoto=b64; $('photo-box').innerHTML=`<img src="${b64}">`; };
+      $('photo-gal').onclick=()=>$('photo-input').click();
+      $('photo-cam').onclick=()=>$('photo-cam-input').click();
+      const handlePhoto=async e=>{ const file=e.target.files[0]; if(!file)return; const b64=await compress(file); if(b64.length>900000){ toast(lang==='ar'?'الصورة كبيرة جداً':'Image too large',true); return; } pendingPhoto=b64; $('photo-box').innerHTML=`<img src="${b64}">`; };
+      $('photo-input').onchange=handlePhoto;
+      $('photo-cam-input').onchange=handlePhoto;
       function mUpd(){const pr=parseFloat($('p-price').value),co=parseFloat($('p-cost').value);if(isNaN(pr)||isNaN(co)||pr<=0){$('p-margin').innerHTML='';return;}const m=pr-co,pct=Math.round(m/pr*100),bad=pct<30;$('p-margin').innerHTML=`<div style="background:${bad?'rgba(192,72,72,0.07)':'rgba(201,168,76,0.1)'};border-radius:10px;padding:8px 12px;margin-bottom:12px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:${bad?'var(--red)':'var(--forest)'};font-weight:600;">${t('margin')}</span><span class="num" style="font-weight:700;color:${bad?'var(--red)':'var(--forest)'}">${m} ${t('currency')} · ${pct}%</span></div>`;}
       $('p-price').oninput=mUpd;$('p-cost').oninput=mUpd;mUpd();
       if(prod)$('p-del').onclick=async()=>{ if(!confirm(t('confirmDelProd')))return; try{await deleteDoc(doc(db,'products',prod.id));products=products.filter(p=>p.id!==prod.id);closeSheet();renderProducts();toast(t('deleted'));}catch(e){toast(t('errorGen'),true);} };
@@ -1522,6 +1561,7 @@
       else qs=await getDocs(query(collection(db,'shifts'),where('branchId','==',currentBranchId),where('userId','==',user.uid)));
       qs.forEach(d=>shifts.push({id:d.id,...d.data()}));
       shifts.sort((a,b)=>(b.openAt||0)-(a.openAt||0));
+      await loadCustodyTx();
     }
 
     async function shiftSalesTotal(sh){
@@ -1530,6 +1570,84 @@
       let tot=0; const end=sh.closeAt||Date.now();
       qs.forEach(d=>{ const s=d.data(); if(s.createdAt>=sh.openAt && s.createdAt<=end) tot+=(s.total||0); });
       return tot;
+    }
+
+    // ===== العُهدة: تسليم النقدية بين الورديات (بتأكيد المستلِم) =====
+    // المبيعات تفضل مسجّلة باسم صاحبها؛ اللي بيتنقل هو حيازة الكاش بس.
+    function custInSum(sh){ return custodyTx.filter(x=>x.status==='confirmed' && x.toShiftId===sh.id).reduce((a,x)=>a+(x.amount||0),0); }
+    function custOutSum(sh){ return custodyTx.filter(x=>x.status==='confirmed' && x.fromShiftId===sh.id).reduce((a,x)=>a+(x.amount||0),0); }
+    function custPendingOut(sh){ return custodyTx.filter(x=>x.status==='pending' && x.fromShiftId===sh.id); }
+    function custNet(sh){ return custInSum(sh)-custOutSum(sh); } // صافي العهدة المؤكَّدة لهذه الوردية
+    async function loadCustodyTx(){
+      custodyTx=[];
+      try{ const qs=await getDocs(query(collection(db,'custodyTransfers'),where('branchId','==',currentBranchId)));
+        qs.forEach(d=>custodyTx.push({id:d.id,...d.data()})); }catch(e){ console.error('loadCustodyTx',e); }
+    }
+    // يفتح شيت تسليم العهدة من الوردية fromSh لزميل ورديته مفتوحة في نفس الفرع (يتسجّل pending)
+    function openHandSheet(fromSh){
+      const targets=shifts.filter(s=>s.status==='open' && s.branchId===fromSh.branchId && s.id!==fromSh.id);
+      if(targets.length===0){ toast(t('noOpenColleague'),true); return; }
+      $('sheet-root').innerHTML=`<div class="overlay" id="ov"><div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-head"><div><div class="sheet-sub">${t('custodyTitle')}</div><div class="sheet-title">🤝 ${t('handOver')}</div></div><button class="close-x" id="cx">×</button></div>
+        <div style="font-size:13px;margin-bottom:12px;">${t('custFrom')}: <b>${fromSh.userName||''}</b></div>
+        <div class="field"><label class="lbl">${t('handTo')}</label><select class="input" id="hand-to">${targets.map(s=>`<option value="${s.id}">${s.userName||''}</option>`).join('')}</select></div>
+        <div class="field"><label class="lbl">${t('handAmount')} (${t('currency')})</label><input class="input num" id="hand-amt" type="number" min="0" step="0.01" dir="ltr" placeholder="0"></div>
+        <button class="btn-forest btn-wide" id="hand-confirm">✓ ${t('handOver')}</button>
+      </div></div>`;
+      $('ov').onclick=closeSheet;$('cx').onclick=closeSheet;
+      $('hand-confirm').onclick=async()=>{
+        const amt=parseFloat($('hand-amt').value)||0;
+        const toId=$('hand-to').value;
+        const toSh=targets.find(s=>s.id===toId);
+        if(amt<=0||!toSh){ toast(t('errorGen'),true); return; }
+        const b=$('hand-confirm'); b.disabled=true; b.textContent='...';
+        try{
+          const createdAt=Date.now();
+          await addDoc(collection(db,'custodyTransfers'),{
+            branchId:fromSh.branchId, fromShiftId:fromSh.id, fromUserId:fromSh.userId, fromUserName:fromSh.userName||'',
+            toShiftId:toSh.id, toUserId:toSh.userId, toUserName:toSh.userName||'',
+            amount:amt, status:'pending', createdAt, tzo:tzOffsetMin(createdAt)
+          });
+          closeSheet(); toast(t('custSent')); await loadCustodyTx(); renderShift();
+        }catch(e){ console.error(e); toast(t('errorGen'),true); b.disabled=false; b.textContent='✓ '+t('handOver'); }
+      };
+    }
+
+    // فحص دوري للعُهد المستنية تأكيد المستخدم الحالي (شبه فوري)
+    let _custodyChecking=false;
+    async function checkPendingCustody(){
+      if(!user||_custodyChecking) return; _custodyChecking=true;
+      try{
+        const qs=await getDocs(query(collection(db,'custodyTransfers'),where('toUserId','==',user.uid),where('status','==','pending')));
+        let pend=null; qs.forEach(d=>{ if(!pend) pend={id:d.id,...d.data()}; });
+        if(pend && !document.getElementById('cust-confirm-ov')) showCustodyConfirm(pend);
+      }catch(e){ console.error('checkPendingCustody',e); } finally{ _custodyChecking=false; }
+    }
+    function showCustodyConfirm(tx){
+      const root=$('sheet-root');
+      root.innerHTML=`<div class="overlay" id="cust-confirm-ov"><div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-head"><div><div class="sheet-sub">${t('custodyTitle')}</div><div class="sheet-title">📥 ${t('custConfirmReceipt')}</div></div></div>
+        <div style="text-align:center;margin:6px 0 14px;">
+          <div style="font-size:13px;margin-bottom:6px;"><b>${tx.fromUserName||''}</b> ${t('custConfirmMsg')}</div>
+          <div class="num" style="font-size:30px;font-weight:700;color:var(--forest);">${fmt(tx.amount)} ${t('currency')}</div>
+        </div>
+        <label style="display:flex;gap:10px;align-items:flex-start;background:rgba(31,58,46,0.05);border-radius:12px;padding:12px;margin-bottom:14px;cursor:pointer;">
+          <input type="checkbox" id="cust-chk" style="width:20px;height:20px;margin-top:1px;flex-shrink:0;">
+          <span style="font-size:13px;font-weight:600;">${t('custCheckbox')}</span>
+        </label>
+        <button class="btn-forest btn-wide" id="cust-confirm-btn" disabled style="opacity:0.5;">✓ ${t('custConfirmBtn')}</button>
+      </div></div>`;
+      const chk=$('cust-chk'), btn=$('cust-confirm-btn');
+      chk.onchange=()=>{ btn.disabled=!chk.checked; btn.style.opacity=chk.checked?'1':'0.5'; };
+      btn.onclick=async()=>{
+        if(!chk.checked) return;
+        btn.disabled=true; btn.textContent='...';
+        try{
+          await updateDoc(doc(db,'custodyTransfers',tx.id),{status:'confirmed',confirmedAt:Date.now()});
+          root.innerHTML=''; toast(t('custConfirmed'));
+          await loadCustodyTx(); if(activeTab==='shift') renderShift();
+        }catch(e){ console.error(e); toast(t('errorGen'),true); btn.disabled=false; btn.textContent='✓ '+t('custConfirmBtn'); }
+      };
     }
 
     async function renderShift(){
@@ -1568,6 +1686,30 @@
           <div class="field"><label class="lbl">${t('countedCash')}</label><input class="input num" id="sh-close-cash" type="number" min="0" step="0.01" dir="ltr" placeholder="0"></div>
           <button class="btn-forest btn-wide" id="sh-close-btn">🔴 ${t('closeShift')}</button>
         </div>`;
+      }
+
+      // ===== العُهد: الورديات المفتوحة في الفرع (أدمن/مدير) =====
+      if(profile.role==='admin'||profile.role==='manager'){
+        const openShifts=shifts.filter(s=>s.status==='open' && s.branchId===currentBranchId);
+        html+=`<div class="card"><div class="card-title">🤝 ${t('custodyTitle')}</div>`;
+        if(openShifts.length===0) html+=`<div class="empty">${t('noOpenShiftsBranch')}</div>`;
+        else html+=openShifts.map(s=>{
+          const inS=custInSum(s), outS=custOutSum(s); const pend=custPendingOut(s);
+          return `<div style="padding:10px 0;border-bottom:1px solid var(--ivory-dark);">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div style="font-weight:700;font-size:13px;">🟢 ${s.userName||''}</div>
+              <button class="hand-btn" data-sh="${s.id}" style="background:var(--forest);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit;">🤝 ${t('handOver')}</button>
+            </div>
+            <div style="display:flex;gap:12px;margin-top:5px;font-size:11px;flex-wrap:wrap;color:rgba(26,26,26,0.6);">
+              ${inS>0?`<span>📥 ${t('custReceived')}: <b class="num" style="color:var(--green);">${fmt(inS)}</b></span>`:''}
+              ${outS>0?`<span>📤 ${t('custHanded')}: <b class="num" style="color:var(--amber);">${fmt(outS)}</b></span>`:''}
+            </div>
+            ${custodyTx.filter(x=>x.status==='confirmed'&&x.toShiftId===s.id).map(x=>`<div style="font-size:11px;color:rgba(26,26,26,0.5);margin-top:2px;">📥 ${t('custFrom')} ${x.fromUserName}: <span class="num">${fmt(x.amount)}</span> ✓</div>`).join('')}
+            ${custodyTx.filter(x=>x.status==='confirmed'&&x.fromShiftId===s.id).map(x=>`<div style="font-size:11px;color:rgba(26,26,26,0.5);margin-top:2px;">📤 ${t('custTo')} ${x.toUserName}: <span class="num">${fmt(x.amount)}</span> ✓</div>`).join('')}
+            ${pend.map(x=>`<div style="font-size:11px;color:var(--amber);margin-top:2px;">⏳ ${t('custTo')} ${x.toUserName}: <span class="num">${fmt(x.amount)}</span> — ${t('custPending')}</div>`).join('')}
+          </div>`;
+        }).join('');
+        html+=`</div>`;
       }
 
       // storico
@@ -1628,17 +1770,19 @@
             const salesTotal=await shiftSalesTotal(shTmp);
             const workedMs=workedMsOf(shTmp,closeAt);
             const pausedMs=pausedMsOf(shTmp,closeAt);
-            const expectedCash=(myShift.openCash||0)+salesTotal;
+            const expectedCash=(myShift.openCash||0)+salesTotal+custNet(myShift); // + العهدة المستلمة − المسلَّمة
             const diff=cc-expectedCash;
-            await updateDoc(doc(db,'shifts',myShift.id),{pauses:ps,closeAt,closeCash:cc,status:'closed',salesTotal,workedMs,pausedMs,expectedCash,diff});
+            const custIn=custInSum(myShift), custOut=custOutSum(myShift);
+            await updateDoc(doc(db,'shifts',myShift.id),{pauses:ps,closeAt,closeCash:cc,status:'closed',salesTotal,workedMs,pausedMs,expectedCash,diff,custodyInTotal:custIn,custodyOutTotal:custOut});
             toast(t('shiftClosed'));
-            const full={...shTmp,closeCash:cc,status:'closed',salesTotal,workedMs,pausedMs,expectedCash,diff};
+            const full={...shTmp,closeCash:cc,status:'closed',salesTotal,workedMs,pausedMs,expectedCash,diff,custodyInTotal:custIn,custodyOutTotal:custOut};
             myShift=null;
             applyBranchLock(); // sblocca il selettore filiale
             showShiftReport(full);
           }catch(e){ console.error(e); toast(t('errorGen'),true); b.disabled=false; b.textContent='🔴 '+t('closeShift'); }
         };
       }
+      document.querySelectorAll('.hand-btn[data-sh]').forEach(btn=>btn.onclick=()=>{ const s=shifts.find(x=>x.id===btn.dataset.sh); if(s) openHandSheet(s); });
       document.querySelectorAll('.lnk-btn[data-sh]').forEach(btn=>btn.onclick=()=>{ const s=shifts.find(x=>x.id===btn.dataset.sh); if(s) showShiftReport(s); });
 
       // timer live (aggiorna ore lavorate ogni 30s se turno aperto)
@@ -1694,7 +1838,60 @@
 
     // ============ MAGAZZINO (المخزن: استلام + جرد) ============
     let whSubTab='receive';
+    let recvCart=[]; // قائمة استلام متعددة المنتجات
     let invCounts={}; // productId -> counted (string)
+
+    // ===== سكانر الباركود بالكاميرا (يستخدم مكتبة html5-qrcode) =====
+    let _bcScanner=null;
+    function stopScanner(){ if(_bcScanner){ try{ _bcScanner.stop().then(()=>{try{_bcScanner.clear();}catch(e){} _bcScanner=null;}).catch(()=>{_bcScanner=null;}); }catch(e){ _bcScanner=null; } } }
+    function openScanner(onResult){
+      $('sheet-root').innerHTML=`<div class="overlay" id="ov"><div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-head"><div><div class="sheet-sub">${t('scanBarcode')}</div><div class="sheet-title">📷 ${t('scanHint')}</div></div><button class="close-x" id="cx">×</button></div>
+        <div id="bc-reader" style="width:100%;border-radius:12px;overflow:hidden;background:#000;min-height:220px;"></div>
+        <div id="bc-msg" style="font-size:12px;color:var(--red);margin-top:10px;text-align:center;"></div>
+        <div class="field" style="margin-top:12px;"><label class="lbl">${t('barcode')}</label><input class="input num" id="bc-manual" dir="ltr" placeholder="..."></div>
+        <button class="btn-secondary btn-wide" id="bc-manual-ok">✓ ${t('barcode')}</button>
+      </div></div>`;
+      const close=()=>{ stopScanner(); closeSheet(); };
+      $('ov').onclick=close; $('cx').onclick=close;
+      $('bc-manual-ok').onclick=()=>{ const v=$('bc-manual').value.trim(); if(v){ close(); onResult(v); } };
+      if(typeof Html5Qrcode==='undefined'){ $('bc-msg').textContent=t('camNoAccess'); return; }
+      const cfg={ fps:10, qrbox:{width:260,height:150}, formatsToSupport:[
+        Html5QrcodeSupportedFormats.EAN_13,Html5QrcodeSupportedFormats.EAN_8,Html5QrcodeSupportedFormats.UPC_A,
+        Html5QrcodeSupportedFormats.UPC_E,Html5QrcodeSupportedFormats.CODE_128,Html5QrcodeSupportedFormats.CODE_39,
+        Html5QrcodeSupportedFormats.CODE_93,Html5QrcodeSupportedFormats.ITF,Html5QrcodeSupportedFormats.CODABAR,Html5QrcodeSupportedFormats.QR_CODE ] };
+      _bcScanner=new Html5Qrcode('bc-reader');
+      const ok=(txt)=>{ if(!txt)return; stopScanner(); closeSheet(); onResult(String(txt).trim()); };
+      _bcScanner.start({facingMode:'environment'},cfg,ok,()=>{}).catch(()=>{
+        Html5Qrcode.getCameras().then(ds=>{ if(ds&&ds.length){ _bcScanner.start(ds[0].id,cfg,ok,()=>{}).catch(()=>{ $('bc-msg').textContent=t('camNoAccess'); }); } else { $('bc-msg').textContent=t('camNoAccess'); } }).catch(()=>{ $('bc-msg').textContent=t('camNoAccess'); });
+      });
+    }
+    // بعد مسح الباركود في الاستلام: موجود => اسأل الكمية؛ جديد => افتح فورم منتج بالباركود
+    function onReceiveScan(code){
+      const p=products.find(x=>x.barcode===code);
+      if(p){ askReceiveQty(p); }
+      else { toast(t('scanNewProd')); prodForm(null, code); }
+    }
+    function askReceiveQty(p){
+      const inv=inventory[p.id]||{qty:0,lastCost:0};
+      $('sheet-root').innerHTML=`<div class="overlay" id="ov"><div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-head"><div><div class="sheet-sub">${t('scanFound')}</div><div class="sheet-title fr" dir="ltr">${p.name}</div></div><button class="close-x" id="cx">×</button></div>
+        <div style="font-size:12px;color:rgba(26,26,26,0.55);margin-bottom:10px;">${t('currentQty')}: <span class="num" style="font-weight:700;">${inv.qty||0}</span> · ${t('cost')}: <span class="num">${fmt(inv.lastCost||0)}</span> ${t('currency')}</div>
+        <div class="row2">
+          <div class="field"><label class="lbl">${t('howManyAdd')}</label><input class="input num" id="sq-qty" type="number" min="1" dir="ltr" placeholder="0"></div>
+          <div class="field"><label class="lbl">${t('newCost')}</label><input class="input num" id="sq-cost" type="number" min="0" step="0.01" dir="ltr" placeholder="${inv.lastCost||0}"></div>
+        </div>
+        <button class="btn-gold btn-wide" id="sq-add">➕ ${t('addToList')}</button>
+      </div></div>`;
+      $('ov').onclick=closeSheet;$('cx').onclick=closeSheet;
+      $('sq-add').onclick=()=>{
+        const add=parseInt($('sq-qty').value)||0; if(add<=0){ toast(t('required'),true); return; }
+        const cost=$('sq-cost').value!==''?parseFloat($('sq-cost').value):(inv.lastCost||0);
+        const e=recvCart.find(r=>r.productId===p.id);
+        if(e){ e.qty+=add; e.cost=cost; } else recvCart.push({productId:p.id,name:p.name,qty:add,cost});
+        closeSheet(); whSubTab='receive'; renderWarehouse(); toast(t('addToList'));
+      };
+    }
 
     function renderWarehouse(){
       const cb=$('cart-bar-root'); if(cb) cb.innerHTML='';
@@ -1718,9 +1915,16 @@
 
     function whReceiveView(actives){
       if(actives.length===0) return `<div class="card"><div class="empty">${t('noProdYet')}</div></div>`;
+      const listRows = recvCart.length===0 ? `<div class="empty">${t('listEmpty')}</div>` :
+        recvCart.map((r,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--ivory-dark);">
+          <div><div style="font-weight:700;font-size:13px;" class="fr" dir="ltr">${r.name}</div>
+            <div style="font-size:11px;color:rgba(26,26,26,0.55);"><span class="num">${r.qty}</span> × <span class="num">${fmt(r.cost)}</span> ${t('currency')}</div></div>
+          <button class="rc-del" data-i="${i}" style="background:none;border:none;color:var(--red);font-weight:700;font-size:12px;cursor:pointer;font-family:inherit;">✕ ${t('removeRow')}</button>
+        </div>`).join('');
       return `<div class="card">
         <div class="card-title">📥 ${t('receive')}</div>
         <div style="font-size:12px;color:rgba(26,26,26,0.55);margin-bottom:12px;">${t('receiveHint')}</div>
+        <button class="btn-forest btn-wide" id="rc-scan" style="margin-bottom:14px;">📷 ${t('scanBarcode')}</button>
         <div class="field"><label class="lbl">${t('selectProduct')}</label>
           <select class="input" id="rc-prod"><option value="">${t('selectProduct')}</option>
           ${actives.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}</select></div>
@@ -1729,38 +1933,53 @@
           <div class="field"><label class="lbl">${t('receiveQty')}</label><input class="input num" id="rc-qty" type="number" min="1" dir="ltr" placeholder="0"></div>
           <div class="field"><label class="lbl">${t('newCost')}</label><input class="input num" id="rc-cost" type="number" min="0" step="0.01" dir="ltr" placeholder="0"></div>
         </div>
-        <div id="rc-after" style="font-size:13px;color:var(--forest);font-weight:600;margin:6px 0 12px;min-height:18px;"></div>
-        <button class="btn-gold btn-wide" id="rc-save">📥 ${t('receive')}</button>
+        <button class="btn-secondary btn-wide" id="rc-add" style="margin-bottom:14px;">➕ ${t('addToList')}</button>
+        <div class="card-title" style="font-size:13px;">🧾 ${t('recvList')} ${recvCart.length?`(<span class="num">${recvCart.length}</span> ${t('itemsN')})`:''}</div>
+        <div id="rc-list">${listRows}</div>
+        <button class="btn-gold btn-wide" id="rc-save" style="margin-top:12px;" ${recvCart.length===0?'disabled style="opacity:0.5;margin-top:12px;"':''}>📥 ${t('loadAll')}</button>
       </div>`;
     }
 
     function bindReceive(){
       const sel=$('rc-prod'), qEl=$('rc-qty'), cEl=$('rc-cost');
+      const scanBtn=$('rc-scan'); if(scanBtn) scanBtn.onclick=()=>openScanner(onReceiveScan);
       const refresh=()=>{
         const p=products.find(x=>x.id===sel.value);
-        if(!p){ $('rc-cur').textContent=''; $('rc-after').textContent=''; return; }
+        if(!p){ $('rc-cur').textContent=''; return; }
         const inv=inventory[p.id]||{qty:0,lastCost:0};
         $('rc-cur').innerHTML=`${t('currentQty')}: <span class="num" style="font-weight:700;">${inv.qty||0}</span> · ${t('cost')}: <span class="num">${fmt(inv.lastCost||0)}</span> ${t('currency')}`;
         if(!cEl.value && inv.lastCost) cEl.placeholder=String(inv.lastCost);
-        const add=parseInt(qEl.value)||0;
-        $('rc-after').textContent = add>0 ? `${t('afterReceive')}: ${(inv.qty||0)+add}` : '';
       };
-      sel.onchange=refresh; qEl.oninput=refresh; cEl.oninput=refresh;
-      $('rc-save').onclick=async()=>{
+      sel.onchange=refresh; qEl.oninput=()=>{}; 
+      // ➕ أضف للقائمة
+      $('rc-add').onclick=()=>{
         const p=products.find(x=>x.id===sel.value);
         const add=parseInt(qEl.value)||0;
         if(!p){ toast(t('selectProduct'),true); return; }
         if(add<=0){ toast(t('required'),true); return; }
-        const inv=inventory[p.id]||{qty:0,threshold:20,lastCost:0};
-        const newCost = cEl.value!=='' ? parseFloat(cEl.value) : (inv.lastCost||0);
-        const newQty=(inv.qty||0)+add;
-        const b=$('rc-save'); b.disabled=true; b.textContent='...';
+        const inv=inventory[p.id]||{qty:0,lastCost:0};
+        const cost = cEl.value!=='' ? parseFloat(cEl.value) : (inv.lastCost||0);
+        const exist=recvCart.find(r=>r.productId===p.id);
+        if(exist){ exist.qty+=add; exist.cost=cost; } else recvCart.push({productId:p.id,name:p.name,qty:add,cost});
+        renderWarehouse();
+      };
+      // حذف صنف من القائمة
+      document.querySelectorAll('.rc-del').forEach(b=>b.onclick=()=>{ recvCart.splice(parseInt(b.dataset.i),1); renderWarehouse(); });
+      // 📥 استلام الكل
+      const saveBtn=$('rc-save');
+      if(saveBtn) saveBtn.onclick=async()=>{
+        if(recvCart.length===0) return;
+        saveBtn.disabled=true; saveBtn.textContent='...';
         try{
-          await setDoc(doc(db,'inventory',`${currentBranchId}_${p.id}`),{branchId:currentBranchId,productId:p.id,qty:newQty,threshold:inv.threshold||20,lastCost:newCost},{merge:true});
-          inventory[p.id]={qty:newQty,threshold:inv.threshold||20,lastCost:newCost};
-          await addDoc(collection(db,'loads'),{branchId:currentBranchId,productId:p.id,name:p.name,qty:add,unitCost:newCost,total:add*newCost,userId:user.uid,userName:profile.name||user.email,createdAt:Date.now()});
-          toast(t('receiveDone')); renderWarehouse();
-        }catch(e){ console.error(e); toast(t('errorGen'),true); b.disabled=false; b.textContent='📥 '+t('receive'); }
+          for(const r of recvCart){
+            const inv=inventory[r.productId]||{qty:0,threshold:20,lastCost:0};
+            const newQty=(inv.qty||0)+r.qty;
+            await setDoc(doc(db,'inventory',`${currentBranchId}_${r.productId}`),{branchId:currentBranchId,productId:r.productId,qty:newQty,threshold:inv.threshold||20,lastCost:r.cost},{merge:true});
+            inventory[r.productId]={qty:newQty,threshold:inv.threshold||20,lastCost:r.cost};
+            await addDoc(collection(db,'loads'),{branchId:currentBranchId,productId:r.productId,name:r.name,qty:r.qty,unitCost:r.cost,total:r.qty*r.cost,userId:user.uid,userName:profile.name||user.email,createdAt:Date.now()});
+          }
+          recvCart=[]; toast(t('receiveDone')); renderWarehouse();
+        }catch(e){ console.error(e); toast(t('errorGen'),true); saveBtn.disabled=false; saveBtn.textContent='📥 '+t('loadAll'); }
       };
     }
 
