@@ -227,6 +227,7 @@
         noSales:'لا توجد مبيعات بعد', loadingReports:'جارٍ تحميل التقارير...', sold:'مُباع', allBranches:'كل الفروع',
         unitsSold:'وحدة', thisBranch:'هذا الفرع', revenueByDay:'الإيراد اليومي',
         thisMonth:'هذا الشهر', monthRev:'إيراد الشهر', stockValue:'قيمة المخزون', atCost:'بالتكلفة',
+        prodDepots:'المنتج في كل المخازن', pickProdView:'اختر منتج عشان تشوفه في كل الفروع', soldMostIn:'الأكتر مبيعاً في', totalAllBranches:'الإجمالي في كل الفروع', stockVal:'قيمة المخزون', noStockAnywhere:'مفيش مخزون في أي فرع', salesByCashier:'المبيعات حسب الكاشير', invoicesShort:'فاتورة',
         atPrice:'بسعر البيع', totalStockCost:'إجمالي التكلفة', totalStockPrice:'إجمالي البيع المتوقع',
         potentialProfit:'الربح المتوقع', units:'الكمية', noStock:'لا يوجد مخزون', stockReport:'تقرير المخزون',
         shift_tab:'الوردية', shift:'الوردية', openShift:'فتح وردية', closeShift:'قفل الوردية',
@@ -261,7 +262,8 @@
         physInv:'الجرد الفعلي', countedQty:'الكمية المعدودة', systemQty:'كمية النظام', diff:'الفرق',
         surplus:'زيادة', shortage:'عجز', match:'مطابق', applyInv:'تطبيق الجرد', invApplied:'تم تطبيق الجرد',
         invReport:'تقرير الجرد', adjustNote:'سيتم تعديل كميات النظام لتطابق العدّ الفعلي', confirmApplyInv:'تأكيد تطبيق الجرد؟ سيتم تعديل المخزون.',
-        receiveTab:'استلام', invTab:'جرد', print:'طباعة', download:'تحميل', noChanges:'لا توجد تغييرات',
+        receiveTab:'استلام', invTab:'جرد', print:'طباعة', download:'تحميل', noChanges:'لا توجد تغييرات', sendWhatsapp:'إرسال واتساب',
+        suppliers_tab:'الموردين', addSupplier:'مورد جديد', editSupplier:'تعديل المورد', supplierName:'اسم المورد', supplierPhone:'التليفون', supplierNote:'ملاحظات', noSuppliers:'مفيش موردين لسه', supplier:'المورد', noSupplier:'بدون مورد', supplierHistory:'تاريخ التعامل', confirmDelSupplier:'متأكد إنك عايز تمسح المورد؟', callSupplier:'اتصال',
         transferTab:'تحويل', transferGoods:'تحويل بضاعة', transferHint:'حوّل كمية من مخزن الفرع الحالي إلى فرع آخر', toBranch:'إلى فرع',
         transferQty:'الكمية المحوّلة', doTransfer:'تحويل', transferDone:'تم التحويل ✓', notEnoughStock:'الكمية غير كافية في المخزن',
         transferLog:'سجل التحويلات', noTransfers:'لا توجد تحويلات بعد', fromLbl:'من', toLbl:'إلى', needTwoBranches:'محتاج فرعين على الأقل للتحويل', selectDestBranch:'اختر الفرع المستلم',
@@ -316,6 +318,7 @@
         noSales:'No sales yet', loadingReports:'Loading reports...', sold:'sold', allBranches:'All branches',
         unitsSold:'units', thisBranch:'This branch', revenueByDay:'Daily revenue',
         thisMonth:'This month', monthRev:'Month revenue', stockValue:'Stock value', atCost:'At cost',
+        prodDepots:'Product across all depots', pickProdView:'Pick a product to view across branches', soldMostIn:'Sells most in', totalAllBranches:'Total across all branches', stockVal:'Stock value', noStockAnywhere:'No stock in any branch', salesByCashier:'Sales by cashier', invoicesShort:'invoices',
         atPrice:'At sale price', totalStockCost:'Total cost', totalStockPrice:'Expected sales',
         potentialProfit:'Potential profit', units:'Qty', noStock:'No stock', stockReport:'Stock report',
         shift_tab:'Shift', shift:'Shift', openShift:'Open shift', closeShift:'Close shift',
@@ -350,7 +353,8 @@
         physInv:'Physical inventory', countedQty:'Counted qty', systemQty:'System qty', diff:'Difference',
         surplus:'Surplus', shortage:'Shortage', match:'Match', applyInv:'Apply inventory', invApplied:'Inventory applied',
         invReport:'Inventory report', adjustNote:'System quantities will be adjusted to match the physical count', confirmApplyInv:'Apply inventory? Stock will be adjusted.',
-        receiveTab:'Receive', invTab:'Count', print:'Print', download:'Download', noChanges:'No changes',
+        receiveTab:'Receive', invTab:'Count', print:'Print', download:'Download', noChanges:'No changes', sendWhatsapp:'Send WhatsApp',
+        suppliers_tab:'Suppliers', addSupplier:'New supplier', editSupplier:'Edit supplier', supplierName:'Supplier name', supplierPhone:'Phone', supplierNote:'Notes', noSuppliers:'No suppliers yet', supplier:'Supplier', noSupplier:'No supplier', supplierHistory:'Purchase history', confirmDelSupplier:'Delete this supplier?', callSupplier:'Call',
         transferTab:'Transfer', transferGoods:'Transfer goods', transferHint:'Move quantity from current branch to another', toBranch:'To branch',
         transferQty:'Quantity to transfer', doTransfer:'Transfer', transferDone:'Transfer done ✓', notEnoughStock:'Not enough stock',
         transferLog:'Transfer log', noTransfers:'No transfers yet', fromLbl:'From', toLbl:'To', needTwoBranches:'Need at least two branches', selectDestBranch:'Choose destination branch',
@@ -383,6 +387,7 @@
     let user=null, profile=null, branches=[], currentBranchId=null;
     let saleBranchSel=null; // فرع البيع المختار للأدمن/المدير اللي بيبيع من غير وردية
     let categories=[], products=[], inventory={}, users=[], activeTab='products';
+    let suppliers=[]; // الموردين
     let myShift=null, shifts=[]; // myShift = vacanza... turno aperto del cassiere; shifts = storico
     let custodyTx=[]; // تحويلات العهدة (pending/confirmed) للفرع الحالي
     let currentShift=null; // {id, ...} la vacanza... il turno aperto del cassiere
@@ -506,6 +511,7 @@
         tabs.push({k:'products',ico:'📦',l:t('products')});
         tabs.push({k:'categories',ico:'🏷️',l:t('categories')});
         tabs.push({k:'warehouse',ico:'🏬',l:t('warehouse')});
+        tabs.push({k:'suppliers',ico:'🚚',l:t('suppliers_tab')});
         tabs.push({k:'users',ico:'👥',l:t('users')});
         tabs.push({k:'staff',ico:'👀',l:t('staff_tab')});
         tabs.push({k:'reports',ico:'📊',l:t('reports')});
@@ -526,12 +532,13 @@
     function render(){
       // refresh nav labels & branch names for language
       const bs=$('branch-select'); if(bs){const cur=bs.value;bs.innerHTML=branches.map(b=>`<option value="${b.id}">${lang==='ar'?b.nameAr:b.nameEn}</option>`).join('');bs.value=cur;}
-      document.querySelectorAll('.nav-btn').forEach(b=>{const k=b.dataset.tab;b.querySelector('.lbl2').textContent=k==='cassa'?t('cashier_tab'):k==='shift'?t('shift_tab'):k==='receipts'?t('receipts_tab'):k==='products'?t('products'):k==='categories'?t('categories'):k==='warehouse'?t('warehouse'):k==='users'?t('users'):k==='staff'?t('staff_tab'):k==='reports'?t('reports'):k==='branches'?t('branches_tab'):t('cashier_tab');});
+      document.querySelectorAll('.nav-btn').forEach(b=>{const k=b.dataset.tab;b.querySelector('.lbl2').textContent=k==='cassa'?t('cashier_tab'):k==='shift'?t('shift_tab'):k==='receipts'?t('receipts_tab'):k==='products'?t('products'):k==='categories'?t('categories'):k==='warehouse'?t('warehouse'):k==='suppliers'?t('suppliers_tab'):k==='users'?t('users'):k==='staff'?t('staff_tab'):k==='reports'?t('reports'):k==='branches'?t('branches_tab'):t('cashier_tab');});
       if(activeTab==='cassa') renderCassa();
       else { const cb=$('cart-bar-root'); if(cb) cb.innerHTML=''; 
         if(activeTab==='products') renderProducts();
         else if(activeTab==='categories') renderCategories();
         else if(activeTab==='warehouse') renderWarehouse();
+        else if(activeTab==='suppliers') renderSuppliers();
         else if(activeTab==='shift') renderShift();
         else if(activeTab==='receipts') renderReceipts();
         else if(activeTab==='users') renderUsers();
@@ -724,6 +731,23 @@
 
     // ============ RICEVUTE / الفواتير (receipts) ============
     function receiptBranchName(bid){ const b=branches.find(x=>x.id===bid); return b?(lang==='ar'?b.nameAr:b.nameEn):''; }
+    // يبني نص الفاتورة ويفتح واتساب (العميل يختار جهة الاتصال)
+    function sendReceiptWhatsapp(sale,bn,dt){
+      const L=[];
+      L.push('Le Coin — '+(bn||''));
+      L.push(t('receiptNo')+': #'+(sale.receiptNo||''));
+      L.push(dt);
+      L.push('----------------------');
+      (sale.items||[]).forEach(i=>{ L.push(`${i.name}  ${i.qty} x ${fmt(i.price)} = ${fmt(i.subtotal)} ${t('currency')}`); });
+      L.push('----------------------');
+      const net=Math.max(0,(sale.total||0)-(sale.refundTotal||0));
+      L.push(t('total')+': '+fmt(net)+' '+t('currency'));
+      if(sale.paid!=null){ L.push(t('received')+': '+fmt(sale.paid)+' '+t('currency')); L.push(t('changeDue')+': '+fmt(sale.change||0)+' '+t('currency')); }
+      L.push('');
+      L.push(t('thankYou'));
+      const txt=encodeURIComponent(L.join('\n'));
+      window.open('https://wa.me/?text='+txt,'_blank');
+    }
     function showReceipt(sale){
       const bn=receiptBranchName(sale.branchId);
       const dt=fmtDT(sale.createdAt,sale.tzo);
@@ -753,6 +777,7 @@
           <button class="btn-forest btn-wide" id="rc-print">🖨️ ${t('print')}</button>
           <button class="btn-secondary btn-wide" id="rc-dl">⬇️ ${t('download')}</button>
         </div>
+        <button class="btn-wide" id="rc-wa" style="margin-top:8px;background:#25D366;color:#fff;border:none;border-radius:12px;font-weight:700;font-family:inherit;padding:12px;cursor:pointer;">📱 ${t('sendWhatsapp')}</button>
         ${canRefund()&&!sale.voided?`<div style="display:flex;gap:8px;margin-top:8px;">
           <button class="btn-secondary btn-wide" id="rc-return" style="color:var(--amber);border-color:rgba(216,142,42,0.4);">↩️ ${t('returnItems')}</button>
           <button class="btn-secondary btn-wide" id="rc-void" style="color:var(--red);border-color:rgba(192,72,72,0.3);">✖ ${t('voidInvoice')}</button>
@@ -760,6 +785,7 @@
       </div></div>`;
       $('ov').onclick=closeSheet;$('cx').onclick=closeSheet;
       $('rc-print').onclick=()=>printReceipt(sale);
+      $('rc-wa')&&($('rc-wa').onclick=()=>sendReceiptWhatsapp(sale,bn,dt));
       $('rc-dl').onclick=()=>{
         const header=[t('receiptNo'),t('saleTime'),t('cashierLbl'),t('itemCol'),t('qtyCol'),t('priceCol'),t('subtotalCol')];
         const rws=(sale.items||[]).map(i=>['#'+(sale.receiptNo||''),dt,sale.userName||'',i.name,i.qty,i.price,i.subtotal]);
@@ -1352,6 +1378,45 @@
         <div style="background:var(--ivory-dark);border-radius:6px;height:7px;overflow:hidden;"><div style="background:var(--forest);height:100%;width:${Math.round(p.qty/mx*100)}%;"></div></div>
       </div>`).join('');
     }
+    // عرض منتج واحد في كل المخازن (نقطة 6): الكمية/التكلفة/السعر/القيمة لكل فرع + فين بيتباع أكتر
+    let ppSel='';
+    async function renderProductDepots(){
+      const box=$('pp-box'); if(!box) return;
+      if(!ppSel){ box.innerHTML=`<div class="empty">${t('pickProdView')}</div>`; return; }
+      const p=products.find(x=>x.id===ppSel); if(!p){ box.innerHTML=''; return; }
+      box.innerHTML=`<div class="spinner"></div>`;
+      const visIds = profile.role==='admin' ? branches.map(b=>b.id) : (profile.branchIds||[]);
+      // كمية المنتج في كل فرع
+      let rows=[]; let totQty=0, totVal=0;
+      try{
+        const qs=await getDocs(query(collection(db,'inventory'),where('productId','==',ppSel)));
+        const byB={}; qs.forEach(d=>{ const x=d.data(); byB[x.branchId]=x; });
+        for(const bid of visIds){
+          const b=branches.find(x=>x.id===bid); if(!b) continue;
+          const inv=byB[bid]||{qty:0,lastCost:0};
+          const q=inv.qty||0, cost=inv.lastCost||0, val=q*(p.price||0);
+          totQty+=q; totVal+=val;
+          rows.push({name:lang==='ar'?b.nameAr:b.nameEn, qty:q, cost, val});
+        }
+      }catch(e){ console.error(e); box.innerHTML=`<div class="empty">${t('errorGen')}</div>`; return; }
+      // فين بيتباع أكتر (من مبيعات التقرير، صافي)
+      const soldByBranch={};
+      reportSales.forEach(s=>{ const rm=(()=>{ const m={}; if(s.voided)(s.items||[]).forEach(it=>m[it.productId]=(m[it.productId]||0)+it.qty); (s.returns||[]).forEach(r=>(r.lines||[]).forEach(l=>m[l.productId]=(m[l.productId]||0)+l.qty)); return m; })();
+        (s.items||[]).forEach(it=>{ if(it.productId!==ppSel) return; const net=Math.max(0,it.qty-(rm[it.productId]||0)); if(net<=0)return; soldByBranch[s.branchId]=(soldByBranch[s.branchId]||0)+net; }); });
+      let topBranch=null, topSold=0; Object.keys(soldByBranch).forEach(bid=>{ if(soldByBranch[bid]>topSold){ topSold=soldByBranch[bid]; topBranch=bid; } });
+      const topName = topBranch ? (()=>{const b=branches.find(x=>x.id===topBranch);return b?(lang==='ar'?b.nameAr:b.nameEn):'';})() : null;
+      const maxQ=Math.max(1,...rows.map(r=>r.qty));
+      let html=`<div style="font-size:12px;color:rgba(26,26,26,0.6);margin-bottom:10px;">${t('cost')}: <span class="num">${fmt(p.cost||0)}</span> · ${t('price')}: <span class="num">${fmt(p.price||0)}</span> ${t('currency')}</div>`;
+      if(totQty===0 && rows.every(r=>r.qty===0)) html+=`<div class="empty">${t('noStockAnywhere')}</div>`;
+      else html+=rows.map(r=>`<div style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px;"><span>${r.name}</span><span class="num" style="font-weight:700;color:var(--forest);">${r.qty}</span></div>
+        <div style="background:var(--ivory-dark);border-radius:6px;height:7px;overflow:hidden;margin-bottom:2px;"><div style="background:var(--forest);height:100%;width:${Math.round(r.qty/maxQ*100)}%;"></div></div>
+        <div style="font-size:10px;color:rgba(26,26,26,0.5);">${t('stockVal')}: <span class="num">${fmt(r.val)}</span> ${t('currency')}</div>
+      </div>`).join('');
+      html+=`<div style="border-top:1px solid var(--ivory-dark);margin-top:8px;padding-top:8px;display:flex;justify-content:space-between;font-size:13px;font-weight:700;"><span>${t('totalAllBranches')}</span><span class="num" style="color:var(--forest);">${totQty} · ${fmt(totVal)} ${t('currency')}</span></div>`;
+      if(topName) html+=`<div style="margin-top:8px;background:rgba(201,168,76,0.12);border-radius:9px;padding:8px 11px;font-size:12px;">🏆 ${t('soldMostIn')}: <b>${topName}</b> (<span class="num">${topSold}</span>)</div>`;
+      box.innerHTML=html;
+    }
     async function renderReports(){
       $('content').innerHTML=`<div class="spinner"></div><div style="text-align:center;color:rgba(26,26,26,0.5);font-size:13px;">${t('loadingReports')}</div>`;
       // quali branch può vedere
@@ -1445,6 +1510,25 @@
         </div>
         <div id="tp-box" style="margin-top:8px;"></div>
       </div>`;
+      // المنتج في كل المخازن (نقطة 6)
+      html+=`<div class="card"><div class="card-title">📦 ${t('prodDepots')}</div>
+        <div class="field" style="margin-bottom:8px;"><select class="input" id="pp-prod"><option value="">${t('selectProduct')}</option>
+        ${products.filter(p=>p.active!==false).map(p=>`<option value="${p.id}" ${ppSel===p.id?'selected':''}>${p.name}</option>`).join('')}</select></div>
+        <div id="pp-box" style="margin-top:6px;"></div>
+      </div>`;
+      // المبيعات حسب الكاشير (نقطة 2 من الباقي) — صافي + عدد فواتير
+      const cashMap={};
+      sales.forEach(s=>{ const nm=s.userName||'—'; if(!cashMap[nm])cashMap[nm]={net:0,cnt:0}; cashMap[nm].net+=effTotal(s); if(!s.voided)cashMap[nm].cnt++; });
+      const cashRows=Object.entries(cashMap).map(([nm,v])=>({nm,...v})).sort((a,b)=>b.net-a.net);
+      if(cashRows.length){
+        const mxC=Math.max(1,...cashRows.map(r=>r.net));
+        html+=`<div class="card"><div class="card-title">🧑‍💼 ${t('salesByCashier')}</div>`+
+        cashRows.map(r=>`<div style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px;"><span style="font-weight:700;">${r.nm}</span><span class="num" style="color:var(--forest);font-weight:700;">${fmt(r.net)} ${t('currency')}</span></div>
+          <div style="background:var(--ivory-dark);border-radius:6px;height:7px;overflow:hidden;margin-bottom:2px;"><div style="background:var(--forest);height:100%;width:${Math.round(r.net/mxC*100)}%;"></div></div>
+          <div style="font-size:10px;color:rgba(26,26,26,0.5);"><span class="num">${r.cnt}</span> ${t('invoicesShort')}</div>
+        </div>`).join('')+`</div>`;
+      }
       // confronto filiali (solo se >1 visibile)
       if(branchRows.length>1){
         html+=`<div class="card"><div class="card-title">🏬 ${t('branchCompare')} · ${t('last7')}</div>`;
@@ -1513,6 +1597,8 @@
       renderTopProducts();
       ['tp-period','tp-branch'].forEach(id=>$(id)&&($(id).onchange=()=>{ tpFilter.period=$('tp-period').value; tpFilter.branchId=$('tp-branch').value; renderTopProducts(); }));
       ['tp-min','tp-max'].forEach(id=>$(id)&&($(id).oninput=()=>{ tpFilter.min=$('tp-min').value; tpFilter.max=$('tp-max').value; renderTopProducts(); }));
+      renderProductDepots();
+      $('pp-prod')&&($('pp-prod').onchange=()=>{ ppSel=$('pp-prod').value; renderProductDepots(); });
       // bind stampa/download report vendite
       const repTitle=t('reports');
       $('rep-print') && ($('rep-print').onclick=()=>{
@@ -1839,6 +1925,7 @@
     // ============ MAGAZZINO (المخزن: استلام + جرد) ============
     let whSubTab='receive';
     let recvCart=[]; // قائمة استلام متعددة المنتجات
+    let recvSupplier=''; // المورد المختار للاستلام
     let invCounts={}; // productId -> counted (string)
 
     // ===== سكانر الباركود بالكاميرا (يستخدم مكتبة html5-qrcode) =====
@@ -1893,8 +1980,59 @@
       };
     }
 
-    function renderWarehouse(){
+    // ============ FORNITORI / الموردين ============
+    async function loadSuppliers(){
+      suppliers=[];
+      try{ const qs=await getDocs(collection(db,'suppliers')); qs.forEach(d=>suppliers.push({id:d.id,...d.data()})); suppliers.sort((a,b)=>(a.name||'').localeCompare(b.name||'')); }catch(e){ console.error('loadSuppliers',e); }
+    }
+    async function renderSuppliers(){
+      $('content').innerHTML=`<div class="spinner"></div>`;
+      await loadSuppliers();
+      let html=`<div style="font-size:11px;letter-spacing:1px;color:var(--forest);font-weight:700;margin-bottom:12px;">${t('suppliers_tab').toUpperCase()}</div>`;
+      html+=`<button class="btn-gold btn-wide" id="sp-add" style="margin-bottom:14px;">➕ ${t('addSupplier')}</button>`;
+      html+=`<div class="card">`;
+      if(suppliers.length===0) html+=`<div class="empty">${t('noSuppliers')}</div>`;
+      else html+=suppliers.map(s=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--ivory-dark);">
+        <div><div style="font-weight:700;font-size:14px;">${s.name||''}</div>
+          ${s.phone?`<div class="num" style="font-size:12px;color:rgba(26,26,26,0.55);">📞 ${s.phone}</div>`:''}
+          ${s.note?`<div style="font-size:11px;color:rgba(26,26,26,0.5);">${s.note}</div>`:''}</div>
+        <div style="display:flex;gap:6px;">
+          ${s.phone?`<a href="tel:${s.phone}" class="btn-secondary" style="padding:6px 10px;font-size:12px;text-decoration:none;">📞</a>`:''}
+          <button class="sp-edit btn-secondary" data-id="${s.id}" style="padding:6px 10px;font-size:12px;">✏️</button>
+        </div>
+      </div>`).join('');
+      html+=`</div>`;
+      $('content').innerHTML=html;
+      $('sp-add').onclick=()=>supplierForm(null);
+      document.querySelectorAll('.sp-edit').forEach(b=>b.onclick=()=>supplierForm(suppliers.find(s=>s.id===b.dataset.id)));
+    }
+    function supplierForm(sp){
+      const f=sp||{name:'',phone:'',note:''};
+      $('sheet-root').innerHTML=`<div class="overlay" id="ov"><div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-head"><div><div class="sheet-sub">${sp?t('edit'):t('create')}</div><div class="sheet-title">${sp?t('editSupplier'):t('addSupplier')}</div></div><button class="close-x" id="cx">×</button></div>
+        <div class="field"><label class="lbl">${t('supplierName')}</label><input class="input" id="sp-name" value="${(f.name||'').replace(/"/g,'&quot;')}"></div>
+        <div class="field"><label class="lbl">${t('supplierPhone')}</label><input class="input num" id="sp-phone" dir="ltr" value="${f.phone||''}"></div>
+        <div class="field"><label class="lbl">${t('supplierNote')}</label><textarea class="input" id="sp-note" style="min-height:50px;resize:vertical;">${f.note||''}</textarea></div>
+        ${sp?`<button class="btn-secondary btn-wide" id="sp-del" style="margin-bottom:10px;color:var(--red);border-color:rgba(192,72,72,0.3);">${t('delete')}</button>`:''}
+        <button class="btn-forest btn-wide" id="sp-save">✓ ${t('save')}</button>
+      </div></div>`;
+      $('ov').onclick=closeSheet;$('cx').onclick=closeSheet;
+      if(sp)$('sp-del').onclick=async()=>{ if(!confirm(t('confirmDelSupplier')))return; try{ await deleteDoc(doc(db,'suppliers',sp.id)); closeSheet(); renderSuppliers(); toast(t('deleted')); }catch(e){ toast(t('errorGen'),true); } };
+      $('sp-save').onclick=async()=>{
+        const name=$('sp-name').value.trim(); if(!name){ toast(t('required'),true); return; }
+        const data={name,phone:$('sp-phone').value.trim(),note:$('sp-note').value.trim()};
+        const b=$('sp-save'); b.disabled=true; b.textContent='...';
+        try{
+          if(sp) await updateDoc(doc(db,'suppliers',sp.id),data);
+          else { data.createdAt=Date.now(); await addDoc(collection(db,'suppliers'),data); }
+          closeSheet(); renderSuppliers(); toast(t('saved'));
+        }catch(e){ console.error(e); toast(t('errorGen'),true); b.disabled=false; b.textContent='✓ '+t('save'); }
+      };
+    }
+
+    async function renderWarehouse(){
       const cb=$('cart-bar-root'); if(cb) cb.innerHTML='';
+      if(suppliers.length===0) await loadSuppliers();
       const actives=products.filter(p=>p.active!==false);
       const onSt='background:var(--forest);color:var(--ivory);border:1px solid var(--forest);';
       const offSt='background:white;color:var(--charcoal);border:1px solid var(--ivory-dark);';
@@ -1925,6 +2063,9 @@
         <div class="card-title">📥 ${t('receive')}</div>
         <div style="font-size:12px;color:rgba(26,26,26,0.55);margin-bottom:12px;">${t('receiveHint')}</div>
         <button class="btn-forest btn-wide" id="rc-scan" style="margin-bottom:14px;">📷 ${t('scanBarcode')}</button>
+        <div class="field"><label class="lbl">🚚 ${t('supplier')}</label>
+          <select class="input" id="rc-supplier"><option value="">${t('noSupplier')}</option>
+          ${suppliers.map(s=>`<option value="${s.id}" ${recvSupplier===s.id?'selected':''}>${s.name||''}</option>`).join('')}</select></div>
         <div class="field"><label class="lbl">${t('selectProduct')}</label>
           <select class="input" id="rc-prod"><option value="">${t('selectProduct')}</option>
           ${actives.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}</select></div>
@@ -1943,6 +2084,7 @@
     function bindReceive(){
       const sel=$('rc-prod'), qEl=$('rc-qty'), cEl=$('rc-cost');
       const scanBtn=$('rc-scan'); if(scanBtn) scanBtn.onclick=()=>openScanner(onReceiveScan);
+      const supSel=$('rc-supplier'); if(supSel) supSel.onchange=()=>{ recvSupplier=supSel.value; };
       const refresh=()=>{
         const p=products.find(x=>x.id===sel.value);
         if(!p){ $('rc-cur').textContent=''; return; }
@@ -1970,13 +2112,14 @@
       if(saveBtn) saveBtn.onclick=async()=>{
         if(recvCart.length===0) return;
         saveBtn.disabled=true; saveBtn.textContent='...';
+        const sup=suppliers.find(s=>s.id===recvSupplier);
         try{
           for(const r of recvCart){
             const inv=inventory[r.productId]||{qty:0,threshold:20,lastCost:0};
             const newQty=(inv.qty||0)+r.qty;
             await setDoc(doc(db,'inventory',`${currentBranchId}_${r.productId}`),{branchId:currentBranchId,productId:r.productId,qty:newQty,threshold:inv.threshold||20,lastCost:r.cost},{merge:true});
             inventory[r.productId]={qty:newQty,threshold:inv.threshold||20,lastCost:r.cost};
-            await addDoc(collection(db,'loads'),{branchId:currentBranchId,productId:r.productId,name:r.name,qty:r.qty,unitCost:r.cost,total:r.qty*r.cost,userId:user.uid,userName:profile.name||user.email,createdAt:Date.now()});
+            await addDoc(collection(db,'loads'),{branchId:currentBranchId,productId:r.productId,name:r.name,qty:r.qty,unitCost:r.cost,total:r.qty*r.cost,supplierId:recvSupplier||null,supplierName:sup?sup.name:null,userId:user.uid,userName:profile.name||user.email,createdAt:Date.now()});
           }
           recvCart=[]; toast(t('receiveDone')); renderWarehouse();
         }catch(e){ console.error(e); toast(t('errorGen'),true); saveBtn.disabled=false; saveBtn.textContent='📥 '+t('loadAll'); }
