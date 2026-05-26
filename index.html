@@ -219,6 +219,7 @@
         reports:'التقارير', today:'اليوم', last7:'آخر ٧ أيام', salesCount:'عدد الفواتير', revenue:'الإيرادات',
         avgSale:'متوسط الفاتورة', topProducts:'أكثر المنتجات مبيعاً', branchCompare:'مقارنة الفروع',
         branchAccounts:'حسابات الفروع', allTime:'الإجمالي الكلي', grossRev:'الإجمالي', netRev:'الصافي', invoicesN:'فاتورة',
+        period:'الفترة', pToday:'اليوم', pMonth:'الشهر', p7:'آخر 7 أيام', pAll:'كل الوقت', priceMin:'أقل سعر', priceMax:'أكبر سعر', branchFilter:'الفرع',
         staff_tab:'مين فين', whoWhere:'مين شغّال فين', onDutyNow:'على رأس العمل دلوقتي', byBranchView:'حسب الفرع', byCashierView:'حسب الكاشير',
         since:'من', onDutyFor:'مدة الخدمة', noOneWorking:'لا أحد على رأس العمل الآن', searchCashierName:'ابحث باسم الكاشير', cashiersCount:'عدد الكاشيرز', onPauseNow:'في استراحة',
         noSales:'لا توجد مبيعات بعد', loadingReports:'جارٍ تحميل التقارير...', sold:'مُباع', allBranches:'كل الفروع',
@@ -303,6 +304,7 @@
         reports:'Reports', today:'Today', last7:'Last 7 days', salesCount:'Sales', revenue:'Revenue',
         avgSale:'Avg sale', topProducts:'Top products', branchCompare:'Branch comparison',
         branchAccounts:'Branch accounts', allTime:'All time', grossRev:'Gross', netRev:'Net', invoicesN:'invoices',
+        period:'Period', pToday:'Today', pMonth:'Month', p7:'Last 7 days', pAll:'All time', priceMin:'Min price', priceMax:'Max price', branchFilter:'Branch',
         staff_tab:"Who's where", whoWhere:"Who's working where", onDutyNow:'On duty now', byBranchView:'By branch', byCashierView:'By cashier',
         since:'Since', onDutyFor:'On duty for', noOneWorking:'Nobody on duty now', searchCashierName:'Search by cashier name', cashiersCount:'Cashiers', onPauseNow:'On break',
         noSales:'No sales yet', loadingReports:'Loading reports...', sold:'sold', allBranches:'All branches',
@@ -1212,6 +1214,7 @@
     function dayStart( d){ const x=new Date(d); x.setHours(0,0,0,0); return x.getTime(); }
     // ===== مين شغّال فين (نقطة 3): الورديات المفتوحة حسب الفرع / الكاشير =====
     let staffView='branch', staffSearch='';
+    let reportSales=[], tpFilter={period:'7',branchId:'',min:'',max:''};
     async function renderStaff(){
       $('content').innerHTML=`<div class="spinner"></div>`;
       const visibleBranchIds = profile.role==='admin' ? branches.map(b=>b.id) : (profile.branchIds||[]);
@@ -1279,6 +1282,37 @@
     }
     function bindSeg(){ document.querySelectorAll('.seg').forEach(b=>b.onclick=()=>{ staffView=b.dataset.v; renderStaff(); }); }
 
+    // ricalcola top prodotti secondo i filtri (periodo/filiale/prezzo)
+    function renderTopProducts(){
+      const box=$('tp-box'); if(!box) return;
+      const now=Date.now(); const tStart=dayStart(now);
+      const md=new Date(now); const mStart=new Date(md.getFullYear(),md.getMonth(),1).getTime();
+      let from=0;
+      if(tpFilter.period==='today') from=tStart;
+      else if(tpFilter.period==='month') from=mStart;
+      else if(tpFilter.period==='7') from=tStart-6*86400000;
+      else from=0; // all
+      const minP=tpFilter.min!==''?parseFloat(tpFilter.min):null;
+      const maxP=tpFilter.max!==''?parseFloat(tpFilter.max):null;
+      const rmFn=s=>{ const m={}; if(s.voided)(s.items||[]).forEach(it=>m[it.productId]=(m[it.productId]||0)+it.qty); (s.returns||[]).forEach(r=>(r.lines||[]).forEach(l=>m[l.productId]=(m[l.productId]||0)+l.qty)); return m; };
+      const sel=reportSales.filter(s=>s.createdAt>=from && (!tpFilter.branchId || s.branchId===tpFilter.branchId));
+      const map={};
+      sel.forEach(s=>{ const rm=rmFn(s); (s.items||[]).forEach(it=>{
+        const price=it.price||0;
+        if(minP!=null && price<minP) return;
+        if(maxP!=null && price>maxP) return;
+        const net=Math.max(0,it.qty-(rm[it.productId]||0)); if(net<=0)return;
+        if(!map[it.productId])map[it.productId]={name:it.name,qty:0,rev:0};
+        map[it.productId].qty+=net; map[it.productId].rev+=net*price;
+      }); });
+      const list=Object.values(map).sort((a,b)=>b.qty-a.qty).slice(0,10);
+      const mx=list.length?list[0].qty:1;
+      if(list.length===0){ box.innerHTML=`<div class="empty">${t('noSales')}</div>`; return; }
+      box.innerHTML=list.map((p,i)=>`<div style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px;"><span><span class="num" style="color:rgba(26,26,26,0.4);">${i+1}.</span> <span class="fr" dir="ltr">${p.name}</span></span><span class="num" style="color:rgba(26,26,26,0.6);">${p.qty} ${t('unitsSold')} · ${fmt(p.rev)} ${t('currency')}</span></div>
+        <div style="background:var(--ivory-dark);border-radius:6px;height:7px;overflow:hidden;"><div style="background:var(--forest);height:100%;width:${Math.round(p.qty/mx*100)}%;"></div></div>
+      </div>`).join('');
+    }
     async function renderReports(){
       $('content').innerHTML=`<div class="spinner"></div><div style="text-align:center;color:rgba(26,26,26,0.5);font-size:13px;">${t('loadingReports')}</div>`;
       // quali branch può vedere
@@ -1298,6 +1332,7 @@
       }catch(e){ console.error(e); $('content').innerHTML=`<div class="card"><div class="empty">${t('errorGen')}</div></div>`; return; }
 
       if(sales.length===0){ $('content').innerHTML=`<div class="card"><div class="empty">${t('noSales')}</div></div>`; return; }
+      reportSales=sales; // للفلترة التفاعلية لأكتر المنتجات
 
       const now=Date.now(); const todayStart=dayStart(now); const weekStart=todayStart-6*86400000;
       const monthD=new Date(now); const monthStart=new Date(monthD.getFullYear(),monthD.getMonth(),1).getTime();
@@ -1350,14 +1385,27 @@
         </div>
         <div style="text-align:center;margin-top:10px;font-size:12px;color:rgba(26,26,26,0.6);">${t('revenue')} ${t('last7')}: <span class="num" style="font-weight:700;color:var(--forest);">${fmt(weekRev)} ${t('currency')}</span></div>
       </div>`;
-      // top prodotti
-      html+=`<div class="card"><div class="card-title">🏆 ${t('topProducts')} · ${t('last7')}</div>`;
-      if(top.length===0) html+=`<div class="empty">${t('noSales')}</div>`;
-      else html+=top.map(p=>`<div style="margin-bottom:10px;">
-        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px;"><span class="fr" dir="ltr">${p.name}</span><span class="num" style="color:rgba(26,26,26,0.6);">${p.qty} ${t('unitsSold')} · ${fmt(p.rev)} ${t('currency')}</span></div>
-        <div style="background:var(--ivory-dark);border-radius:6px;height:7px;overflow:hidden;"><div style="background:var(--forest);height:100%;width:${Math.round(p.qty/maxQty*100)}%;"></div></div>
-      </div>`).join('');
-      html+=`</div>`;
+      // top prodotti (موسّع: فلاتر الفترة/الفرع/السعر)
+      const visBranches=branches.filter(b=>visibleBranchIds.includes(b.id));
+      html+=`<div class="card"><div class="card-title">🏆 ${t('topProducts')}</div>
+        <div class="row2">
+          <div class="field" style="margin-bottom:8px;"><label class="lbl">${t('period')}</label>
+            <select class="input" id="tp-period">
+              <option value="today" ${tpFilter.period==='today'?'selected':''}>${t('pToday')}</option>
+              <option value="month" ${tpFilter.period==='month'?'selected':''}>${t('pMonth')}</option>
+              <option value="7" ${tpFilter.period==='7'?'selected':''}>${t('p7')}</option>
+              <option value="all" ${tpFilter.period==='all'?'selected':''}>${t('pAll')}</option>
+            </select></div>
+          <div class="field" style="margin-bottom:8px;"><label class="lbl">${t('branchFilter')}</label>
+            <select class="input" id="tp-branch"><option value="">${t('allBranches')}</option>
+            ${visBranches.map(b=>`<option value="${b.id}" ${tpFilter.branchId===b.id?'selected':''}>${lang==='ar'?b.nameAr:b.nameEn}</option>`).join('')}</select></div>
+        </div>
+        <div class="row2">
+          <div class="field" style="margin-bottom:8px;"><label class="lbl">${t('priceMin')}</label><input class="input num" id="tp-min" type="number" dir="ltr" value="${tpFilter.min}" placeholder="0"></div>
+          <div class="field" style="margin-bottom:8px;"><label class="lbl">${t('priceMax')}</label><input class="input num" id="tp-max" type="number" dir="ltr" value="${tpFilter.max}" placeholder="∞"></div>
+        </div>
+        <div id="tp-box" style="margin-top:8px;"></div>
+      </div>`;
       // confronto filiali (solo se >1 visibile)
       if(branchRows.length>1){
         html+=`<div class="card"><div class="card-title">🏬 ${t('branchCompare')} · ${t('last7')}</div>`;
@@ -1422,6 +1470,10 @@
         <button class="btn-secondary btn-wide" id="rep-dl">⬇️ ${t('download')}</button>
       </div>`;
       $('content').innerHTML=html;
+      // bind filtri top prodotti
+      renderTopProducts();
+      ['tp-period','tp-branch'].forEach(id=>$(id)&&($(id).onchange=()=>{ tpFilter.period=$('tp-period').value; tpFilter.branchId=$('tp-branch').value; renderTopProducts(); }));
+      ['tp-min','tp-max'].forEach(id=>$(id)&&($(id).oninput=()=>{ tpFilter.min=$('tp-min').value; tpFilter.max=$('tp-max').value; renderTopProducts(); }));
       // bind stampa/download report vendite
       const repTitle=t('reports');
       $('rep-print') && ($('rep-print').onclick=()=>{
