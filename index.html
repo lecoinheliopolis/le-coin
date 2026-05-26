@@ -218,6 +218,7 @@
         addToCart:'أُضيف', removeItem:'حذف', selectBranchFirst:'اختر فرعاً', whatsapp:'إرسال واتساب', receipt:'إيصال',
         reports:'التقارير', today:'اليوم', last7:'آخر ٧ أيام', salesCount:'عدد الفواتير', revenue:'الإيرادات',
         avgSale:'متوسط الفاتورة', topProducts:'أكثر المنتجات مبيعاً', branchCompare:'مقارنة الفروع',
+        branchAccounts:'حسابات الفروع', allTime:'الإجمالي الكلي', grossRev:'الإجمالي', netRev:'الصافي', invoicesN:'فاتورة',
         noSales:'لا توجد مبيعات بعد', loadingReports:'جارٍ تحميل التقارير...', sold:'مُباع', allBranches:'كل الفروع',
         unitsSold:'وحدة', thisBranch:'هذا الفرع', revenueByDay:'الإيراد اليومي',
         thisMonth:'هذا الشهر', monthRev:'إيراد الشهر', stockValue:'قيمة المخزون', atCost:'بالتكلفة',
@@ -296,6 +297,7 @@
         addToCart:'Added', removeItem:'Remove', selectBranchFirst:'Select a branch', whatsapp:'Send WhatsApp', receipt:'Receipt',
         reports:'Reports', today:'Today', last7:'Last 7 days', salesCount:'Sales', revenue:'Revenue',
         avgSale:'Avg sale', topProducts:'Top products', branchCompare:'Branch comparison',
+        branchAccounts:'Branch accounts', allTime:'All time', grossRev:'Gross', netRev:'Net', invoicesN:'invoices',
         noSales:'No sales yet', loadingReports:'Loading reports...', sold:'sold', allBranches:'All branches',
         unitsSold:'units', thisBranch:'This branch', revenueByDay:'Daily revenue',
         thisMonth:'This month', monthRev:'Month revenue', stockValue:'Stock value', atCost:'At cost',
@@ -1284,6 +1286,31 @@
         </div>`).join('');
         html+=`</div>`;
       }
+      // ===== حسابات الفروع (نقطة 2): صافي/إجمالي + الشهر + عدد الفواتير لكل فرع =====
+      const acctRows=branches.filter(b=>visibleBranchIds.includes(b.id)).map(b=>{
+        const bs=sales.filter(s=>s.branchId===b.id);
+        const bsMonth=bs.filter(s=>s.createdAt>=monthStart);
+        const gross=bs.reduce((a,s)=>a+(s.voided?0:(s.total||0)),0);
+        const net=bs.reduce((a,s)=>a+effTotal(s),0);
+        const netMonth=bsMonth.reduce((a,s)=>a+effTotal(s),0);
+        const inv=bs.filter(s=>!s.voided).length;
+        return {name:lang==='ar'?b.nameAr:b.nameEn, gross, net, netMonth, inv};
+      }).sort((a,b)=>b.net-a.net);
+      const maxAcct=Math.max(1,...acctRows.map(r=>r.net));
+      html+=`<div class="card"><div class="card-title">🏢 ${t('branchAccounts')}</div>`;
+      html+=acctRows.map(r=>`<div style="padding:10px 0;border-bottom:1px solid var(--ivory-dark);">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px;">
+          <span style="font-weight:700;font-size:14px;">${r.name}</span>
+          <span class="num" style="font-weight:700;font-size:15px;color:var(--forest);">${fmt(r.net)} ${t('currency')}</span>
+        </div>
+        <div style="background:var(--ivory-dark);border-radius:6px;height:7px;overflow:hidden;margin-bottom:5px;"><div style="background:var(--forest);height:100%;width:${Math.round(r.net/maxAcct*100)}%;"></div></div>
+        <div style="display:flex;gap:14px;font-size:11px;color:rgba(26,26,26,0.55);" class="num">
+          <span>${t('allTime')}: ${fmt(r.net)}</span>
+          <span>${t('thisMonth')}: ${fmt(r.netMonth)}</span>
+          <span>${r.inv} ${t('invoicesN')}</span>
+        </div>
+      </div>`).join('');
+      html+=`</div>`;
       // قيمة المخزون (للفرع الحالي) — بالتكلفة وبسعر البيع
       let totCost=0, totPrice=0; const stockRows=[];
       products.filter(p=>p.active!==false).forEach(p=>{
