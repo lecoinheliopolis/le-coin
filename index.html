@@ -245,6 +245,7 @@
         confirmPay:'تأكيد الدفع', insufficient:'المبلغ أقل من المطلوب', received:'المستلم', collapse:'إخفاء',
         fromDate:'من تاريخ', toDate:'إلى تاريخ', allCashiers:'كل الكاشيرز', minAmount:'أقل مبلغ', maxAmount:'أكبر مبلغ',
         results:'النتائج', clearFilters:'مسح الفلاتر', searchByNo:'رقم الفاتورة', netSum:'إجمالي الصافي', filters:'بحث وفلترة',
+        showVoided:'إظهار الملغاة',
         warehouse:'المخزن', receive:'استلام بضاعة', receiveQty:'الكمية المستلمة', newCost:'التكلفة الجديدة (للوحدة)',
         receiveDone:'تم الاستلام', currentQty:'الكمية الحالية', afterReceive:'بعد الاستلام', selectProduct:'— اختر المنتج —',
         physInv:'الجرد الفعلي', countedQty:'الكمية المعدودة', systemQty:'كمية النظام', diff:'الفرق',
@@ -261,7 +262,9 @@
         openShiftHint:'اكتب النقدية اللي في الدرج وافتح ورديتك', enterStartCash:'أدخل النقدية الابتدائية',
         shiftReport:'تقرير الوردية', allShifts:'كل الورديات', myShift:'ورديتي', cashier:'الكاشير', date:'التاريخ',
         duration:'المدة', status:'الحالة', closed:'مقفولة', open2:'مفتوحة', shiftsList:'سجل الورديات', noShifts:'لا توجد ورديات',
-        hrs:'س', mins:'د', breakNote:'الوقت في الاستراحة لا يُحسب من ساعات العمل', resumeFirst:'استأنف الاستراحة أولاً قبل القفل'
+        hrs:'س', mins:'د', breakNote:'الوقت في الاستراحة لا يُحسب من ساعات العمل', resumeFirst:'استأنف الاستراحة أولاً قبل القفل',
+        shiftBranch:'فرع الوردية', pickBranch:'اختر الفرع اللي هتشتغل فيه', branchLocked:'الفرع مقفول على ورديتك المفتوحة',
+        needShiftToSell:'لازم تفتح وردية الأول عشان تبدأ البيع', openShiftNow:'افتح وردية دلوقتي', sellingIn:'بتبيع في'
       },
       en: {
         dir:'ltr', langBtn:'ع', email:'Email', pass:'Password', login:'Sign in',
@@ -320,6 +323,7 @@
         confirmPay:'Confirm payment', insufficient:'Amount is less than total', received:'Received', collapse:'Hide',
         fromDate:'From date', toDate:'To date', allCashiers:'All cashiers', minAmount:'Min', maxAmount:'Max',
         results:'Results', clearFilters:'Clear filters', searchByNo:'Receipt no.', netSum:'Net total', filters:'Search & filter',
+        showVoided:'Show voided',
         warehouse:'Warehouse', receive:'Receive goods', receiveQty:'Quantity received', newCost:'New unit cost',
         receiveDone:'Goods received', currentQty:'Current qty', afterReceive:'After receiving', selectProduct:'— select product —',
         physInv:'Physical inventory', countedQty:'Counted qty', systemQty:'System qty', diff:'Difference',
@@ -336,7 +340,9 @@
         openShiftHint:'Enter the cash in the drawer and open your shift', enterStartCash:'Enter starting cash',
         shiftReport:'Shift report', allShifts:'All shifts', myShift:'My shift', cashier:'Cashier', date:'Date',
         duration:'Duration', status:'Status', closed:'Closed', open2:'Open', shiftsList:'Shifts log', noShifts:'No shifts',
-        hrs:'h', mins:'m', breakNote:'Break time is not counted in worked hours', resumeFirst:'Resume the break first before closing'
+        hrs:'h', mins:'m', breakNote:'Break time is not counted in worked hours', resumeFirst:'Resume the break first before closing',
+        shiftBranch:'Shift branch', pickBranch:'Choose the branch you will work in', branchLocked:'Branch locked to your open shift',
+        needShiftToSell:'You must open a shift first to start selling', openShiftNow:'Open a shift now', sellingIn:'Selling in'
       }
     };
     let lang = localStorage.getItem('lecoin_lang') || 'ar';
@@ -411,6 +417,7 @@
         await loadBranches();
         if(branches.length===0){ $('login-error').textContent=t('noBranch'); await signOut(auth); $('login-btn').textContent=t('login'); return; }
         currentBranchId=branches[0].id;
+        await loadMyOpenShift(); // se c'è un turno aperto, blocca la filiale su quella del turno
         $('login-screen').classList.add('hidden'); $('app').classList.remove('hidden');
         $('login-btn').textContent=t('login');
         setupChrome();
@@ -432,6 +439,15 @@
         }
       }
     }
+    // turno aperto del cassiere (in qualsiasi filiale) — definisce la filiale di lavoro
+    async function loadMyOpenShift(){
+      myShift=null;
+      try{
+        const qs=await getDocs(query(collection(db,'shifts'),where('userId','==',user.uid),where('status','==','open')));
+        qs.forEach(d=>{ if(!myShift) myShift={id:d.id,...d.data()}; });
+        if(myShift && myShift.branchId){ currentBranchId=myShift.branchId; } // blocca la filiale sul turno
+      }catch(e){ console.error('loadMyOpenShift',e); }
+    }
     async function loadCatalog(){
       categories=[]; products=[]; inventory={};
       const cs=await getDocs(collection(db,'categories'));
@@ -450,7 +466,8 @@
       const bs=$('branch-select');
       bs.innerHTML=branches.map(b=>`<option value="${b.id}">${lang==='ar'?b.nameAr:b.nameEn}</option>`).join('');
       bs.value=currentBranchId;
-      bs.onchange=async()=>{ currentBranchId=bs.value; await loadCatalog(); render(); };
+      bs.onchange=async()=>{ if(myShift){ bs.value=currentBranchId; toast(t('branchLocked'),true); return; } currentBranchId=bs.value; await loadCatalog(); render(); };
+      applyBranchLock();
       $('user-btn').onclick=openSettings;
       // nav depends on role
       const tabs=[];
@@ -471,6 +488,12 @@
       document.querySelectorAll('.nav-btn').forEach(b=>b.onclick=()=>{activeTab=b.dataset.tab;document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x===b));render();});
     }
 
+    // blocca/sblocca il selettore filiale in alto in base al turno aperto
+    function applyBranchLock(){
+      const bs=$('branch-select'); if(!bs) return;
+      if(myShift){ bs.value=myShift.branchId; bs.style.opacity='0.6'; bs.title=t('branchLocked'); }
+      else { bs.style.opacity='1'; bs.title=''; }
+    }
     function render(){
       // refresh nav labels & branch names for language
       const bs=$('branch-select'); if(bs){const cur=bs.value;bs.innerHTML=branches.map(b=>`<option value="${b.id}">${lang==='ar'?b.nameAr:b.nameEn}</option>`).join('');bs.value=cur;}
@@ -554,6 +577,17 @@
     }
     function renderCassa(){
       $('cart-bar-root')||$('content').insertAdjacentHTML('afterend','<div id="cart-bar-root"></div>');
+      // niente vendita senza turno aperto (la vendita è legata al turno + filiale)
+      if(!myShift){
+        const cb=$('cart-bar-root'); if(cb) cb.innerHTML='';
+        $('content').innerHTML=`<div class="card" style="text-align:center;padding:32px 18px;">
+          <div style="font-size:40px;margin-bottom:10px;">🕐</div>
+          <div style="font-weight:700;font-size:16px;margin-bottom:8px;">${t('needShiftToSell')}</div>
+          <button class="btn-gold btn-wide" id="go-shift" style="margin-top:10px;">🕐 ${t('openShiftNow')}</button>
+        </div>`;
+        const g=$('go-shift'); if(g) g.onclick=()=>{ activeTab='shift'; document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab==='shift')); render(); };
+        return;
+      }
       const actives=products.filter(p=>p.active!==false);
       if(actives.length===0){ $('content').innerHTML=`<div class="card"><div class="empty">${t('noProdYet')}</div></div>`; renderCartBar(); return; }
       const cats=categories.filter(c=>c.active!==false);
@@ -613,6 +647,8 @@
     }
     async function doCheckout(paid){
       if(cart.length===0)return;
+      if(!myShift){ toast(t('needShiftToSell'),true); closeSheet(); return; } // لازم وردية مفتوحة
+      const saleBranchId=myShift.branchId||currentBranchId; // البيع يتسجّل على فرع الوردية
       const cb=$('pay-confirm'); if(cb){ cb.textContent='...'; cb.disabled=true; }
       try{
         const items=cart.map(i=>({productId:i.id,name:i.name,price:i.price,qty:i.qty,subtotal:i.price*i.qty}));
@@ -622,9 +658,9 @@
         const receiptNo=Number(String(createdAt).slice(-6)); // numero fattura stabile
         const paidAmt=(paid==null||isNaN(paid))?total:paid;
         const change=Math.max(0,paidAmt-total);
-        // 1) registra la vendita
+        // 1) registra la vendita (legata al turno + filiale del turno)
         const ref=await addDoc(collection(db,'sales'),{
-          branchId:currentBranchId, userId:user.uid, userName:profile.name||user.email,
+          branchId:saleBranchId, shiftId:myShift.id, userId:user.uid, userName:profile.name||user.email,
           items, total, count:cartCount(), receiptNo, paid:paidAmt, change, createdAt, tzo
         });
         // 2) scala l'inventario di questo branch
@@ -634,7 +670,7 @@
           await setDoc(doc(db,'inventory',`${currentBranchId}_${i.id}`),{branchId:currentBranchId,productId:i.id,qty:nq,threshold:cur.threshold||20,lastCost:cur.lastCost||0},{merge:true});
           inventory[i.id]={qty:nq,threshold:cur.threshold||20,lastCost:cur.lastCost||0};
         }
-        const sale={id:ref.id,branchId:currentBranchId,userName:profile.name||user.email,items,total,count:cartCount(),receiptNo,paid:paidAmt,change,createdAt,tzo};
+        const sale={id:ref.id,branchId:saleBranchId,shiftId:myShift.id,userName:profile.name||user.email,items,total,count:cartCount(),receiptNo,paid:paidAmt,change,createdAt,tzo};
         cart=[]; closeSheet(); renderCassa(); toast(t('saleDone'));
         showReceipt(sale); // mostra la fattura automaticamente
       }catch(e){ console.error(e); toast(t('errorGen'),true); if(cb){ cb.textContent='✓ '+t('confirmPay'); cb.disabled=false; } }
@@ -796,7 +832,7 @@
       w.document.close(); w.focus(); setTimeout(()=>{ try{w.print();}catch(e){} },400);
     }
     let receiptsCache=[]; // vendite caricate per il filtraggio
-    let rcFilter={q:'',from:'',to:'',cashier:'',min:'',max:''};
+    let rcFilter={q:'',from:'',to:'',cashier:'',min:'',max:'',showVoided:false};
     async function renderReceipts(){
       const cb=$('cart-bar-root'); if(cb) cb.innerHTML='';
       $('content').innerHTML=`<div class="empty">…</div>`;
@@ -822,19 +858,22 @@
           <div class="field"><label class="lbl">${t('maxAmount')}</label><input class="input num" id="rcf-max" type="number" dir="ltr" value="${f.max}" placeholder="∞"></div>
         </div>
         ${isStaff?`<div class="field"><label class="lbl">${t('cashierLbl')}</label><select class="input" id="rcf-cashier"><option value="">${t('allCashiers')}</option>${cashiers.map(c=>`<option value="${c}" ${f.cashier===c?'selected':''}>${c}</option>`).join('')}</select></div>`:''}
+        <label style="display:flex;align-items:center;gap:8px;margin:4px 0 12px;font-size:13px;color:rgba(26,26,26,0.7);cursor:pointer;"><input type="checkbox" id="rcf-voided" ${f.showVoided?'checked':''}> ${t('showVoided')}</label>
         <button class="btn-secondary btn-wide" id="rcf-clear" style="color:var(--forest);">✕ ${t('clearFilters')}</button>
       </div>
       <div id="rcpt-list"></div>`;
       $('content').innerHTML=html;
       const apply=()=>{
         rcFilter={ q:$('rcf-q').value.trim(), from:$('rcf-from').value, to:$('rcf-to').value,
-          cashier:isStaff&&$('rcf-cashier')?$('rcf-cashier').value:'', min:$('rcf-min').value, max:$('rcf-max').value };
+          cashier:isStaff&&$('rcf-cashier')?$('rcf-cashier').value:'', min:$('rcf-min').value, max:$('rcf-max').value,
+          showVoided:$('rcf-voided')?$('rcf-voided').checked:false };
         renderReceiptsList();
       };
       ['rcf-q','rcf-min','rcf-max'].forEach(id=>$(id)&&($(id).oninput=apply));
       ['rcf-from','rcf-to'].forEach(id=>$(id)&&($(id).onchange=apply));
       if(isStaff&&$('rcf-cashier')) $('rcf-cashier').onchange=apply;
-      $('rcf-clear').onclick=()=>{ rcFilter={q:'',from:'',to:'',cashier:'',min:'',max:''}; renderReceipts(); };
+      if($('rcf-voided')) $('rcf-voided').onchange=apply;
+      $('rcf-clear').onclick=()=>{ rcFilter={q:'',from:'',to:'',cashier:'',min:'',max:'',showVoided:false}; renderReceipts(); };
       renderReceiptsList();
     }
     function renderReceiptsList(){
@@ -844,6 +883,7 @@
       const minV=f.min!==''?parseFloat(f.min):null;
       const maxV=f.max!==''?parseFloat(f.max):null;
       let list=receiptsCache.filter(s=>{
+        if(!f.showVoided && s.voided) return false; // الفواتير الملغاة مخفية افتراضياً
         if(f.q && !String(s.receiptNo||'').includes(f.q.replace('#',''))) return false;
         if(fromTs && (s.createdAt||0)<fromTs) return false;
         if(toTs && (s.createdAt||0)>toTs) return false;
@@ -1314,11 +1354,9 @@
     function fmtTime(ts, tzo){ const off=(tzo!=null)?tzo:tzOffsetMin(ts); return fmtFromOffShort(ts,off); }
 
     async function loadShifts(){
-      myShift=null; shifts=[];
-      // turno aperto di questo utente in questo branch
-      const qOpen=await getDocs(query(collection(db,'shifts'),where('branchId','==',currentBranchId),where('userId','==',user.uid),where('status','==','open')));
-      qOpen.forEach(d=>{ myShift={id:d.id,...d.data()}; });
-      // storico: admin/manager => tutti del branch; cassiere => i suoi
+      shifts=[];
+      await loadMyOpenShift(); // turno aperto (in qualsiasi filiale) — definisce la filiale
+      // storico: admin/manager => tutti del branch corrente; cassiere => i suoi
       let qs;
       if(profile.role==='admin'||profile.role==='manager') qs=await getDocs(query(collection(db,'shifts'),where('branchId','==',currentBranchId)));
       else qs=await getDocs(query(collection(db,'shifts'),where('branchId','==',currentBranchId),where('userId','==',user.uid)));
@@ -1345,6 +1383,7 @@
         html+=`<div class="card">
           <div class="card-title">🕐 ${t('openShift')}</div>
           <div style="font-size:12px;color:rgba(26,26,26,0.55);margin-bottom:12px;">${t('openCashHint')}</div>
+          <div class="field"><label class="lbl">${t('shiftBranch')}</label><select class="input" id="sh-open-branch">${branches.map(b=>`<option value="${b.id}" ${b.id===currentBranchId?'selected':''}>${lang==='ar'?b.nameAr:b.nameEn}</option>`).join('')}</select><div style="font-size:11px;color:rgba(26,26,26,0.5);margin-top:4px;">${t('pickBranch')}</div></div>
           <div class="field"><label class="lbl">${t('openCash')}</label><input class="input num" id="sh-open-cash" type="number" min="0" step="0.01" dir="ltr" placeholder="0"></div>
           <button class="btn-gold btn-wide" id="sh-open-btn">🕐 ${t('openShift')}</button>
         </div>`;
@@ -1353,6 +1392,7 @@
         const onP=isOnPause(myShift);
         html+=`<div class="card">
           <div class="card-title">🟢 ${t('shiftOpen')}</div>
+          <div style="background:rgba(31,58,46,0.06);border-radius:10px;padding:9px 12px;margin-bottom:12px;font-size:13px;font-weight:700;color:var(--forest);">📍 ${t('sellingIn')}: ${(()=>{const b=branches.find(x=>x.id===myShift.branchId);return b?(lang==='ar'?b.nameAr:b.nameEn):myShift.branchId;})()}</div>
           <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
             <div style="flex:1;min-width:90px;background:rgba(31,58,46,0.05);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;color:rgba(26,26,26,0.55);font-weight:700;">${t('openedAt')}</div><div class="num" style="font-size:14px;font-weight:700;margin-top:3px;">${fmtTime(myShift.openAt)}</div></div>
             <div style="flex:1;min-width:90px;background:rgba(31,58,46,0.05);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;color:rgba(26,26,26,0.55);font-weight:700;">${t('worked')}</div><div class="num" id="sh-worked" style="font-size:14px;font-weight:700;margin-top:3px;color:var(--forest);">${fmtDur(workedMsOf(myShift))}</div></div>
@@ -1397,10 +1437,15 @@
       if(!myShift){
         $('sh-open-btn').onclick=async()=>{
           const oc=parseFloat($('sh-open-cash').value)||0;
+          const chosenBranch=$('sh-open-branch')?$('sh-open-branch').value:currentBranchId;
           const b=$('sh-open-btn'); b.disabled=true; b.textContent='...';
           try{
-            const data={branchId:currentBranchId,userId:user.uid,userName:profile.name||user.email,openAt:Date.now(),closeAt:null,openCash:oc,closeCash:null,pauses:[],status:'open',createdAt:Date.now()};
-            await addDoc(collection(db,'shifts'),data);
+            const data={branchId:chosenBranch,userId:user.uid,userName:profile.name||user.email,openAt:Date.now(),closeAt:null,openCash:oc,closeCash:null,pauses:[],status:'open',createdAt:Date.now()};
+            const ref=await addDoc(collection(db,'shifts'),data);
+            myShift={id:ref.id,...data};
+            currentBranchId=chosenBranch;        // blocca la filiale sul turno
+            applyBranchLock();
+            await loadCatalog();                 // carica il magazzino della filiale del turno
             toast(t('shiftOpened')); renderShift();
           }catch(e){ console.error(e); toast(t('errorGen'),true); b.disabled=false; b.textContent='🕐 '+t('openShift'); }
         };
@@ -1429,6 +1474,7 @@
             toast(t('shiftClosed'));
             const full={...shTmp,closeCash:cc,status:'closed',salesTotal,workedMs,pausedMs,expectedCash,diff};
             myShift=null;
+            applyBranchLock(); // sblocca il selettore filiale
             showShiftReport(full);
           }catch(e){ console.error(e); toast(t('errorGen'),true); b.disabled=false; b.textContent='🔴 '+t('closeShift'); }
         };
