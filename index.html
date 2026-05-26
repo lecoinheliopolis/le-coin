@@ -264,6 +264,7 @@
         invReport:'تقرير الجرد', adjustNote:'سيتم تعديل كميات النظام لتطابق العدّ الفعلي', confirmApplyInv:'تأكيد تطبيق الجرد؟ سيتم تعديل المخزون.',
         receiveTab:'استلام', invTab:'جرد', print:'طباعة', download:'تحميل', noChanges:'لا توجد تغييرات', sendWhatsapp:'إرسال واتساب',
         suppliers_tab:'الموردين', addSupplier:'مورد جديد', editSupplier:'تعديل المورد', supplierName:'اسم المورد', supplierPhone:'التليفون', supplierNote:'ملاحظات', noSuppliers:'مفيش موردين لسه', supplier:'المورد', noSupplier:'بدون مورد', supplierHistory:'تاريخ التعامل', confirmDelSupplier:'متأكد إنك عايز تمسح المورد؟', callSupplier:'اتصال',
+        backupTitle:'النسخة الاحتياطية', exportData:'تصدير كل البيانات', importData:'استيراد البيانات', exporting:'بيصدّر...', importing:'بيستورد...', exportDone:'تم تصدير كل البيانات', importDone:'تم استيراد البيانات', importConfirm:'ده هيكتب فوق البيانات الحالية بالكامل. متأكد؟', importBad:'الملف مش صالح', backupHint:'صدّر نسخة من كل بياناتك، أو استورد نسخة قديمة',
         transferTab:'تحويل', transferGoods:'تحويل بضاعة', transferHint:'حوّل كمية من مخزن الفرع الحالي إلى فرع آخر', toBranch:'إلى فرع',
         transferQty:'الكمية المحوّلة', doTransfer:'تحويل', transferDone:'تم التحويل ✓', notEnoughStock:'الكمية غير كافية في المخزن',
         transferLog:'سجل التحويلات', noTransfers:'لا توجد تحويلات بعد', fromLbl:'من', toLbl:'إلى', needTwoBranches:'محتاج فرعين على الأقل للتحويل', selectDestBranch:'اختر الفرع المستلم',
@@ -355,6 +356,7 @@
         invReport:'Inventory report', adjustNote:'System quantities will be adjusted to match the physical count', confirmApplyInv:'Apply inventory? Stock will be adjusted.',
         receiveTab:'Receive', invTab:'Count', print:'Print', download:'Download', noChanges:'No changes', sendWhatsapp:'Send WhatsApp',
         suppliers_tab:'Suppliers', addSupplier:'New supplier', editSupplier:'Edit supplier', supplierName:'Supplier name', supplierPhone:'Phone', supplierNote:'Notes', noSuppliers:'No suppliers yet', supplier:'Supplier', noSupplier:'No supplier', supplierHistory:'Purchase history', confirmDelSupplier:'Delete this supplier?', callSupplier:'Call',
+        backupTitle:'Backup', exportData:'Export all data', importData:'Import data', exporting:'Exporting...', importing:'Importing...', exportDone:'All data exported', importDone:'Data imported', importConfirm:'This will fully overwrite current data. Sure?', importBad:'Invalid file', backupHint:'Export a copy of all your data, or import an old backup',
         transferTab:'Transfer', transferGoods:'Transfer goods', transferHint:'Move quantity from current branch to another', toBranch:'To branch',
         transferQty:'Quantity to transfer', doTransfer:'Transfer', transferDone:'Transfer done ✓', notEnoughStock:'Not enough stock',
         transferLog:'Transfer log', noTransfers:'No transfers yet', fromLbl:'From', toLbl:'To', needTwoBranches:'Need at least two branches', selectDestBranch:'Choose destination branch',
@@ -2352,6 +2354,42 @@
     function setToggle(id,init,cb){ let v=init; const el=$(id); el.onclick=()=>{v=!v;el.style.background=v?'var(--forest)':'rgba(26,26,26,0.2)';cb(v);}; }
     function compress(file,maxW=600,q=0.7){ return new Promise(res=>{ const img=new Image(); img.onload=()=>{ const sc=Math.min(1,maxW/img.width); const c=document.createElement('canvas'); c.width=img.width*sc; c.height=img.height*sc; c.getContext('2d').drawImage(img,0,0,c.width,c.height); res(c.toDataURL('image/jpeg',q)); }; img.src=URL.createObjectURL(file); }); }
 
+    // ===== النسخة الاحتياطية: تصدير/استيراد كل البيانات (JSON) =====
+    const BACKUP_COLLECTIONS=['branches','categories','products','inventory','inventories','loads','sales','shifts','custodyTransfers','transfers','suppliers','users'];
+    async function exportAllData(btn){
+      if(btn){ btn.disabled=true; btn.textContent=t('exporting'); }
+      try{
+        const out={ app:'LeCoinPOS', version:1, exportedAt:Date.now(), collections:{} };
+        for(const c of BACKUP_COLLECTIONS){
+          const qs=await getDocs(collection(db,c));
+          out.collections[c]=[]; qs.forEach(d=>out.collections[c].push({id:d.id,...d.data()}));
+        }
+        const blob=new Blob([JSON.stringify(out)],{type:'application/json'});
+        const url=URL.createObjectURL(blob); const a=document.createElement('a');
+        a.href=url; a.download=`lecoin-backup-${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a); a.click();
+        setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); },800);
+        toast(t('exportDone'));
+      }catch(e){ console.error(e); toast(t('errorGen'),true); }
+      finally{ if(btn){ btn.disabled=false; btn.textContent='💾 '+t('exportData'); } }
+    }
+    async function importAllData(file,btn){
+      if(!file) return;
+      let data;
+      try{ data=JSON.parse(await file.text()); }catch(e){ toast(t('importBad'),true); return; }
+      if(!data||!data.collections){ toast(t('importBad'),true); return; }
+      if(!confirm(t('importConfirm'))) return;
+      if(btn){ btn.disabled=true; btn.textContent=t('importing'); }
+      try{
+        for(const c of BACKUP_COLLECTIONS){
+          const arr=data.collections[c]; if(!Array.isArray(arr)) continue;
+          for(const rec of arr){ const {id,...rest}=rec; if(!id) continue; await setDoc(doc(db,c,id),rest); }
+        }
+        toast(t('importDone'));
+        setTimeout(()=>location.reload(),1200); // إعادة تحميل عشان البيانات الجديدة تظهر
+      }catch(e){ console.error(e); toast(t('errorGen'),true); if(btn){ btn.disabled=false; btn.textContent='📥 '+t('importData'); } }
+    }
+
     function openSettings(){
       const roleLabel=t(profile.role);
       $('sheet-root').innerHTML=`<div class="overlay" id="ov"><div class="sheet" onclick="event.stopPropagation()">
@@ -2360,9 +2398,21 @@
           <div style="display:flex;justify-content:space-between;"><span style="color:rgba(26,26,26,0.6);">${t('email')}</span><span class="num">${user.email}</span></div>
           <div style="display:flex;justify-content:space-between;"><span style="color:rgba(26,26,26,0.6);">${t('role')}</span><span style="font-weight:600;color:var(--forest);">${roleLabel}</span></div>
         </div>
+        ${profile.role==='admin'?`<div class="card" style="display:grid;gap:8px;">
+          <div style="font-size:11px;letter-spacing:0.5px;color:var(--forest);font-weight:700;">💾 ${t('backupTitle')}</div>
+          <div style="font-size:11px;color:rgba(26,26,26,0.55);margin-bottom:4px;">${t('backupHint')}</div>
+          <button class="btn-forest btn-wide" id="exp-btn">💾 ${t('exportData')}</button>
+          <button class="btn-secondary btn-wide" id="imp-btn">📥 ${t('importData')}</button>
+          <input type="file" id="imp-input" accept="application/json,.json" class="hidden">
+        </div>`:''}
         <button class="btn-secondary btn-wide" id="logout-btn" style="color:var(--red);border-color:rgba(192,72,72,0.3);">${t('logout')}</button>
       </div></div>`;
       $('ov').onclick=closeSheet;$('cx').onclick=closeSheet;
+      if(profile.role==='admin'){
+        $('exp-btn').onclick=()=>exportAllData($('exp-btn'));
+        $('imp-btn').onclick=()=>$('imp-input').click();
+        $('imp-input').onchange=e=>{ const f=e.target.files[0]; if(f) importAllData(f,$('imp-btn')); };
+      }
       $('logout-btn').onclick=async()=>{ await signOut(auth); closeSheet(); };
     }
 
