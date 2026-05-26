@@ -803,25 +803,29 @@
       const fname=`receipt_${sale.receiptNo||'lecoin'}.png`;
       const dataUrl=c.toDataURL('image/png');
       if(btn){ btn.disabled=false; btn.textContent='🧾 '+t('receiptImage'); }
-      const toBlob=()=>new Promise(r=>{ try{ c.toBlob(r,'image/png'); }catch(e){ r(null); } });
-      const dlBlob=(b)=>{ const url=URL.createObjectURL(b); const a=document.createElement('a'); a.href=url; a.download=fname; document.body.appendChild(a); a.click(); setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); },800); };
+      // نحوّل الصورة لـ Blob فوراً (بدون انتظار) عشان التحميل/المشاركة مايتمنعوش من المتصفح
+      const imgBlob=(()=>{ try{ const b64=dataUrl.split(',')[1]; const bin=atob(b64); const arr=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i); return new Blob([arr],{type:'image/png'}); }catch(e){ return null; } })();
+      const blobUrl=imgBlob?URL.createObjectURL(imgBlob):dataUrl;
+      const doDownload=()=>{ const a=document.createElement('a'); a.href=blobUrl; a.download=fname; document.body.appendChild(a); a.click(); setTimeout(()=>document.body.removeChild(a),100); };
       $('sheet-root').innerHTML=`<div class="overlay" id="ov2"><div class="sheet" onclick="event.stopPropagation()">
         <div class="sheet-head"><div><div class="sheet-sub">${t('imgReady')}</div><div class="sheet-title">🧾 ${t('receiptImage')}</div></div><button class="close-x" id="cx2">×</button></div>
         <div style="text-align:center;margin-bottom:14px;"><img src="${dataUrl}" alt="receipt" style="max-width:100%;border-radius:14px;box-shadow:0 6px 20px rgba(0,0,0,0.15);"></div>
         <button class="btn-wide" id="rci-wa" style="background:#25D366;color:#fff;border:none;border-radius:12px;font-weight:700;font-family:inherit;padding:13px;cursor:pointer;margin-bottom:8px;">📱 ${t('shareWa')}</button>
         <button class="btn-secondary btn-wide" id="rci-dl">⬇️ ${t('saveImg')}</button>
+        <div style="font-size:11px;color:rgba(26,26,26,0.5);text-align:center;margin-top:8px;">${t('attachHint')}</div>
       </div></div>`;
       const back=()=>showReceipt(sale);
       $('ov2').onclick=back; $('cx2').onclick=back;
-      $('rci-dl').onclick=async()=>{ const b=await toBlob(); if(b){ dlBlob(b); toast(t('exportDone')); } };
-      $('rci-wa').onclick=async()=>{
-        const b=await toBlob(); if(!b) return;
-        const file=new File([b],fname,{type:'image/png'});
-        if(navigator.canShare && navigator.canShare({files:[file]})){
-          try{ await navigator.share({files:[file], title:'Le Coin', text:t('thankYou')}); }catch(e){}
+      // تحميل مباشر — يشتغل على كل الأجهزة (بدون انتظار = المتصفح مايمنعهوش)
+      $('rci-dl').onclick=()=>{ doDownload(); toast(t('exportDone')); };
+      // مشاركة: موبايل => مشاركة الصورة مباشرة؛ كمبيوتر => تنزيل + فتح واتساب ويب
+      $('rci-wa').onclick=()=>{
+        const file=imgBlob?new File([imgBlob],fname,{type:'image/png'}):null;
+        if(file && navigator.canShare && navigator.canShare({files:[file]})){
+          navigator.share({files:[file], title:'Le Coin', text:t('thankYou')}).catch(()=>{});
         } else {
-          dlBlob(b);                                  // كمبيوتر: نزّل الصورة
-          window.open('https://web.whatsapp.com/','_blank'); // وافتح واتساب ويب لإرفاقها
+          doDownload();                                   // نزّل الصورة فوراً
+          setTimeout(()=>window.open('https://web.whatsapp.com/','_blank'),300);
           toast(t('attachHint'));
         }
       };
