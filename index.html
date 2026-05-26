@@ -265,6 +265,7 @@
         receiveTab:'استلام', invTab:'جرد', print:'طباعة', download:'تحميل', noChanges:'لا توجد تغييرات', sendWhatsapp:'إرسال واتساب',
         suppliers_tab:'الموردين', addSupplier:'مورد جديد', editSupplier:'تعديل المورد', supplierName:'اسم المورد', supplierPhone:'التليفون', supplierNote:'ملاحظات', noSuppliers:'مفيش موردين لسه', supplier:'المورد', noSupplier:'بدون مورد', supplierHistory:'تاريخ التعامل', confirmDelSupplier:'متأكد إنك عايز تمسح المورد؟', callSupplier:'اتصال',
         backupTitle:'النسخة الاحتياطية', exportData:'تصدير كل البيانات', importData:'استيراد البيانات', exporting:'بيصدّر...', importing:'بيستورد...', exportDone:'تم تصدير كل البيانات', importDone:'تم استيراد البيانات', importConfirm:'ده هيكتب فوق البيانات الحالية بالكامل. متأكد؟', importBad:'الملف مش صالح', backupHint:'صدّر نسخة من كل بياناتك، أو استورد نسخة قديمة',
+        fullReports:'التقارير الشاملة', repSuppliers:'تقرير الموردين', repProducts:'تقرير المنتجات', repBranches:'تقرير الفروع', repUsers:'تقرير المستخدمين', repProfits:'تقرير الأرباح', repFrom:'من تاريخ', repTo:'إلى تاريخ', purchased:'المشتريات', cogs:'تكلفة المباع', grossProfit:'إجمالي الربح', purchasesTotal:'إجمالي المشتريات', hoursWorked:'ساعات العمل', pickRangeHint:'اختر الفترة، وبعدين نزّل التقرير بالشكل اللي تحبه', reportsHubHint:'تقارير مرتبة جاهزة للتصدير PDF / Excel / CSV',
         transferTab:'تحويل', transferGoods:'تحويل بضاعة', transferHint:'حوّل كمية من مخزن الفرع الحالي إلى فرع آخر', toBranch:'إلى فرع',
         transferQty:'الكمية المحوّلة', doTransfer:'تحويل', transferDone:'تم التحويل ✓', notEnoughStock:'الكمية غير كافية في المخزن',
         transferLog:'سجل التحويلات', noTransfers:'لا توجد تحويلات بعد', fromLbl:'من', toLbl:'إلى', needTwoBranches:'محتاج فرعين على الأقل للتحويل', selectDestBranch:'اختر الفرع المستلم',
@@ -357,6 +358,7 @@
         receiveTab:'Receive', invTab:'Count', print:'Print', download:'Download', noChanges:'No changes', sendWhatsapp:'Send WhatsApp',
         suppliers_tab:'Suppliers', addSupplier:'New supplier', editSupplier:'Edit supplier', supplierName:'Supplier name', supplierPhone:'Phone', supplierNote:'Notes', noSuppliers:'No suppliers yet', supplier:'Supplier', noSupplier:'No supplier', supplierHistory:'Purchase history', confirmDelSupplier:'Delete this supplier?', callSupplier:'Call',
         backupTitle:'Backup', exportData:'Export all data', importData:'Import data', exporting:'Exporting...', importing:'Importing...', exportDone:'All data exported', importDone:'Data imported', importConfirm:'This will fully overwrite current data. Sure?', importBad:'Invalid file', backupHint:'Export a copy of all your data, or import an old backup',
+        fullReports:'Full reports', repSuppliers:'Suppliers report', repProducts:'Products report', repBranches:'Branches report', repUsers:'Users report', repProfits:'Profits report', repFrom:'From date', repTo:'To date', purchased:'Purchased', cogs:'Cost of goods sold', grossProfit:'Gross profit', purchasesTotal:'Total purchases', hoursWorked:'Hours worked', pickRangeHint:'Pick the period, then download the report in the format you like', reportsHubHint:'Organized reports ready to export as PDF / Excel / CSV',
         transferTab:'Transfer', transferGoods:'Transfer goods', transferHint:'Move quantity from current branch to another', toBranch:'To branch',
         transferQty:'Quantity to transfer', doTransfer:'Transfer', transferDone:'Transfer done ✓', notEnoughStock:'Not enough stock',
         transferLog:'Transfer log', noTransfers:'No transfers yet', fromLbl:'From', toLbl:'To', needTwoBranches:'Need at least two branches', selectDestBranch:'Choose destination branch',
@@ -1472,6 +1474,10 @@
       const kpi=(label,val,sub)=>`<div class="card" style="margin-bottom:0;flex:1;min-width:0;padding:14px;"><div style="font-size:10px;letter-spacing:0.5px;color:rgba(26,26,26,0.55);font-weight:700;">${label}</div><div class="num" style="font-size:22px;font-weight:700;color:var(--forest);margin-top:4px;">${val}</div><div style="font-size:11px;color:rgba(26,26,26,0.5);">${sub}</div></div>`;
 
       let html=`<div style="font-size:11px;letter-spacing:1px;color:var(--forest);font-weight:700;margin-bottom:12px;">${t('reports').toUpperCase()}</div>`;
+      html+=`<div class="card" style="background:var(--forest);color:var(--ivory);"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+        <div><div style="font-weight:700;font-size:14px;">📑 ${t('fullReports')}</div><div style="font-size:11px;opacity:0.8;margin-top:2px;">${t('reportsHubHint')}</div></div>
+        <button id="open-hub" style="background:var(--gold);color:var(--forest-dark);border:none;border-radius:10px;padding:9px 14px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;">${t('exportData').split(' ')[0]} ⤓</button>
+      </div></div>`;
       // KPI oggi vs mese
       html+=`<div style="display:flex;gap:10px;margin-bottom:14px;">
         ${kpi(t('today'),fmt(todayRev)+' '+t('currency'),cnt(todaySales)+' '+t('salesCount'))}
@@ -1600,6 +1606,7 @@
       ['tp-period','tp-branch'].forEach(id=>$(id)&&($(id).onchange=()=>{ tpFilter.period=$('tp-period').value; tpFilter.branchId=$('tp-branch').value; renderTopProducts(); }));
       ['tp-min','tp-max'].forEach(id=>$(id)&&($(id).oninput=()=>{ tpFilter.min=$('tp-min').value; tpFilter.max=$('tp-max').value; renderTopProducts(); }));
       renderProductDepots();
+      $('open-hub')&&($('open-hub').onclick=openFullReports);
       $('pp-prod')&&($('pp-prod').onchange=()=>{ ppSel=$('pp-prod').value; renderProductDepots(); });
       // bind stampa/download report vendite
       const repTitle=t('reports');
@@ -2350,6 +2357,24 @@
       setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); },800);
     }
 
+    // تصدير Excel (ملف .xls يفتح في إكسل مباشرة — بدون مكتبات)
+    function downloadXLS(filename, title, header, rows){
+      const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const th=header.map(h=>`<th style="background:#1F3A2E;color:#fff;border:1px solid #999;padding:5px;">${esc(h)}</th>`).join('');
+      const trs=rows.map(r=>`<tr>${r.map(c=>`<td style="border:1px solid #ccc;padding:5px;">${esc(c)}</td>`).join('')}</tr>`).join('');
+      const html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"></head><body><table><tr><th colspan="${header.length}" style="font-size:15px;">${esc(title)}</th></tr><tr>${th}</tr>${trs}</table></body></html>`;
+      const blob=new Blob(['\ufeff'+html],{type:'application/vnd.ms-excel;charset=utf-8;'});
+      const url=URL.createObjectURL(blob); const a=document.createElement('a');
+      a.href=url; a.download=filename; document.body.appendChild(a); a.click();
+      setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); },800);
+    }
+    // يبني جدول HTML من header+rows لاستخدامه في الطباعة/PDF
+    function tableHtml(title, header, rows){
+      const th=header.map(h=>`<th>${h}</th>`).join('');
+      const trs=rows.map(r=>`<tr>${r.map(c=>`<td>${c==null?'':c}</td>`).join('')}</tr>`).join('');
+      return `<h2>${title}</h2><table><tr>${th}</tr>${trs}</table>`;
+    }
+
     // ============ HELPERS ============
     function setToggle(id,init,cb){ let v=init; const el=$(id); el.onclick=()=>{v=!v;el.style.background=v?'var(--forest)':'rgba(26,26,26,0.2)';cb(v);}; }
     function compress(file,maxW=600,q=0.7){ return new Promise(res=>{ const img=new Image(); img.onload=()=>{ const sc=Math.min(1,maxW/img.width); const c=document.createElement('canvas'); c.width=img.width*sc; c.height=img.height*sc; c.getContext('2d').drawImage(img,0,0,c.width,c.height); res(c.toDataURL('image/jpeg',q)); }; img.src=URL.createObjectURL(file); }); }
@@ -2388,6 +2413,93 @@
         toast(t('importDone'));
         setTimeout(()=>location.reload(),1200); // إعادة تحميل عشان البيانات الجديدة تظهر
       }catch(e){ console.error(e); toast(t('errorGen'),true); if(btn){ btn.disabled=false; btn.textContent='📥 '+t('importData'); } }
+    }
+
+    // ===== التقارير الشاملة: 5 تقارير + فلتر تاريخ + تصدير PDF/Excel/CSV =====
+    async function buildReportData(fromTs, toTs){
+      const visIds = profile.role==='admin' ? branches.map(b=>b.id) : (profile.branchIds||[]);
+      // حمّل المبيعات + الاستلامات + الورديات + كل المخزون
+      let sales=[], loadsArr=[], shiftsArr=[], invAll=[];
+      if(profile.role==='admin'){ (await getDocs(collection(db,'sales'))).forEach(d=>sales.push(d.data())); }
+      else { for(const b of visIds){ (await getDocs(query(collection(db,'sales'),where('branchId','==',b)))).forEach(d=>sales.push(d.data())); } }
+      (await getDocs(collection(db,'loads'))).forEach(d=>loadsArr.push(d.data()));
+      (await getDocs(collection(db,'shifts'))).forEach(d=>shiftsArr.push(d.data()));
+      (await getDocs(collection(db,'inventory'))).forEach(d=>invAll.push(d.data()));
+      const inRange=ts=>ts>=fromTs&&ts<=toTs;
+      sales=sales.filter(s=>inRange(s.createdAt) && (profile.role==='admin'||visIds.includes(s.branchId)));
+      loadsArr=loadsArr.filter(l=>inRange(l.createdAt) && (profile.role==='admin'||visIds.includes(l.branchId)));
+      shiftsArr=shiftsArr.filter(s=>inRange(s.openAt) && (profile.role==='admin'||visIds.includes(s.branchId)));
+      invAll=invAll.filter(i=>profile.role==='admin'||visIds.includes(i.branchId));
+      const effTotal=s=>Math.max(0,(s.total||0)-(s.refundTotal||0));
+      const rmFn=s=>{ const m={}; if(s.voided)(s.items||[]).forEach(it=>m[it.productId]=(m[it.productId]||0)+it.qty); (s.returns||[]).forEach(r=>(r.lines||[]).forEach(l=>m[l.productId]=(m[l.productId]||0)+l.qty)); return m; };
+      const bName=id=>{const b=branches.find(x=>x.id===id);return b?(lang==='ar'?b.nameAr:b.nameEn):id;};
+      // ---- الموردين ----
+      const supMap={};
+      loadsArr.forEach(l=>{ const k=l.supplierName||t('noSupplier'); if(!supMap[k])supMap[k]={qty:0,cost:0,cnt:0}; supMap[k].qty+=(l.qty||0); supMap[k].cost+=(l.total||0); supMap[k].cnt++; });
+      const suppliersRep={ title:t('repSuppliers'), header:[t('supplier'),t('itemsN'),t('purchased'),t('cogs')+'('+t('currency')+')'],
+        rows:Object.entries(supMap).map(([k,v])=>[k,v.cnt,v.qty,fmt(v.cost)]) };
+      // ---- المنتجات ----
+      const soldMap={};
+      sales.forEach(s=>{ const rm=rmFn(s); (s.items||[]).forEach(it=>{ const net=Math.max(0,it.qty-(rm[it.productId]||0)); if(!soldMap[it.productId])soldMap[it.productId]={qty:0,rev:0}; soldMap[it.productId].qty+=net; soldMap[it.productId].rev+=net*(it.price||0); }); });
+      const purMap={}; loadsArr.forEach(l=>{ purMap[l.productId]=(purMap[l.productId]||0)+(l.qty||0); });
+      const stockMap={}; invAll.forEach(i=>{ stockMap[i.productId]=(stockMap[i.productId]||0)+(i.qty||0); });
+      const productsRep={ title:t('repProducts'), header:[t('name'),t('unitsSold'),t('revenue'),t('purchased'),t('stock'),t('cost'),t('price'),t('grossProfit')],
+        rows:products.map(p=>{ const sm=soldMap[p.id]||{qty:0,rev:0}; const prof=sm.rev-sm.qty*(p.cost||0);
+          return [p.name, sm.qty, fmt(sm.rev), purMap[p.id]||0, stockMap[p.id]||0, fmt(p.cost||0), fmt(p.price||0), fmt(prof)]; }) };
+      // ---- الفروع ----
+      const brRev={}, brCnt={}, brStock={};
+      sales.forEach(s=>{ brRev[s.branchId]=(brRev[s.branchId]||0)+effTotal(s); if(!s.voided)brCnt[s.branchId]=(brCnt[s.branchId]||0)+1; });
+      invAll.forEach(i=>{ const p=products.find(x=>x.id===i.productId); brStock[i.branchId]=(brStock[i.branchId]||0)+(i.qty||0)*(p?(p.price||0):0); });
+      const branchesRep={ title:t('repBranches'), header:[t('branch'),t('revenue'),t('invoicesShort'),t('stockVal')],
+        rows:visIds.map(id=>[bName(id), fmt(brRev[id]||0), brCnt[id]||0, fmt(brStock[id]||0)]) };
+      // ---- المستخدمين ----
+      const uSales={}, uCnt={}, uMs={};
+      sales.forEach(s=>{ uSales[s.userId]=(uSales[s.userId]||0)+effTotal(s); if(!s.voided)uCnt[s.userId]=(uCnt[s.userId]||0)+1; });
+      shiftsArr.forEach(s=>{ if(s.status==='closed'&&s.workedMs) uMs[s.userId]=(uMs[s.userId]||0)+s.workedMs; });
+      const usersRep={ title:t('repUsers'), header:[t('name'),t('role'),t('revenue'),t('invoicesShort'),t('hoursWorked')],
+        rows:users.map(u=>[u.name||u.email, t(u.role), fmt(uSales[u.uid]||0), uCnt[u.uid]||0, ((uMs[u.uid]||0)/3600000).toFixed(1)]) };
+      // ---- الأرباح ----
+      const revTot=sales.reduce((a,s)=>a+effTotal(s),0);
+      let cogs=0; sales.forEach(s=>{ const rm=rmFn(s); (s.items||[]).forEach(it=>{ const net=Math.max(0,it.qty-(rm[it.productId]||0)); const p=products.find(x=>x.id===it.productId); cogs+=net*(p?(p.cost||0):0); }); });
+      const purTot=loadsArr.reduce((a,l)=>a+(l.total||0),0);
+      const profitsRep={ title:t('repProfits'), header:[t('name'),t('currency')],
+        rows:[ [t('revenue'),fmt(revTot)], [t('cogs'),fmt(cogs)], [t('grossProfit'),fmt(revTot-cogs)], [t('purchasesTotal'),fmt(purTot)] ] };
+      return { suppliers:suppliersRep, products:productsRep, branches:branchesRep, users:usersRep, profits:profitsRep };
+    }
+    let _repCache=null;
+    function openFullReports(){
+      const now=new Date(); const mStart=new Date(now.getFullYear(),now.getMonth(),1);
+      const f=mStart.toISOString().slice(0,10), tt=now.toISOString().slice(0,10);
+      const row=(key,id)=>`<div style="padding:10px 0;border-bottom:1px solid var(--ivory-dark);">
+        <div style="font-weight:700;font-size:13px;margin-bottom:6px;">${t(key)}</div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn-secondary rep-btn" data-k="${id}" data-f="pdf" style="flex:1;padding:8px 0;">📄 PDF</button>
+          <button class="btn-secondary rep-btn" data-k="${id}" data-f="xls" style="flex:1;padding:8px 0;">📊 Excel</button>
+          <button class="btn-secondary rep-btn" data-k="${id}" data-f="csv" style="flex:1;padding:8px 0;">📑 CSV</button>
+        </div></div>`;
+      $('sheet-root').innerHTML=`<div class="overlay" id="ov"><div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-head"><div><div class="sheet-sub">${t('fullReports')}</div><div class="sheet-title">📑 ${t('fullReports')}</div></div><button class="close-x" id="cx">×</button></div>
+        <div style="font-size:12px;color:rgba(26,26,26,0.55);margin-bottom:10px;">${t('pickRangeHint')}</div>
+        <div class="row2"><div class="field"><label class="lbl">${t('repFrom')}</label><input class="input" id="rep-from" type="date" value="${f}"></div>
+          <div class="field"><label class="lbl">${t('repTo')}</label><input class="input" id="rep-to" type="date" value="${tt}"></div></div>
+        <div id="rep-list">${row('repSuppliers','suppliers')}${row('repProducts','products')}${row('repBranches','branches')}${row('repUsers','users')}${row('repProfits','profits')}</div>
+        <div id="rep-busy" style="text-align:center;font-size:12px;color:var(--forest);margin-top:8px;"></div>
+      </div></div>`;
+      $('ov').onclick=closeSheet;$('cx').onclick=closeSheet;
+      document.querySelectorAll('.rep-btn').forEach(b=>b.onclick=async()=>{
+        const fromTs=dayStart(new Date($('rep-from').value+'T00:00:00').getTime());
+        const toTs=new Date($('rep-to').value+'T23:59:59').getTime();
+        $('rep-busy').textContent=t('loadingReports')||'...';
+        try{
+          const data=await buildReportData(fromTs,toTs);
+          const rep=data[b.dataset.k]; const fmt2=b.dataset.f;
+          const fname=`${b.dataset.k}_${$('rep-from').value}_${$('rep-to').value}`;
+          if(fmt2==='csv') downloadCSV(fname+'.csv', rep.header, rep.rows);
+          else if(fmt2==='xls') downloadXLS(fname+'.xls', rep.title, rep.header, rep.rows);
+          else printDoc(rep.title, tableHtml(rep.title+` (${$('rep-from').value} → ${$('rep-to').value})`, rep.header, rep.rows));
+          $('rep-busy').textContent='';
+        }catch(e){ console.error(e); $('rep-busy').textContent=''; toast(t('errorGen'),true); }
+      });
     }
 
     function openSettings(){
