@@ -219,6 +219,8 @@
         reports:'التقارير', today:'اليوم', last7:'آخر ٧ أيام', salesCount:'عدد الفواتير', revenue:'الإيرادات',
         avgSale:'متوسط الفاتورة', topProducts:'أكثر المنتجات مبيعاً', branchCompare:'مقارنة الفروع',
         branchAccounts:'حسابات الفروع', allTime:'الإجمالي الكلي', grossRev:'الإجمالي', netRev:'الصافي', invoicesN:'فاتورة',
+        staff_tab:'مين فين', whoWhere:'مين شغّال فين', onDutyNow:'على رأس العمل دلوقتي', byBranchView:'حسب الفرع', byCashierView:'حسب الكاشير',
+        since:'من', onDutyFor:'مدة الخدمة', noOneWorking:'لا أحد على رأس العمل الآن', searchCashierName:'ابحث باسم الكاشير', cashiersCount:'عدد الكاشيرز', onPauseNow:'في استراحة',
         noSales:'لا توجد مبيعات بعد', loadingReports:'جارٍ تحميل التقارير...', sold:'مُباع', allBranches:'كل الفروع',
         unitsSold:'وحدة', thisBranch:'هذا الفرع', revenueByDay:'الإيراد اليومي',
         thisMonth:'هذا الشهر', monthRev:'إيراد الشهر', stockValue:'قيمة المخزون', atCost:'بالتكلفة',
@@ -298,6 +300,8 @@
         reports:'Reports', today:'Today', last7:'Last 7 days', salesCount:'Sales', revenue:'Revenue',
         avgSale:'Avg sale', topProducts:'Top products', branchCompare:'Branch comparison',
         branchAccounts:'Branch accounts', allTime:'All time', grossRev:'Gross', netRev:'Net', invoicesN:'invoices',
+        staff_tab:"Who's where", whoWhere:"Who's working where", onDutyNow:'On duty now', byBranchView:'By branch', byCashierView:'By cashier',
+        since:'Since', onDutyFor:'On duty for', noOneWorking:'Nobody on duty now', searchCashierName:'Search by cashier name', cashiersCount:'Cashiers', onPauseNow:'On break',
         noSales:'No sales yet', loadingReports:'Loading reports...', sold:'sold', allBranches:'All branches',
         unitsSold:'units', thisBranch:'This branch', revenueByDay:'Daily revenue',
         thisMonth:'This month', monthRev:'Month revenue', stockValue:'Stock value', atCost:'At cost',
@@ -481,6 +485,7 @@
         tabs.push({k:'categories',ico:'🏷️',l:t('categories')});
         tabs.push({k:'warehouse',ico:'🏬',l:t('warehouse')});
         tabs.push({k:'users',ico:'👥',l:t('users')});
+        tabs.push({k:'staff',ico:'👀',l:t('staff_tab')});
         tabs.push({k:'reports',ico:'📊',l:t('reports')});
       }
       if(profile.role==='admin') tabs.push({k:'branches',ico:'🏢',l:t('branches_tab')});
@@ -499,7 +504,7 @@
     function render(){
       // refresh nav labels & branch names for language
       const bs=$('branch-select'); if(bs){const cur=bs.value;bs.innerHTML=branches.map(b=>`<option value="${b.id}">${lang==='ar'?b.nameAr:b.nameEn}</option>`).join('');bs.value=cur;}
-      document.querySelectorAll('.nav-btn').forEach(b=>{const k=b.dataset.tab;b.querySelector('.lbl2').textContent=k==='cassa'?t('cashier_tab'):k==='shift'?t('shift_tab'):k==='receipts'?t('receipts_tab'):k==='products'?t('products'):k==='categories'?t('categories'):k==='warehouse'?t('warehouse'):k==='users'?t('users'):k==='reports'?t('reports'):k==='branches'?t('branches_tab'):t('cashier_tab');});
+      document.querySelectorAll('.nav-btn').forEach(b=>{const k=b.dataset.tab;b.querySelector('.lbl2').textContent=k==='cassa'?t('cashier_tab'):k==='shift'?t('shift_tab'):k==='receipts'?t('receipts_tab'):k==='products'?t('products'):k==='categories'?t('categories'):k==='warehouse'?t('warehouse'):k==='users'?t('users'):k==='staff'?t('staff_tab'):k==='reports'?t('reports'):k==='branches'?t('branches_tab'):t('cashier_tab');});
       if(activeTab==='cassa') renderCassa();
       else { const cb=$('cart-bar-root'); if(cb) cb.innerHTML=''; 
         if(activeTab==='products') renderProducts();
@@ -508,6 +513,7 @@
         else if(activeTab==='shift') renderShift();
         else if(activeTab==='receipts') renderReceipts();
         else if(activeTab==='users') renderUsers();
+        else if(activeTab==='staff') renderStaff();
         else if(activeTab==='reports') renderReports();
         else if(activeTab==='branches') renderBranches();
         else renderCassa();
@@ -1198,6 +1204,75 @@
 
     // ============ REPORTS (تقارير) ============
     function dayStart( d){ const x=new Date(d); x.setHours(0,0,0,0); return x.getTime(); }
+    // ===== مين شغّال فين (نقطة 3): الورديات المفتوحة حسب الفرع / الكاشير =====
+    let staffView='branch', staffSearch='';
+    async function renderStaff(){
+      $('content').innerHTML=`<div class="spinner"></div>`;
+      const visibleBranchIds = profile.role==='admin' ? branches.map(b=>b.id) : (profile.branchIds||[]);
+      let open=[];
+      try{
+        if(profile.role==='admin'){
+          const qs=await getDocs(query(collection(db,'shifts'),where('status','==','open')));
+          qs.forEach(d=>open.push({id:d.id,...d.data()}));
+        } else {
+          for(const bid of visibleBranchIds){
+            const qs=await getDocs(query(collection(db,'shifts'),where('branchId','==',bid),where('status','==','open')));
+            qs.forEach(d=>open.push({id:d.id,...d.data()}));
+          }
+        }
+      }catch(e){ console.error(e); $('content').innerHTML=`<div class="card"><div class="empty">${t('errorGen')}</div></div>`; return; }
+      const bn=id=>{ const b=branches.find(x=>x.id===id); return b?(lang==='ar'?b.nameAr:b.nameEn):id; };
+
+      let html=`<div style="font-size:11px;letter-spacing:1px;color:var(--forest);font-weight:700;margin-bottom:12px;">${t('whoWhere').toUpperCase()}</div>`;
+      // مبدّل العرض
+      html+=`<div style="display:flex;gap:8px;margin-bottom:14px;">
+        <button class="seg ${staffView==='branch'?'on':''}" data-v="branch" style="flex:1;padding:9px;border-radius:9px;border:1px solid var(--ivory-dark);background:${staffView==='branch'?'var(--forest)':'#fff'};color:${staffView==='branch'?'#fff':'var(--forest)'};font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;">🏢 ${t('byBranchView')}</button>
+        <button class="seg ${staffView==='cashier'?'on':''}" data-v="cashier" style="flex:1;padding:9px;border-radius:9px;border:1px solid var(--ivory-dark);background:${staffView==='cashier'?'var(--forest)':'#fff'};color:${staffView==='cashier'?'#fff':'var(--forest)'};font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;">🧑 ${t('byCashierView')}</button>
+      </div>`;
+
+      if(open.length===0){
+        html+=`<div class="card"><div class="empty">${t('noOneWorking')}</div></div>`;
+        $('content').innerHTML=html;
+        bindSeg(); return;
+      }
+
+      if(staffView==='branch'){
+        // مجمّع حسب الفرع
+        const byBranch={};
+        open.forEach(s=>{ (byBranch[s.branchId]=byBranch[s.branchId]||[]).push(s); });
+        const ids=Object.keys(byBranch).filter(id=>visibleBranchIds.includes(id));
+        html+=ids.map(id=>{
+          const list=byBranch[id].sort((a,b)=>a.openAt-b.openAt);
+          return `<div class="card"><div class="card-title">🏢 ${bn(id)} · <span class="num">${list.length}</span> ${t('cashiersCount')}</div>
+          ${list.map(s=>staffRow(s)).join('')}</div>`;
+        }).join('');
+      } else {
+        // بحث بالكاشير
+        html+=`<div class="card"><div class="field" style="margin-bottom:0;"><input class="input" id="staff-q" placeholder="🔎 ${t('searchCashierName')}" value="${staffSearch}"></div></div>`;
+        const q=staffSearch.trim().toLowerCase();
+        const filtered=open.filter(s=>!q || (s.userName||'').toLowerCase().includes(q)).sort((a,b)=>(a.userName||'').localeCompare(b.userName||''));
+        if(filtered.length===0) html+=`<div class="card"><div class="empty">${t('noOneWorking')}</div></div>`;
+        else html+=`<div class="card">${filtered.map(s=>staffRow(s,true)).join('')}</div>`;
+      }
+      $('content').innerHTML=html;
+      bindSeg();
+      const sq=$('staff-q'); if(sq){ sq.oninput=()=>{ staffSearch=sq.value; renderStaff(); setTimeout(()=>{const e=$('staff-q'); if(e){e.focus(); e.setSelectionRange(e.value.length,e.value.length);}},0); }; }
+    }
+    function staffRow(s, showBranch){
+      const worked=workedMsOf(s); const paused=isOnPause(s);
+      const start=fmtTime(s.openAt, s.tzo);
+      return `<div style="padding:10px 0;border-bottom:1px solid var(--ivory-dark);">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-weight:700;font-size:14px;">🧑 ${s.userName||'—'} ${paused?`<span style="font-size:10px;color:var(--amber);border:1px solid rgba(216,142,42,0.4);border-radius:6px;padding:1px 5px;">⏸ ${t('onPauseNow')}</span>`:`<span style="font-size:10px;color:var(--green);">🟢</span>`}</span>
+          <span class="num" style="font-weight:700;color:var(--forest);">${fmtDur(worked)}</span>
+        </div>
+        <div class="num" style="font-size:11px;color:rgba(26,26,26,0.55);margin-top:3px;">
+          ${showBranch?`📍 ${(()=>{const b=branches.find(x=>x.id===s.branchId);return b?(lang==='ar'?b.nameAr:b.nameEn):s.branchId;})()} · `:''}${t('since')}: ${start} · ${t('onDutyFor')}: ${fmtDur(worked)}
+        </div>
+      </div>`;
+    }
+    function bindSeg(){ document.querySelectorAll('.seg').forEach(b=>b.onclick=()=>{ staffView=b.dataset.v; renderStaff(); }); }
+
     async function renderReports(){
       $('content').innerHTML=`<div class="spinner"></div><div style="text-align:center;color:rgba(26,26,26,0.5);font-size:13px;">${t('loadingReports')}</div>`;
       // quali branch può vedere
