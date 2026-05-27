@@ -633,6 +633,7 @@
       if(inCart+1>(inv.qty||0)){ toast(t('outOfStock'),true); return; }
       if(existing) existing.qty++;
       else cart.push({id:p.id,name:p.name,price:p.price,photoUrl:p.photoUrl||'',qty:1});
+      beep(); // صوت زي السوبر ماركت عند إضافة منتج للبيع
       cartExpanded=true; // si apre/cresce dal basso
       renderCartBar();
     }
@@ -2317,6 +2318,21 @@
     // ===== سكانر الباركود بالكاميرا (يستخدم مكتبة html5-qrcode) =====
     let _bcScanner=null;
     function stopScanner(){ if(_bcScanner){ try{ _bcScanner.stop().then(()=>{try{_bcScanner.clear();}catch(e){} _bcScanner=null;}).catch(()=>{_bcScanner=null;}); }catch(e){ _bcScanner=null; } } }
+    // صوت "بيب" زي ماسح السوبر ماركت — متولّد بدون ملفات (Web Audio)
+    let _audioCtx=null;
+    function beep(){
+      try{
+        _audioCtx = _audioCtx || new (window.AudioContext||window.webkitAudioContext)();
+        if(_audioCtx.state==='suspended') _audioCtx.resume();
+        const o=_audioCtx.createOscillator(), g=_audioCtx.createGain();
+        o.type='square'; o.frequency.value=2000; // نغمة عالية واضحة زي السوبر ماركت
+        g.gain.setValueAtTime(0.0001,_audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.25,_audioCtx.currentTime+0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001,_audioCtx.currentTime+0.12);
+        o.connect(g); g.connect(_audioCtx.destination);
+        o.start(); o.stop(_audioCtx.currentTime+0.13);
+      }catch(e){ /* لو المتصفح مش بيدعم الصوت، يكمّل عادي */ }
+    }
     function openScanner(onResult){
       $('sheet-root').innerHTML=`<div class="overlay" id="ov"><div class="sheet" onclick="event.stopPropagation()">
         <div class="sheet-head"><div><div class="sheet-sub">${t('scanBarcode')}</div><div class="sheet-title">📷 ${t('scanHint')}</div></div><button class="close-x" id="cx">×</button></div>
@@ -2327,14 +2343,14 @@
       </div></div>`;
       const close=()=>{ stopScanner(); closeSheet(); };
       $('ov').onclick=close; $('cx').onclick=close;
-      $('bc-manual-ok').onclick=()=>{ const v=$('bc-manual').value.trim(); if(v){ close(); onResult(v); } };
+      $('bc-manual-ok').onclick=()=>{ const v=$('bc-manual').value.trim(); if(v){ beep(); close(); onResult(v); } };
       if(typeof Html5Qrcode==='undefined'){ $('bc-msg').textContent=t('camNoAccess'); return; }
       const cfg={ fps:10, qrbox:{width:260,height:150}, formatsToSupport:[
         Html5QrcodeSupportedFormats.EAN_13,Html5QrcodeSupportedFormats.EAN_8,Html5QrcodeSupportedFormats.UPC_A,
         Html5QrcodeSupportedFormats.UPC_E,Html5QrcodeSupportedFormats.CODE_128,Html5QrcodeSupportedFormats.CODE_39,
         Html5QrcodeSupportedFormats.CODE_93,Html5QrcodeSupportedFormats.ITF,Html5QrcodeSupportedFormats.CODABAR,Html5QrcodeSupportedFormats.QR_CODE ] };
       _bcScanner=new Html5Qrcode('bc-reader');
-      const ok=(txt)=>{ if(!txt)return; stopScanner(); closeSheet(); onResult(String(txt).trim()); };
+      const ok=(txt)=>{ if(!txt)return; beep(); stopScanner(); closeSheet(); onResult(String(txt).trim()); };
       _bcScanner.start({facingMode:'environment'},cfg,ok,()=>{}).catch(()=>{
         Html5Qrcode.getCameras().then(ds=>{ if(ds&&ds.length){ _bcScanner.start(ds[0].id,cfg,ok,()=>{}).catch(()=>{ $('bc-msg').textContent=t('camNoAccess'); }); } else { $('bc-msg').textContent=t('camNoAccess'); } }).catch(()=>{ $('bc-msg').textContent=t('camNoAccess'); });
       });
