@@ -836,6 +836,7 @@
     // يبني نص الفاتورة ويفتح واتساب (العميل يختار جهة الاتصال)
     // يرسم الفاتورة كصورة (Canvas) فيها اللوجو وكل التفاصيل، ويشاركها أو ينزّلها PNG
     function receiptToImage(sale, bn, dt, btn){
+      const btnLabel = btn ? btn.textContent : '';
       const W=620, pad=34, ar=(lang==='ar');
       // قياس الارتفاع المطلوب
       const items=sale.items||[];
@@ -897,7 +898,7 @@
       // إخراج: اعرض الصورة في نافذة فيها واتساب + تحميل
       const fname=`receipt_${sale.receiptNo||'lecoin'}.png`;
       const dataUrl=c.toDataURL('image/png');
-      if(btn){ btn.disabled=false; btn.textContent='🧾 '+t('receiptImage'); }
+      if(btn){ btn.disabled=false; btn.textContent=btnLabel; }
       // نحوّل الصورة لـ Blob فوراً (بدون انتظار) عشان التحميل/المشاركة مايتمنعوش من المتصفح
       const imgBlob=(()=>{ try{ const b64=dataUrl.split(',')[1]; const bin=atob(b64); const arr=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i); return new Blob([arr],{type:'image/png'}); }catch(e){ return null; } })();
       const blobUrl=imgBlob?URL.createObjectURL(imgBlob):dataUrl;
@@ -970,8 +971,7 @@
           <button class="btn-forest btn-wide" id="rc-print">🖨️ ${t('print')}</button>
           <button class="btn-secondary btn-wide" id="rc-dl">⬇️ ${t('download')}</button>
         </div>
-        <button class="btn-wide" id="rc-wa" style="margin-top:8px;background:#25D366;color:#fff;border:none;border-radius:12px;font-weight:700;font-family:inherit;padding:12px;cursor:pointer;">📱 ${t('sendWhatsapp')}</button>
-        <button class="btn-wide" id="rc-img" style="margin-top:8px;background:var(--gold);color:var(--forest-dark);border:none;border-radius:12px;font-weight:700;font-family:inherit;padding:12px;cursor:pointer;">🧾 ${t('receiptImage')}</button>
+        <button class="btn-wide" id="rc-wa" style="margin-top:8px;background:#25D366;color:#fff;border:none;border-radius:12px;font-weight:700;font-family:inherit;padding:13px;cursor:pointer;">📱 ${t('sendWhatsapp')} (${t('receiptImage')})</button>
         ${canRefund()&&!sale.voided?`<div style="display:flex;gap:8px;margin-top:8px;">
           <button class="btn-secondary btn-wide" id="rc-return" style="color:var(--amber);border-color:rgba(216,142,42,0.4);">↩️ ${t('returnItems')}</button>
           <button class="btn-secondary btn-wide" id="rc-void" style="color:var(--red);border-color:rgba(192,72,72,0.3);">✖ ${t('voidInvoice')}</button>
@@ -979,8 +979,7 @@
       </div></div>`;
       $('ov').onclick=closeSheet;$('cx').onclick=closeSheet;
       $('rc-print').onclick=()=>printReceipt(sale);
-      $('rc-wa')&&($('rc-wa').onclick=()=>sendReceiptWhatsapp(sale,bn,dt));
-      $('rc-img')&&($('rc-img').onclick=()=>{ const b=$('rc-img'); b.disabled=true; b.textContent=t('makingImage'); receiptToImage(sale,bn,dt,b); });
+      $('rc-wa')&&($('rc-wa').onclick=()=>{ const b=$('rc-wa'); b.disabled=true; b.textContent=t('makingImage'); receiptToImage(sale,bn,dt,b); });
       $('rc-dl').onclick=()=>{
         const header=[t('receiptNo'),t('saleTime'),t('cashierLbl'),t('itemCol'),t('qtyCol'),t('priceCol'),t('subtotalCol')];
         const rws=(sale.items||[]).map(i=>['#'+(sale.receiptNo||''),dt,sale.userName||'',i.name,i.qty,i.price,i.subtotal]);
