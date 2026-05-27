@@ -2,7 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#1F3A2E">
   <meta name="theme-color" content="#1F3A2E">
   <link rel="manifest" href="manifest.json">
   <title>Le Coin · POS</title>
@@ -27,15 +28,16 @@
     .login-brand .lb-name { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:40px; color:var(--forest); font-weight:500; }
     .login-brand .lb-tag { font-size:10px; letter-spacing:3px; color:var(--gold); font-weight:700; text-transform:uppercase; margin-top:2px; }
 
-    header { background:var(--forest); color:var(--ivory); padding:12px 16px; position:sticky; top:0; z-index:20; }
+    header { background:var(--forest); color:var(--ivory); padding:10px 16px; position:sticky; top:0; z-index:20; padding-top:max(10px,env(safe-area-inset-top)); }
     .header-inner { display:flex; justify-content:space-between; align-items:center; max-width:900px; margin:0 auto; gap:10px; }
     .brand-name { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:22px; font-weight:500; }
+    #header-logo { height:62px !important; }
     .header-ctrl { display:flex; align-items:center; gap:8px; }
     .branch-sel { background:rgba(255,255,255,0.1); color:var(--ivory); border:1px solid rgba(201,168,76,0.3); border-radius:8px; padding:5px 8px; font-size:11px; font-family:inherit; max-width:120px; }
     .lang-btn { background:rgba(201,168,76,0.2); color:var(--gold); border:none; border-radius:8px; padding:5px 9px; font-size:11px; font-weight:700; cursor:pointer; font-family:inherit; }
     .user-btn { background:none; border:none; color:var(--ivory); cursor:pointer; font-size:18px; opacity:0.85; }
 
-    main { max-width:900px; margin:0 auto; padding:16px; padding-bottom:80px; }
+    main { max-width:900px; margin:0 auto; padding:16px; padding-bottom:calc(96px + env(safe-area-inset-bottom,0)); }
     .card { background:white; border-radius:16px; padding:16px; box-shadow:0 1px 2px rgba(0,0,0,0.04),0 4px 12px rgba(0,0,0,0.04); margin-bottom:14px; }
     .card-title { font-size:11px; letter-spacing:1px; color:var(--forest); font-weight:700; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
 
@@ -52,13 +54,14 @@
     .btn-secondary { background:white; color:var(--charcoal); border:1px solid var(--ivory-dark); padding:10px 16px; border-radius:10px; font-weight:600; font-size:12px; cursor:pointer; font-family:inherit; }
     .btn-wide { width:100%; justify-content:center; }
 
-    nav { position:fixed; bottom:0; left:0; right:0; background:white; border-top:1px solid var(--ivory-dark); z-index:40; }
-    .nav-inner { max-width:900px; margin:0 auto; display:grid; }
-    .nav-btn { background:transparent; border:none; padding:10px 4px 8px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px; color:rgba(26,26,26,0.5); position:relative; font-family:inherit; }
+    nav { position:fixed; bottom:0; left:0; right:0; background:white; border-top:1px solid var(--ivory-dark); z-index:40; padding-bottom:env(safe-area-inset-bottom,0); box-shadow:0 -2px 12px rgba(0,0,0,0.06); }
+    .nav-inner { max-width:900px; margin:0 auto; display:flex; flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; scroll-snap-type:x proximity; }
+    .nav-inner::-webkit-scrollbar { display:none; }
+    .nav-btn { flex:0 0 auto; min-width:70px; background:transparent; border:none; padding:9px 6px 7px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px; color:rgba(26,26,26,0.5); position:relative; font-family:inherit; scroll-snap-align:center; }
     .nav-btn.active { color:var(--forest); }
     .nav-btn.active::before { content:''; position:absolute; top:0; left:50%; transform:translateX(-50%); width:32px; height:3px; background:var(--gold); border-radius:0 0 4px 4px; }
-    .nav-btn .ico { font-size:20px; }
-    .nav-btn .lbl2 { font-size:11px; font-weight:500; }
+    .nav-btn .ico { font-size:22px; }
+    .nav-btn .lbl2 { font-size:10.5px; font-weight:600; white-space:nowrap; }
 
     .overlay { position:fixed; inset:0; background:rgba(26,26,26,0.55); display:flex; align-items:flex-end; justify-content:center; z-index:50; }
     @keyframes sheetin { from{transform:translateY(100%)} to{transform:translateY(0)} }
@@ -95,6 +98,23 @@
 
     /* CASSA / CASHIER */
     .pos-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:10px; margin-bottom:120px; }
+    /* تحسين للتابلت والشاشات الكبيرة */
+    @media (min-width:700px){
+      main { max-width:1100px; padding:22px; }
+      .header-inner, .nav-inner, .cart-inner, .cart-panel { max-width:1100px; }
+      .pos-grid { grid-template-columns:repeat(auto-fill,minmax(165px,1fr)); gap:14px; }
+      #header-logo { height:72px !important; }
+    }
+    @media (min-width:1000px){ main { max-width:1200px; } .header-inner,.nav-inner{ max-width:1200px; } }
+    /* قائمة الأقسام (drawer) */
+    .menu-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+    @media (min-width:600px){ .menu-grid { grid-template-columns:repeat(4,1fr); } }
+    .menu-tile { background:var(--ivory); border:1px solid var(--ivory-dark); border-radius:16px; padding:18px 8px; display:flex; flex-direction:column; align-items:center; gap:7px; cursor:pointer; font-family:inherit; transition:transform .08s, background .15s; }
+    .menu-tile:active { transform:scale(0.96); }
+    .menu-tile.active { background:var(--forest); border-color:var(--forest); }
+    .menu-tile.active .mt-l, .menu-tile.active .mt-i { color:#fff; }
+    .menu-tile .mt-i { font-size:30px; }
+    .menu-tile .mt-l { font-size:12.5px; font-weight:700; color:var(--charcoal); text-align:center; line-height:1.2; }
     .pos-card { background:white; border-radius:14px; overflow:hidden; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.04),0 4px 12px rgba(0,0,0,0.05); border:2px solid transparent; transition:border-color 0.15s; text-align:start; display:flex; flex-direction:column; }
     .pos-card:active { border-color:var(--gold); }
     .pos-card .pc-photo { width:100%; aspect-ratio:1/1; object-fit:cover; background:var(--ivory-dark); display:flex; align-items:center; justify-content:center; font-size:34px; color:rgba(26,26,26,0.3); }
@@ -137,7 +157,10 @@
   <div id="app" class="hidden">
     <header>
       <div class="header-inner">
-        <img id="header-logo" class="brand-name" alt="Le Coin" style="height:34px;width:auto;border-radius:7px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <button class="menu-btn" id="menu-btn" aria-label="menu" style="background:rgba(255,255,255,0.12);border:none;color:var(--ivory);width:42px;height:42px;border-radius:11px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:0 0 auto;">☰</button>
+          <img id="header-logo" class="brand-name" alt="Le Coin" style="height:62px;width:auto;border-radius:11px;">
+        </div>
         <div class="header-ctrl">
           <select class="branch-sel" id="branch-select"></select>
           <button class="lang-btn" id="lang-btn">EN</button>
@@ -197,12 +220,14 @@
         dir:'rtl', langBtn:'EN', email:'البريد الإلكتروني', pass:'كلمة المرور', login:'دخول',
         loginErr:'بيانات الدخول غير صحيحة', noProfile:'لا يوجد ملف مستخدم. تواصل مع المسؤول.', inactive:'حسابك متوقف.',
         noBranch:'لا توجد فروع مخصصة لك.',
-        products:'المنتجات', categories:'الفئات', logout:'تسجيل الخروج', settings:'الإعدادات',
+        products:'المنتجات', categories:'الفئات', logout:'تسجيل الخروج', settings:'الإعدادات', sectionsMenu:'كل الأقسام',
         cashierSoon:'واجهة الكاشير', cashierSoonMsg:'وحدة البيع ستُضاف في المرحلة التالية. حالياً يمكن للمسؤول والمدير إدارة الكتالوج.',
         addCategory:'فئة جديدة', editCategory:'تعديل الفئة', nameAr:'الاسم بالعربية', nameEn:'الاسم بالإنجليزية',
         order:'الترتيب', active:'نشط', save:'حفظ', cancel:'إلغاء', delete:'حذف', create:'إنشاء', edit:'تعديل',
+        deleteUser:'حذف المستخدم', confirmDelUser:'متأكد إنك عايز تمسح المستخدم؟ هيتمنع من الدخول. (الإيميل هيفضل محجوز في فايربيز ومش هينفع تعيد استخدامه)', userDeleted:'تم حذف المستخدم',
+        depotTools:'أدوات المخزن', softReset:'تصفير المخزون (Soft)', hardReset:'تفريغ المخزن (Hard)', softResetDesc:'يصفّر كل الكميات لصفر ويحتفظ بالمنتجات — يسهّل إعادة الإدخال', hardResetDesc:'يمسح كل المنتجات من هذا المخزن نهائياً (المنتجات تفضل في الكتالوج)', confirmSoftReset:'متأكد؟ كل الكميات في هذا الفرع هتبقى صفر (المنتجات تفضل موجودة)', confirmHardReset:'تحذير! ده هيمسح كل أصناف هذا المخزن نهائياً. متأكد؟', resetDone:'تمت العملية', resetting:'بيشتغل...',
         confirmDelCat:'حذف هذه الفئة؟', confirmDelProd:'حذف هذا المنتج؟',
-        addProduct:'منتج جديد', editProduct:'تعديل المنتج', barcode:'الباركود', name:'الاسم (فرنسي)',
+        addProduct:'منتج جديد', scanAddProduct:'مسح باركود لمنتج جديد', prodExistsScan:'المنتج موجود — هفتحه لك للتعديل', editProduct:'تعديل المنتج', barcode:'الباركود', name:'الاسم (فرنسي)',
         descAr:'الوصف بالعربية', descEn:'الوصف بالإنجليزية', category:'الفئة', price:'السعر', cost:'التكلفة',
         photo:'صورة المنتج', addPhoto:'إضافة صورة', stock:'المخزون', threshold:'حد الإنذار',
         margin:'الربح', search:'بحث...', noCategories:'لا توجد فئات بعد', noProducts:'لا توجد منتجات بعد',
@@ -239,7 +264,7 @@
         pause:'استراحة', resume:'استئناف', onPause:'في استراحة', pausedTime:'وقت الاستراحات', shiftSales:'مبيعات الوردية',
         expectedCash:'الكاش المتوقع', cashDiff:'فرق الدرج', shiftReport:'تقرير الوردية', shiftHistory:'سجل الورديات',
         custodyTitle:'العُهدة (تسليم النقدية)', handOver:'تسليم العهدة', handTo:'تسليم لـ', handAmount:'المبلغ المسلَّم', custReceived:'مستلَم', custHanded:'مسلَّم', toDeliver:'المطلوب تسليمه', noOpenColleague:'مفيش زميل ورديته مفتوحة في نفس الفرع', handDone:'تم تسليم العهدة', noOpenShiftsBranch:'مفيش ورديات مفتوحة في الفرع', custFrom:'من', custTo:'إلى',
-        custPending:'في انتظار التأكيد', custSent:'اتبعت — مستني تأكيد الزميل', custConfirmReceipt:'تأكيد استلام النقدية', custConfirmMsg:'بيسلّمك المبلغ ده. اتأكد إنك استلمته وأكّد.', custCheckbox:'أنا أكّد إني استلمت المبلغ المذكور', custConfirmBtn:'تأكيد الاستلام', custConfirmed:'تم تأكيد الاستلام',
+        custPending:'في انتظار التأكيد', custSent:'اتبعت — مستني تأكيد الزميل', custConfirmReceipt:'تأكيد استلام النقدية', custConfirmMsg:'بيسلّمك المبلغ ده. اتأكد إنك استلمته وأكّد.', custCheckbox:'أنا أكّد إني استلمت المبلغ المذكور', custConfirmBtn:'تأكيد الاستلام', custConfirmed:'تم تأكيد الاستلام', custReject:'رفض الاستلام', custRejectMsg:'متأكد إنك عايز ترفض استلام المبلغ؟ المبلغ هيرجع لزميلك', custRejectedToast:'تم رفض الاستلام', custRejected:'مرفوض', custWasRejected:'رفض الزميل الاستلام',
         confirmCloseShift:'متأكد إنك عايز تقفل الوردية؟', shiftOpened:'تم فتح الوردية', shiftClosed:'تم قفل الوردية',
         openCashHint:'اكتب الكاش اللي في الدرج وانت بتفتح الوردية', countedCashHint:'عُدّ الكاش في الدرج واكتب الرقم',
         noShiftsYet:'لا توجد ورديات بعد', hShort:'س', mShort:'د', byUser:'الكاشير', cashOver:'زيادة', cashShort:'عجز',
@@ -254,6 +279,7 @@
         returnDone:'تم الاسترداد', alreadyVoided:'الفاتورة ملغاة بالفعل', selectReturnQty:'اكتب الكمية المرتجعة لكل صنف',
         nothingToReturn:'مفيش كمية متاحة للاسترداد', doReturn:'تنفيذ الاسترداد', returnedSoFar:'مرتجع',
         payTitle:'الدفع', amountPaid:'المبلغ المدفوع', payExact:'دفع بالظبط', changeDue:'الباقي', enterAmount:'أدخل المبلغ',
+        payMethodLbl:'طريقة الدفع', mCash:'كاش', mInstapay:'Instapay', instapayNote:'دفع أونلاين — بيروح للمركز مباشرة، مش بيدخل درج الكاشير', soldCash:'مبيعات كاش', soldInstapay:'مبيعات Instapay',
         confirmPay:'تأكيد الدفع', insufficient:'المبلغ أقل من المطلوب', received:'المستلم', collapse:'إخفاء',
         fromDate:'من تاريخ', toDate:'إلى تاريخ', allCashiers:'كل الكاشيرز', minAmount:'أقل مبلغ', maxAmount:'أكبر مبلغ',
         results:'النتائج', clearFilters:'مسح الفلاتر', searchByNo:'رقم الفاتورة', netSum:'إجمالي الصافي', filters:'بحث وفلترة',
@@ -269,6 +295,8 @@
         suppliers_tab:'الموردين', addSupplier:'مورد جديد', editSupplier:'تعديل المورد', supplierName:'اسم المورد', supplierPhone:'التليفون', supplierNote:'ملاحظات', noSuppliers:'مفيش موردين لسه', supplier:'المورد', noSupplier:'بدون مورد', supplierHistory:'تاريخ التعامل', confirmDelSupplier:'متأكد إنك عايز تمسح المورد؟', callSupplier:'اتصال',
         backupTitle:'النسخة الاحتياطية', exportData:'تصدير كل البيانات', importData:'استيراد البيانات', exporting:'بيصدّر...', importing:'بيستورد...', exportDone:'تم تصدير كل البيانات', importDone:'تم استيراد البيانات', importConfirm:'ده هيكتب فوق البيانات الحالية بالكامل. متأكد؟', importBad:'الملف مش صالح', backupHint:'صدّر نسخة من كل بياناتك، أو استورد نسخة قديمة',
         fullReports:'التقارير الشاملة', repSuppliers:'تقرير الموردين', repProducts:'تقرير المنتجات', repBranches:'تقرير الفروع', repUsers:'تقرير المستخدمين', repProfits:'تقرير الأرباح', repFrom:'من تاريخ', repTo:'إلى تاريخ', purchased:'المشتريات', cogs:'تكلفة المباع', grossProfit:'إجمالي الربح', purchasesTotal:'إجمالي المشتريات', hoursWorked:'ساعات العمل', pickRangeHint:'اختر الفترة، وبعدين نزّل التقرير بالشكل اللي تحبه', reportsHubHint:'تقارير مرتبة جاهزة للتصدير PDF / Excel / CSV',
+        repSalesByInvoice:'المبيعات — فاتورة بفاتورة', repSalesDetail:'المبيعات — تفصيل المنتجات', repPurchasesDetail:'المشتريات — تفصيل', repBranchesDetail:'الفروع — تفصيل', repUsersDetail:'الموظفين — تفصيل', secSales:'المبيعات', secPurchases:'المشتريات', secBranchesSec:'الفروع', secUsersSec:'الموظفين', secProfitsSec:'الأرباح',
+        colDateTime:'التاريخ/الوقت', colInvoice:'رقم الفاتورة', colProduct:'المنتج', colSell:'سعر البيع', colQty:'الكمية', colLineRev:'إيراد السطر', colLineProfit:'ربح المنتج', colInvProfit:'ربح الفاتورة', colProdCount:'عدد المنتجات', colUnitCost:'تكلفة الوحدة', colReceivedBy:'استلمها', colPayment:'الدفع', colInvTotal:'إجمالي الفاتورة',
         transferTab:'تحويل', transferGoods:'تحويل بضاعة', transferHint:'حوّل كمية من مخزن الفرع الحالي إلى فرع آخر', toBranch:'إلى فرع',
         transferQty:'الكمية المحوّلة', doTransfer:'تحويل', transferDone:'تم التحويل ✓', notEnoughStock:'الكمية غير كافية في المخزن',
         transferLog:'سجل التحويلات', noTransfers:'لا توجد تحويلات بعد', fromLbl:'من', toLbl:'إلى', needTwoBranches:'محتاج فرعين على الأقل للتحويل', selectDestBranch:'اختر الفرع المستلم',
@@ -279,6 +307,9 @@
         startedAt:'بدأت', elapsed:'المدة', worked:'ساعات العمل', onBreak:'في استراحة', pause:'استراحة', resume:'استئناف',
         breaks:'الاستراحات', breakTime:'وقت الاستراحة', shiftClosed:'تم قفل الوردية', confirmCloseShift:'تأكيد قفل الوردية؟',
         cashSales:'مبيعات الوردية', expectedCash:'النقدية المتوقعة', cashDiff:'الفرق', over:'زيادة', short:'عجز', balanced:'مطابق',
+        shiftLiveTitle:'مبيعاتي لحد دلوقتي', soldSoFar:'المباع', prodsCount:'منتجات', stornoLbl:'مرتجعات / إلغاء', liveNet:'الصافي',
+        dashboard_tab:'لوحة التحكم', opInsights:'نظرة تشغيلية', newSaleBtn:'بيع جديد', addProductBtn:'إضافة منتج', refreshBtn:'تحديث', summaryWindow:'نافذة الملخص', showing:'بيعرض', rToday:'اليوم', r7:'7 أيام', r30:'30 يوم', rCustom:'مخصص',
+        mSalesRevenue:'إيراد المبيعات', mNetRevRange:'صافي الإيراد بالفترة', mProfit:'الربح', mAfterCosts:'بعد التكاليف والمرتجعات', mExpenses:'المصاريف', mExpSub:'تتخصم من الربح في الفترة', mReturnAmount:'قيمة المرتجعات', mReturnEntries:'مرتجع', mTotalDue:'المستحق الآجل', mDueSub:'مستحق التحصيل', mGrossProfit:'إجمالي الربح', mBeforeExp:'قبل المصاريف', mSalesOrders:'طلبات البيع', mCompletedTx:'عمليات مكتملة', mItemsSold:'منتجات مباعة', mQtySold:'إجمالي الكمية المباعة', mPurchaseValue:'قيمة المشتريات', mProcVal:'قيمة التوريد', mItemsPurchased:'منتجات مشتراة', mIncomingQty:'كمية واردة للمخزون', mItemPerf:'أداء مبيعات المنتجات', mTopByRev:'أعلى المنتجات إيراداً', mNoItemData:'مفيش بيانات مبيعات في الفترة', mLowStock:'تنبيه نقص المخزون', mLimit:'الحد', mPcs:'قطعة', mOpenSites:'الفروع المفتوحة', mOpenSitesSub:'فروع بورديات نشطة', mActiveStaff:'موظفين في الخدمة', mActiveStaffSub:'في ورديات نشطة دلوقتي',
         openShiftHint:'اكتب النقدية اللي في الدرج وافتح ورديتك', enterStartCash:'أدخل النقدية الابتدائية',
         shiftReport:'تقرير الوردية', allShifts:'كل الورديات', myShift:'ورديتي', cashier:'الكاشير', date:'التاريخ',
         duration:'المدة', status:'الحالة', closed:'مقفولة', open2:'مفتوحة', shiftsList:'سجل الورديات', noShifts:'لا توجد ورديات',
@@ -290,12 +321,14 @@
         dir:'ltr', langBtn:'ع', email:'Email', pass:'Password', login:'Sign in',
         loginErr:'Invalid login credentials', noProfile:'No user profile. Contact the admin.', inactive:'Your account is disabled.',
         noBranch:'No branches assigned to you.',
-        products:'Products', categories:'Categories', logout:'Logout', settings:'Settings',
+        products:'Products', categories:'Categories', logout:'Logout', settings:'Settings', sectionsMenu:'All sections',
         cashierSoon:'Cashier interface', cashierSoonMsg:'The sales module arrives in the next stage. For now, admins and managers manage the catalog.',
         addCategory:'New category', editCategory:'Edit category', nameAr:'Name (Arabic)', nameEn:'Name (English)',
         order:'Order', active:'Active', save:'Save', cancel:'Cancel', delete:'Delete', create:'Create', edit:'Edit',
+        deleteUser:'Delete user', confirmDelUser:'Delete this user? They will be blocked from login. (The email stays reserved in Firebase and cannot be reused)', userDeleted:'User deleted',
+        depotTools:'Depot tools', softReset:'Reset stock (Soft)', hardReset:'Empty depot (Hard)', softResetDesc:'Sets all quantities to zero and keeps products — easier re-entry', hardResetDesc:'Permanently removes all products from this depot (products stay in the catalog)', confirmSoftReset:'Sure? All quantities in this branch will become zero (products stay)', confirmHardReset:'Warning! This permanently removes every item in this depot. Sure?', resetDone:'Done', resetting:'Working...',
         confirmDelCat:'Delete this category?', confirmDelProd:'Delete this product?',
-        addProduct:'New product', editProduct:'Edit product', barcode:'Barcode', name:'Name (French)',
+        addProduct:'New product', scanAddProduct:'Scan barcode for new product', prodExistsScan:'Product exists — opening it to edit', editProduct:'Edit product', barcode:'Barcode', name:'Name (French)',
         descAr:'Description (Arabic)', descEn:'Description (English)', category:'Category', price:'Price', cost:'Cost',
         photo:'Product photo', addPhoto:'Add photo', stock:'Stock', threshold:'Low-stock alert',
         margin:'Margin', search:'Search...', noCategories:'No categories yet', noProducts:'No products yet',
@@ -332,7 +365,7 @@
         pause:'Break', resume:'Resume', onPause:'On break', pausedTime:'Break time', shiftSales:'Shift sales',
         expectedCash:'Expected cash', cashDiff:'Drawer difference', shiftReport:'Shift report', shiftHistory:'Shift history',
         custodyTitle:'Custody (cash handover)', handOver:'Hand over cash', handTo:'Hand over to', handAmount:'Amount handed', custReceived:'Received', custHanded:'Handed', toDeliver:'To deliver', noOpenColleague:'No colleague with an open shift in this branch', handDone:'Cash handed over', noOpenShiftsBranch:'No open shifts in this branch', custFrom:'From', custTo:'To',
-        custPending:'Awaiting confirmation', custSent:'Sent — awaiting colleague confirmation', custConfirmReceipt:'Confirm cash received', custConfirmMsg:'is handing you this amount. Make sure you received it and confirm.', custCheckbox:'I confirm I received the stated amount', custConfirmBtn:'Confirm receipt', custConfirmed:'Receipt confirmed',
+        custPending:'Awaiting confirmation', custSent:'Sent — awaiting colleague confirmation', custConfirmReceipt:'Confirm cash received', custConfirmMsg:'is handing you this amount. Make sure you received it and confirm.', custCheckbox:'I confirm I received the stated amount', custConfirmBtn:'Confirm receipt', custConfirmed:'Receipt confirmed', custReject:'Reject', custRejectMsg:'Reject receiving this amount? It will go back to your colleague', custRejectedToast:'Receipt rejected', custRejected:'Rejected', custWasRejected:'Colleague rejected the receipt',
         confirmCloseShift:'Confirm closing the shift?', shiftOpened:'Shift opened', shiftClosed:'Shift closed',
         openCashHint:'Enter the cash in the drawer when opening', countedCashHint:'Count the cash in the drawer and enter it',
         noShiftsYet:'No shifts yet', hShort:'h', mShort:'m', byUser:'Cashier', cashOver:'Over', cashShort:'Short',
@@ -347,6 +380,7 @@
         returnDone:'Refund done', alreadyVoided:'Invoice already voided', selectReturnQty:'Enter returned qty per item',
         nothingToReturn:'Nothing available to return', doReturn:'Process refund', returnedSoFar:'returned',
         payTitle:'Payment', amountPaid:'Amount paid', payExact:'Exact amount', changeDue:'Change', enterAmount:'Enter amount',
+        payMethodLbl:'Payment method', mCash:'Cash', mInstapay:'Instapay', instapayNote:'Online payment — goes straight to HQ, not in the cashier drawer', soldCash:'Cash sales', soldInstapay:'Instapay sales',
         confirmPay:'Confirm payment', insufficient:'Amount is less than total', received:'Received', collapse:'Hide',
         fromDate:'From date', toDate:'To date', allCashiers:'All cashiers', minAmount:'Min', maxAmount:'Max',
         results:'Results', clearFilters:'Clear filters', searchByNo:'Receipt no.', netSum:'Net total', filters:'Search & filter',
@@ -362,6 +396,8 @@
         suppliers_tab:'Suppliers', addSupplier:'New supplier', editSupplier:'Edit supplier', supplierName:'Supplier name', supplierPhone:'Phone', supplierNote:'Notes', noSuppliers:'No suppliers yet', supplier:'Supplier', noSupplier:'No supplier', supplierHistory:'Purchase history', confirmDelSupplier:'Delete this supplier?', callSupplier:'Call',
         backupTitle:'Backup', exportData:'Export all data', importData:'Import data', exporting:'Exporting...', importing:'Importing...', exportDone:'All data exported', importDone:'Data imported', importConfirm:'This will fully overwrite current data. Sure?', importBad:'Invalid file', backupHint:'Export a copy of all your data, or import an old backup',
         fullReports:'Full reports', repSuppliers:'Suppliers report', repProducts:'Products report', repBranches:'Branches report', repUsers:'Users report', repProfits:'Profits report', repFrom:'From date', repTo:'To date', purchased:'Purchased', cogs:'Cost of goods sold', grossProfit:'Gross profit', purchasesTotal:'Total purchases', hoursWorked:'Hours worked', pickRangeHint:'Pick the period, then download the report in the format you like', reportsHubHint:'Organized reports ready to export as PDF / Excel / CSV',
+        repSalesByInvoice:'Sales — by invoice', repSalesDetail:'Sales — product detail', repPurchasesDetail:'Purchases — detail', repBranchesDetail:'Branches — detail', repUsersDetail:'Users — detail', secSales:'Sales', secPurchases:'Purchases', secBranchesSec:'Branches', secUsersSec:'Users', secProfitsSec:'Profits',
+        colDateTime:'Date/Time', colInvoice:'Invoice no.', colProduct:'Product', colSell:'Sell price', colQty:'Qty', colLineRev:'Line revenue', colLineProfit:'Product profit', colInvProfit:'Invoice profit', colProdCount:'Products count', colUnitCost:'Unit cost', colReceivedBy:'Received by', colPayment:'Payment', colInvTotal:'Invoice total',
         transferTab:'Transfer', transferGoods:'Transfer goods', transferHint:'Move quantity from current branch to another', toBranch:'To branch',
         transferQty:'Quantity to transfer', doTransfer:'Transfer', transferDone:'Transfer done ✓', notEnoughStock:'Not enough stock',
         transferLog:'Transfer log', noTransfers:'No transfers yet', fromLbl:'From', toLbl:'To', needTwoBranches:'Need at least two branches', selectDestBranch:'Choose destination branch',
@@ -372,6 +408,9 @@
         startedAt:'Started', elapsed:'Elapsed', worked:'Worked hours', onBreak:'On break', pause:'Break', resume:'Resume',
         breaks:'Breaks', breakTime:'Break time', shiftClosed:'Shift closed', confirmCloseShift:'Confirm close shift?',
         cashSales:'Shift sales', expectedCash:'Expected cash', cashDiff:'Difference', over:'Over', short:'Short', balanced:'Balanced',
+        shiftLiveTitle:'My sales so far', soldSoFar:'Sold', prodsCount:'products', stornoLbl:'Refunds / voids', liveNet:'Net',
+        dashboard_tab:'Dashboard', opInsights:'Operational insights', newSaleBtn:'New Sale', addProductBtn:'Add Product', refreshBtn:'Refresh', summaryWindow:'Summary Window', showing:'Showing', rToday:'Today', r7:'7 Days', r30:'30 Days', rCustom:'Custom',
+        mSalesRevenue:'Sales Revenue', mNetRevRange:'Net revenue in range', mProfit:'Profit', mAfterCosts:'After costs & returns', mExpenses:'Expenses', mExpSub:'Subtracted from profit in this range', mReturnAmount:'Return Amount', mReturnEntries:'return entries', mTotalDue:'Total Due', mDueSub:'Outstanding to collect', mGrossProfit:'Gross Profit', mBeforeExp:'Before expenses', mSalesOrders:'Sales Orders', mCompletedTx:'Completed transactions', mItemsSold:'Items Sold', mQtySold:'Total quantity sold', mPurchaseValue:'Purchase Value', mProcVal:'Procurement value', mItemsPurchased:'Items Purchased', mIncomingQty:'Incoming stock qty', mItemPerf:'Item Sales Performance', mTopByRev:'Top products by revenue', mNoItemData:'No item sales data in range', mLowStock:'Low Stock Alert', mLimit:'Limit', mPcs:'pcs', mOpenSites:'Open sites', mOpenSitesSub:'Branches with active shifts', mActiveStaff:'Staff on shift', mActiveStaffSub:'In active shifts now',
         openShiftHint:'Enter the cash in the drawer and open your shift', enterStartCash:'Enter starting cash',
         shiftReport:'Shift report', allShifts:'All shifts', myShift:'My shift', cashier:'Cashier', date:'Date',
         duration:'Duration', status:'Status', closed:'Closed', open2:'Open', shiftsList:'Shifts log', noShifts:'No shifts',
@@ -500,6 +539,24 @@
     }
 
     // ============ CHROME (top bar, nav) ============
+    let navTabs=[]; // كل الأقسام المتاحة للدور الحالي (للقائمة)
+    // قائمة الأقسام: شبكة كبيرة سهلة اللمس — توصلك لأي قسم بضغطة واحدة
+    function openMenu(){
+      if(!navTabs.length) return;
+      $('sheet-root').innerHTML=`<div class="overlay" id="ov"><div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-head"><div><div class="sheet-sub">${t('settings')}</div><div class="sheet-title">☰ ${t('sectionsMenu')}</div></div><button class="close-x" id="cx">×</button></div>
+        <div class="menu-grid">
+          ${navTabs.map(x=>`<button class="menu-tile ${x.k===activeTab?'active':''}" data-tab="${x.k}"><span class="mt-i">${x.ico}</span><span class="mt-l">${x.l}</span></button>`).join('')}
+        </div>
+      </div></div>`;
+      $('ov').onclick=closeSheet; $('cx').onclick=closeSheet;
+      document.querySelectorAll('.menu-tile').forEach(b=>b.onclick=()=>{
+        activeTab=b.dataset.tab; closeSheet();
+        document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x.dataset.tab===activeTab));
+        const av=document.querySelector('.nav-btn.active'); if(av) av.scrollIntoView({inline:'center',block:'nearest'});
+        render();
+      });
+    }
     function setupChrome(){
       applyLang();
       $('lang-btn').onclick=toggleLang;
@@ -509,8 +566,10 @@
       bs.onchange=async()=>{ if(myShift){ bs.value=currentBranchId; toast(t('branchLocked'),true); return; } currentBranchId=bs.value; await loadCatalog(); render(); };
       applyBranchLock();
       $('user-btn').onclick=openSettings;
+      $('menu-btn')&&($('menu-btn').onclick=openMenu);
       // nav depends on role
       const tabs=[];
+      if(profile.role==='admin'||profile.role==='manager') tabs.push({k:'dashboard',ico:'📈',l:t('dashboard_tab')});
       tabs.push({k:'cassa',ico:'🛒',l:t('cashier_tab')});
       tabs.push({k:'shift',ico:'🕐',l:t('shift_tab')});
       tabs.push({k:'receipts',ico:'🧾',l:t('receipts_tab')});
@@ -524,10 +583,14 @@
         tabs.push({k:'reports',ico:'📊',l:t('reports')});
       }
       if(profile.role==='admin') tabs.push({k:'branches',ico:'🏢',l:t('branches_tab')});
-      if(profile.role==='cashier') activeTab='cassa';
+      // landing page: الكاشير يفتح على الوردية، المدير/الأدمن على لوحة التحكم
+      if(profile.role==='cashier') activeTab='shift';
+      else activeTab='dashboard';
+      navTabs=tabs; // عشان قائمة الأقسام تستخدمها
       $('nav-inner').style.gridTemplateColumns=`repeat(${tabs.length},1fr)`;
       $('nav-inner').innerHTML=tabs.map(x=>`<button class="nav-btn ${x.k===activeTab?'active':''}" data-tab="${x.k}"><span class="ico">${x.ico}</span><span class="lbl2">${x.l}</span></button>`).join('');
-      document.querySelectorAll('.nav-btn').forEach(b=>b.onclick=()=>{activeTab=b.dataset.tab;document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x===b));render();});
+      document.querySelectorAll('.nav-btn').forEach(b=>b.onclick=()=>{activeTab=b.dataset.tab;document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x===b));b.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});render();});
+      const av=document.querySelector('.nav-btn.active'); if(av) av.scrollIntoView({inline:'center',block:'nearest'});
     }
 
     // blocca/sblocca il selettore filiale in alto in base al turno aperto
@@ -539,10 +602,11 @@
     function render(){
       // refresh nav labels & branch names for language
       const bs=$('branch-select'); if(bs){const cur=bs.value;bs.innerHTML=branches.map(b=>`<option value="${b.id}">${lang==='ar'?b.nameAr:b.nameEn}</option>`).join('');bs.value=cur;}
-      document.querySelectorAll('.nav-btn').forEach(b=>{const k=b.dataset.tab;b.querySelector('.lbl2').textContent=k==='cassa'?t('cashier_tab'):k==='shift'?t('shift_tab'):k==='receipts'?t('receipts_tab'):k==='products'?t('products'):k==='categories'?t('categories'):k==='warehouse'?t('warehouse'):k==='suppliers'?t('suppliers_tab'):k==='users'?t('users'):k==='staff'?t('staff_tab'):k==='reports'?t('reports'):k==='branches'?t('branches_tab'):t('cashier_tab');});
+      document.querySelectorAll('.nav-btn').forEach(b=>{const k=b.dataset.tab;b.querySelector('.lbl2').textContent=k==='dashboard'?t('dashboard_tab'):k==='cassa'?t('cashier_tab'):k==='shift'?t('shift_tab'):k==='receipts'?t('receipts_tab'):k==='products'?t('products'):k==='categories'?t('categories'):k==='warehouse'?t('warehouse'):k==='suppliers'?t('suppliers_tab'):k==='users'?t('users'):k==='staff'?t('staff_tab'):k==='reports'?t('reports'):k==='branches'?t('branches_tab'):t('cashier_tab');});
       if(activeTab==='cassa') renderCassa();
       else { const cb=$('cart-bar-root'); if(cb) cb.innerHTML=''; 
-        if(activeTab==='products') renderProducts();
+        if(activeTab==='dashboard') renderDashboard();
+        else if(activeTab==='products') renderProducts();
         else if(activeTab==='categories') renderCategories();
         else if(activeTab==='warehouse') renderWarehouse();
         else if(activeTab==='suppliers') renderSuppliers();
@@ -619,6 +683,10 @@
       $('do-pay').onclick=openPaymentSheet;
       $('clear-cart').onclick=()=>{ if(!confirm(t('confirmClear')))return; cart=[]; renderCartBar(); };
     }
+    // اسم المنتج حسب اللغة مع ريجوع للّغة التانية لو ناقص (يمنع اللخبطة)
+    function pName(p){ if(!p) return ''; return lang==='ar' ? (p.nameAr||p.name||'') : (p.name||p.nameAr||''); }
+    function pName2(p){ if(!p) return ''; return lang==='ar' ? (p.name||'') : (p.nameAr||''); } // الاسم الثانوي
+
     function renderCassa(){
       $('cart-bar-root')||$('content').insertAdjacentHTML('afterend','<div id="cart-bar-root"></div>');
       // الأدمن بس يقدر يبيع من غير وردية. الكاشير والمدير لازم يفتحوا وردية.
@@ -645,14 +713,17 @@
         return `<button class="pos-card" data-id="${p.id}" ${out?'disabled style="opacity:0.45;"':''}>
           ${p.photoUrl?`<img class="pc-photo" src="${p.photoUrl}">`:`<div class="pc-photo">🍽️</div>`}
           <div class="pc-body">
-            <div class="pc-name fr" dir="ltr">${p.name}</div>
-            ${desc?`<div class="pc-desc">${desc}</div>`:`<div class="pc-desc"></div>`}
+            <div class="pc-name">${pName(p)}</div>
+            ${pName2(p)?`<div class="pc-desc fr" dir="ltr">${pName2(p)}</div>`:desc?`<div class="pc-desc">${desc}</div>`:`<div class="pc-desc"></div>`}
             <div class="pc-price num">${fmt(p.price)} ${t('currency')}</div>
             ${out?`<span class="pc-badge">${t('outOfStock')}</span>`:low?`<span class="pc-badge" style="background:rgba(216,142,42,0.15);color:var(--amber);">${t('lowStock')}: ${inv.qty}</span>`:''}
           </div>
         </button>`;
       }).join('');
-      $('content').innerHTML=`<div class="pos-cat-bar">${chips}</div><div class="pos-grid">${grid}</div>`;
+      const canAddProd = profile.role==='admin'||profile.role==='manager';
+      const scanBar = canAddProd ? `<button id="cassa-scan-add" class="btn-secondary btn-wide" style="margin-bottom:10px;">📷 ${t('scanAddProduct')}</button>` : '';
+      $('content').innerHTML=`${scanBar}<div class="pos-cat-bar">${chips}</div><div class="pos-grid">${grid}</div>`;
+      $('cassa-scan-add')&&($('cassa-scan-add').onclick=scanForNewProduct);
       document.querySelectorAll('.pos-cat-chip').forEach(ch=>ch.onclick=()=>{posCatFilter=ch.dataset.cat;renderCassa();});
       document.querySelectorAll('.pos-card').forEach(c=>c.onclick=()=>{ if(c.disabled)return; addToCart(products.find(p=>p.id===c.dataset.id)); });
       renderCartBar();
@@ -675,6 +746,12 @@
         <div class="sheet-head"><div><div class="sheet-sub">${t('payTitle')}</div><div class="sheet-title">${t('checkout')}</div></div><button class="close-x" id="cx">×</button></div>
         ${branchRow}
         <div style="text-align:center;margin-bottom:14px;"><div style="font-size:12px;color:rgba(26,26,26,0.55);">${t('total')}</div><div class="num" style="font-size:30px;font-weight:700;color:var(--forest);">${fmt(total)} ${t('currency')}</div></div>
+        <div style="font-size:12px;color:rgba(26,26,26,0.55);margin-bottom:6px;">${t('payMethodLbl')}</div>
+        <div style="display:flex;gap:8px;margin-bottom:14px;">
+          <button id="pm-cash" style="flex:1;padding:12px 0;border-radius:12px;font-weight:700;font-family:inherit;cursor:pointer;border:2px solid var(--forest);background:var(--forest);color:#fff;">💵 ${t('mCash')}</button>
+          <button id="pm-insta" style="flex:1;padding:12px 0;border-radius:12px;font-weight:700;font-family:inherit;cursor:pointer;border:2px solid var(--ivory-dark);background:#fff;color:var(--charcoal);">📲 ${t('mInstapay')}</button>
+        </div>
+        <div id="pay-cash-area">
         <button class="btn-gold btn-wide" id="pay-exact" style="margin-bottom:12px;">✓ ${t('payExact')} (${fmt(total)})</button>
         <div class="field"><label class="lbl">${t('amountPaid')}</label><input class="input num" id="pay-amount" type="number" min="0" step="0.01" dir="ltr" placeholder="${t('enterAmount')}"></div>
         <div style="display:flex;gap:6px;margin-bottom:12px;">
@@ -684,9 +761,25 @@
           <div style="font-size:12px;color:rgba(26,26,26,0.55);">${t('changeDue')}</div>
           <div class="num" id="pay-change-val" style="font-size:24px;font-weight:700;color:var(--forest);">—</div>
         </div>
+        </div>
+        <div id="pay-insta-area" style="display:none;background:rgba(61,115,85,0.1);border-radius:12px;padding:14px;text-align:center;margin-bottom:14px;">
+          <div style="font-size:13px;color:var(--green);font-weight:700;">📲 ${t('mInstapay')}</div>
+          <div style="font-size:11px;color:rgba(26,26,26,0.6);margin-top:4px;">${t('instapayNote')}</div>
+        </div>
         <button class="btn-forest btn-wide" id="pay-confirm">✓ ${t('confirmPay')}</button>
       </div></div>`;
       $('ov').onclick=closeSheet;$('cx').onclick=closeSheet;
+      let payMethod='cash';
+      const cashArea=$('pay-cash-area'), instaArea=$('pay-insta-area'), pmCash=$('pm-cash'), pmInsta=$('pm-insta');
+      const setMethod=(m)=>{ payMethod=m;
+        if(m==='cash'){ cashArea.style.display=''; instaArea.style.display='none';
+          pmCash.style.background='var(--forest)'; pmCash.style.color='#fff'; pmCash.style.borderColor='var(--forest)';
+          pmInsta.style.background='#fff'; pmInsta.style.color='var(--charcoal)'; pmInsta.style.borderColor='var(--ivory-dark)';
+        } else { cashArea.style.display='none'; instaArea.style.display='';
+          pmInsta.style.background='var(--green)'; pmInsta.style.color='#fff'; pmInsta.style.borderColor='var(--green)';
+          pmCash.style.background='#fff'; pmCash.style.color='var(--charcoal)'; pmCash.style.borderColor='var(--ivory-dark)';
+        } };
+      pmCash.onclick=()=>setMethod('cash'); pmInsta.onclick=()=>setMethod('instapay');
       const pb=$('pay-branch'); if(pb) pb.onchange=()=>{ saleBranchSel=pb.value; };
       const amtEl=$('pay-amount'), changeEl=$('pay-change-val'), confirmBtn=$('pay-confirm');
       const recompute=()=>{
@@ -699,11 +792,12 @@
       amtEl.oninput=recompute;
       $('pay-exact').onclick=()=>{ amtEl.value=total; recompute(); };
       $('sheet-root').querySelectorAll('.pay-quick').forEach(b=>b.onclick=()=>{ amtEl.value=(parseFloat(amtEl.value)||0)+Number(b.dataset.v); recompute(); });
-      confirmBtn.onclick=()=>{ const p=amtEl.value===''?total:(parseFloat(amtEl.value)||0); if(p<total){ toast(t('insufficient'),true); return; } doCheckout(p); };
+      confirmBtn.onclick=()=>{ if(payMethod==='instapay'){ doCheckout(total,'instapay'); return; } const p=amtEl.value===''?total:(parseFloat(amtEl.value)||0); if(p<total){ toast(t('insufficient'),true); return; } doCheckout(p,'cash'); };
     }
-    async function doCheckout(paid){
+    async function doCheckout(paid, payMethod){
       if(cart.length===0)return;
       if(!myShift && profile.role!=='admin'){ toast(t('needShiftToSell'),true); closeSheet(); return; } // الأدمن بس يبيع من غير وردية
+      payMethod = payMethod==='instapay' ? 'instapay' : 'cash';
       const saleBranchId = myShift ? (myShift.branchId||currentBranchId) : (saleBranchSel||currentBranchId); // فرع الوردية أو الفرع المؤكَّد
       const saleShiftId = myShift ? myShift.id : null;
       const cb=$('pay-confirm'); if(cb){ cb.textContent='...'; cb.disabled=true; }
@@ -713,12 +807,13 @@
         const createdAt=Date.now();
         const tzo=tzOffsetMin(createdAt); // congela l'offset (estate/inverno) al momento della fattura
         const receiptNo=Number(String(createdAt).slice(-6)); // numero fattura stabile
-        const paidAmt=(paid==null||isNaN(paid))?total:paid;
-        const change=Math.max(0,paidAmt-total);
-        // 1) registra la vendita (legata al turno + filiale del turno)
+        // Instapay: pagamento esatto online (niente resto, non entra nel cash)
+        const paidAmt = payMethod==='instapay' ? total : ((paid==null||isNaN(paid))?total:paid);
+        const change = payMethod==='instapay' ? 0 : Math.max(0,paidAmt-total);
+        // 1) registra la vendita (legata al turno + filiale del turno) con il metodo di pagamento
         const ref=await addDoc(collection(db,'sales'),{
           branchId:saleBranchId, shiftId:saleShiftId, userId:user.uid, userName:profile.name||user.email,
-          items, total, count:cartCount(), receiptNo, paid:paidAmt, change, createdAt, tzo
+          items, total, count:cartCount(), receiptNo, paid:paidAmt, change, payMethod, createdAt, tzo
         });
         // 2) scala l'inventario del branch di vendita
         const sameBranch = (saleBranchId===currentBranchId);
@@ -730,7 +825,7 @@
           await setDoc(doc(db,'inventory',`${saleBranchId}_${i.id}`),{branchId:saleBranchId,productId:i.id,qty:nq,threshold:cur.threshold||20,lastCost:cur.lastCost||0},{merge:true});
           if(sameBranch) inventory[i.id]={qty:nq,threshold:cur.threshold||20,lastCost:cur.lastCost||0};
         }
-        const sale={id:ref.id,branchId:saleBranchId,shiftId:saleShiftId,userName:profile.name||user.email,items,total,count:cartCount(),receiptNo,paid:paidAmt,change,createdAt,tzo};
+        const sale={id:ref.id,branchId:saleBranchId,shiftId:saleShiftId,userName:profile.name||user.email,items,total,count:cartCount(),receiptNo,paid:paidAmt,change,payMethod,createdAt,tzo};
         cart=[]; closeSheet(); renderCassa(); toast(t('saleDone'));
         showReceipt(sale); // mostra la fattura automaticamente
       }catch(e){ console.error(e); toast(t('errorGen'),true); if(cb){ cb.textContent='✓ '+t('confirmPay'); cb.disabled=false; } }
@@ -1073,9 +1168,10 @@
         const net=Math.max(0,(s.total||0)-(s.refundTotal||0));
         const badge = s.voided?`<span style="font-size:10px;color:var(--red);font-weight:700;border:1px solid rgba(192,72,72,0.4);border-radius:6px;padding:1px 6px;">${t('voidedLbl')}</span>`
           : (s.refundTotal>0?`<span style="font-size:10px;color:var(--amber);font-weight:700;border:1px solid rgba(216,142,42,0.4);border-radius:6px;padding:1px 6px;">${t('refundedLbl')}</span>`:'');
+        const payBadge = s.payMethod==='instapay'?`<span style="font-size:10px;color:var(--green);font-weight:700;border:1px solid rgba(61,115,85,0.4);border-radius:6px;padding:1px 6px;">📲 ${t('mInstapay')}</span>`:'';
         return `<div class="rcpt-row" data-id="${s.id}" style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:11px 0;border-bottom:1px solid var(--ivory-dark);cursor:pointer;">
         <div style="min-width:0;">
-          <div style="font-weight:700;font-size:14px;">#${s.receiptNo||'—'} <span style="font-weight:400;font-size:11px;color:rgba(26,26,26,0.5);">· ${(s.count||(s.items?s.items.length:0))} ${t('items_n')}</span> ${badge}</div>
+          <div style="font-weight:700;font-size:14px;">#${s.receiptNo||'—'} <span style="font-weight:400;font-size:11px;color:rgba(26,26,26,0.5);">· ${(s.count||(s.items?s.items.length:0))} ${t('items_n')}</span> ${badge} ${payBadge}</div>
           <div class="num" style="font-size:11px;color:rgba(26,26,26,0.55);">${fmtDT(s.createdAt,s.tzo)} · ${s.userName||''}</div>
         </div>
         <div style="text-align:end;white-space:nowrap;"><div class="num" style="font-weight:700;font-size:15px;color:${s.voided?'rgba(26,26,26,0.4)':'var(--forest)'};${s.voided?'text-decoration:line-through;':''}">${fmt(s.total||0)} ${t('currency')}</div>${s.refundTotal>0&&!s.voided?`<div class="num" style="font-size:11px;color:var(--red);">${t('netTotal')}: ${fmt(net)}</div>`:''}</div>
@@ -1178,16 +1274,18 @@
     let prodSearch='';
     function renderProducts(){
       const catName=id=>{const c=categories.find(x=>x.id===id);return c?(lang==='ar'?c.nameAr:c.nameEn):'—';};
-      let html=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px;"><input class="input" id="p-search" placeholder="${t('search')}" value="${prodSearch}" style="flex:1;"><button class="btn-gold" id="add-prod" style="padding:8px 14px;white-space:nowrap;">+ ${t('addProduct')}</button></div>`;
-      let list=products.filter(p=>!prodSearch||(p.name||'').toLowerCase().includes(prodSearch.toLowerCase())||(p.barcode||'').includes(prodSearch));
+      let html=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;"><input class="input" id="p-search" placeholder="${t('search')}" value="${prodSearch}" style="flex:1;"><button class="btn-secondary" id="scan-prod" style="padding:8px 12px;white-space:nowrap;">📷</button><button class="btn-gold" id="add-prod" style="padding:8px 14px;white-space:nowrap;">+ ${t('addProduct')}</button></div>`;
+      let list=products.filter(p=>!prodSearch||(p.name||'').toLowerCase().includes(prodSearch.toLowerCase())||(p.nameAr||'').includes(prodSearch)||(p.barcode||'').includes(prodSearch));
       if(list.length===0) html+=`<div class="card"><div class="empty">${t('noProducts')}</div></div>`;
       else html+=list.map(p=>{
         const inv=inventory[p.id]||{qty:0,threshold:20}; const low=inv.qty<=5;
         const m=p.price-p.cost,mPct=p.price>0?Math.round(m/p.price*100):0;
+        const sec=pName2(p);
         return `<div class="prod-card" data-id="${p.id}" style="opacity:${p.active===false?0.5:1}">
           ${p.photoUrl?`<img class="prod-photo" src="${p.photoUrl}">`:`<div class="prod-photo">🍽️</div>`}
           <div class="prod-info">
-            <div class="fr" dir="ltr" style="font-size:16px;font-weight:500;">${p.name}</div>
+            <div style="font-size:16px;font-weight:600;">${pName(p)}</div>
+            ${sec?`<div class="fr" dir="ltr" style="font-size:12px;color:rgba(26,26,26,0.5);margin-top:1px;">${sec}</div>`:''}
             <div style="font-size:11px;color:rgba(26,26,26,0.55);margin-top:1px;">${catName(p.categoryId)}</div>
             <div class="prod-meta">
               <span class="num" style="color:var(--forest);font-weight:700;">${p.price} ${t('currency')}</span>
@@ -1200,6 +1298,7 @@
       }).join('');
       $('content').innerHTML=html;
       $('add-prod')&&($('add-prod').onclick=()=>prodForm(null));
+      $('scan-prod')&&($('scan-prod').onclick=scanForNewProduct);
       const ps=$('p-search'); if(ps){ps.oninput=()=>{prodSearch=ps.value;const pos=ps.selectionStart;renderProducts();const n=$('p-search');n.focus();n.setSelectionRange(pos,pos);};}
       document.querySelectorAll('.prod-card').forEach(r=>r.onclick=()=>prodForm(products.find(p=>p.id===r.dataset.id)));
     }
@@ -1207,7 +1306,7 @@
     let pendingPhoto=null;
     function prodForm(prod, presetBarcode){
       pendingPhoto=null;
-      const f=prod||{barcode:presetBarcode||'',name:'',descAr:'',descEn:'',categoryId:'',price:'',cost:'',active:true,photoUrl:''};
+      const f=prod||{barcode:presetBarcode||'',name:'',nameAr:'',descAr:'',descEn:'',categoryId:'',price:'',cost:'',active:true,photoUrl:''};
       const inv=prod?(inventory[prod.id]||{qty:0,threshold:20}):{qty:0,threshold:20};
       let act=f.active!==false;
       const opts=categories.filter(c=>c.active!==false).map(c=>`<option value="${c.id}" ${f.categoryId===c.id?'selected':''}>${lang==='ar'?c.nameAr:c.nameEn}</option>`).join('');
@@ -1222,7 +1321,8 @@
         <input type="file" id="photo-input" accept="image/*" class="hidden">
         <input type="file" id="photo-cam-input" accept="image/*" capture="environment" class="hidden">
         <div class="field" style="margin-top:12px;"><label class="lbl">${t('barcode')}</label><input class="input num" id="p-bc" value="${f.barcode}" dir="ltr"></div>
-        <div class="field"><label class="lbl">${t('name')}</label><input class="input fr" id="p-name" value="${f.name}" dir="ltr"></div>
+        <div class="field"><label class="lbl">${t('name')}</label><input class="input fr" id="p-name" value="${f.name||''}" dir="ltr"></div>
+        <div class="field"><label class="lbl">${t('nameAr')}</label><input class="input" id="p-name-ar" value="${(f.nameAr||'').replace(/"/g,'&quot;')}" dir="rtl"></div>
         <div class="field"><label class="lbl">${t('category')}</label><select class="input" id="p-cat"><option value="">${t('selectCat')}</option>${opts}</select></div>
         <div class="field"><label class="lbl">${t('descAr')}</label><textarea class="input" id="p-dar" dir="rtl" style="min-height:50px;resize:vertical;">${f.descAr||''}</textarea></div>
         <div class="field"><label class="lbl">${t('descEn')}</label><textarea class="input" id="p-den" dir="ltr" style="min-height:50px;resize:vertical;">${f.descEn||''}</textarea></div>
@@ -1248,16 +1348,16 @@
       $('p-price').oninput=mUpd;$('p-cost').oninput=mUpd;mUpd();
       if(prod)$('p-del').onclick=async()=>{ if(!confirm(t('confirmDelProd')))return; try{await deleteDoc(doc(db,'products',prod.id));products=products.filter(p=>p.id!==prod.id);closeSheet();renderProducts();toast(t('deleted'));}catch(e){toast(t('errorGen'),true);} };
       $('p-save').onclick=async()=>{
-        const barcode=$('p-bc').value.trim(),name=$('p-name').value.trim(),categoryId=$('p-cat').value;
+        const barcode=$('p-bc').value.trim(),name=$('p-name').value.trim(),nameAr=$('p-name-ar').value.trim(),categoryId=$('p-cat').value;
         const descAr=$('p-dar').value.trim(),descEn=$('p-den').value.trim();
         const price=parseFloat($('p-price').value),cost=parseFloat($('p-cost').value);
         const qty=parseInt($('p-stock').value)||0,threshold=parseInt($('p-thr').value)||20;
-        if(!barcode||!name||!categoryId||isNaN(price)||price<=0||isNaN(cost)){toast(t('required'),true);return;}
+        if(!barcode||(!name&&!nameAr)||!categoryId||isNaN(price)||price<=0||isNaN(cost)){toast(t('required'),true);return;}
         if(products.find(p=>p.barcode===barcode&&(!prod||p.id!==prod.id))){toast(lang==='ar'?'باركود مستخدم':'Barcode in use',true);return;}
         $('p-save').textContent=t('uploading');
         try{
           let prodId=prod?prod.id:null;
-          const data={barcode,name,categoryId,descAr,descEn,price,cost,active:act};
+          const data={barcode,name,nameAr,categoryId,descAr,descEn,price,cost,active:act};
           if(prod){ await updateDoc(doc(db,'products',prodId),data); }
           else{ data.createdAt=Date.now(); data.photoUrl=''; const r=await addDoc(collection(db,'products'),data); prodId=r.id; }
           // photo upload
@@ -1334,7 +1434,16 @@
         <div style="background:white;border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--ivory-dark);margin-bottom:12px;"><span style="font-size:13px;font-weight:600;">${t('active')}</span><button class="toggle" id="u-act" style="background:${act?'var(--forest)':'rgba(26,26,26,0.2)'}" ${isSelf?'disabled':''}><span class="thumb"></span></button></div>
         ${isSelf?`<div style="font-size:11px;color:var(--red);margin-bottom:10px;text-align:center;">${t('noEditSelf')}</div>`:''}
         <button class="btn-forest btn-wide" id="u-save">✓ ${t('save')}</button>
+        ${(isEdit && !isSelf && profile.role==='admin')?`<button class="btn-secondary btn-wide" id="u-del" style="margin-top:8px;color:var(--red);border-color:rgba(192,72,72,0.3);">🗑️ ${t('deleteUser')}</button>`:''}
       </div></div>`;
+      if(isEdit && !isSelf && profile.role==='admin'){
+        $('u-del').onclick=async()=>{
+          if(!confirm(t('confirmDelUser'))) return;
+          const db2=$('u-del'); db2.disabled=true; db2.textContent='...';
+          try{ await deleteDoc(doc(db,'users',u.uid)); closeSheet(); renderUsers(); toast(t('userDeleted')); }
+          catch(e){ console.error(e); toast(t('errorGen'),true); db2.disabled=false; db2.textContent='🗑️ '+t('deleteUser'); }
+        };
+      }
       if(!isSelf) setToggle('u-act',act,v=>act=v);
       $('u-role').onchange=()=>{selRole=$('u-role').value;};
       $('ov').onclick=closeSheet;$('cx').onclick=closeSheet;
@@ -1517,6 +1626,121 @@
       if(topName) html+=`<div style="margin-top:8px;background:rgba(201,168,76,0.12);border-radius:9px;padding:8px 11px;font-size:12px;">🏆 ${t('soldMostIn')}: <b>${topName}</b> (<span class="num">${topSold}</span>)</div>`;
       box.innerHTML=html;
     }
+    // ============ DASHBOARD / لوحة التحكم (admin + manager) ============
+    let dashRange={mode:'today',from:'',to:''};
+    function dashRangeTs(){
+      const now=Date.now();
+      if(dashRange.mode==='today') return [dayStart(now), now];
+      if(dashRange.mode==='7') return [now-7*86400000, now];
+      if(dashRange.mode==='30') return [now-30*86400000, now];
+      const f=dashRange.from?new Date(dashRange.from+'T00:00:00').getTime():dayStart(now);
+      const tt=dashRange.to?new Date(dashRange.to+'T23:59:59').getTime():now;
+      return [f,tt];
+    }
+    async function renderDashboard(){
+      $('content').innerHTML=`<div class="spinner"></div>`;
+      const [fromTs,toTs]=dashRangeTs();
+      const visIds = profile.role==='admin' ? branches.map(b=>b.id) : (profile.branchIds||[]);
+      // حمّل البيانات
+      let sales=[], loadsArr=[], invAll=[], shiftsArr=[];
+      try{
+        if(profile.role==='admin'){ (await getDocs(collection(db,'sales'))).forEach(d=>sales.push(d.data())); }
+        else { for(const b of visIds){ (await getDocs(query(collection(db,'sales'),where('branchId','==',b)))).forEach(d=>sales.push(d.data())); } }
+        (await getDocs(collection(db,'loads'))).forEach(d=>loadsArr.push(d.data()));
+        (await getDocs(collection(db,'inventory'))).forEach(d=>invAll.push(d.data()));
+        (await getDocs(collection(db,'shifts'))).forEach(d=>shiftsArr.push(d.data()));
+      }catch(e){ console.error(e); $('content').innerHTML=`<div class="empty">${t('errorGen')}</div>`; return; }
+      const vis=id=>profile.role==='admin'||visIds.includes(id);
+      const inRange=ts=>ts>=fromTs&&ts<=toTs;
+      sales=sales.filter(s=>vis(s.branchId)&&inRange(s.createdAt));
+      loadsArr=loadsArr.filter(l=>vis(l.branchId)&&inRange(l.createdAt));
+      invAll=invAll.filter(i=>vis(i.branchId));
+      // حسابات
+      const rmFn=s=>{ const m={}; if(s.voided)(s.items||[]).forEach(it=>m[it.productId]=(m[it.productId]||0)+it.qty); (s.returns||[]).forEach(r=>(r.lines||[]).forEach(l=>m[l.productId]=(m[l.productId]||0)+l.qty)); return m; };
+      const eff=s=>s.voided?0:Math.max(0,(s.total||0)-(s.refundTotal||0));
+      let revenue=0, cogs=0, itemsSold=0, orders=0, returnAmt=0, returnEntries=0;
+      const prodRev={};
+      sales.forEach(s=>{
+        revenue+=eff(s); if(!s.voided)orders++;
+        if(s.voided){ returnAmt+=(s.total||0); returnEntries++; } else if(s.refundTotal>0){ returnAmt+=s.refundTotal; returnEntries++; }
+        const rm=rmFn(s);
+        (s.items||[]).forEach(it=>{ const net=Math.max(0,it.qty-(rm[it.productId]||0)); if(net<=0)return; itemsSold+=net; const p=products.find(x=>x.id===it.productId); cogs+=net*(p?(p.cost||0):0); prodRev[it.productId]=(prodRev[it.productId]||0)+net*(it.price||0); });
+      });
+      const grossProfit=revenue-cogs;
+      const expenses=0, totalDue=0; // لسه (هنفعّلهم مع المصاريف/المرتبات)
+      const profit=grossProfit-expenses;
+      let purchaseValue=0, itemsPurchased=0;
+      loadsArr.forEach(l=>{ purchaseValue+=(l.total||0); itemsPurchased+=(l.qty||0); });
+      // الفروع المفتوحة + الموظفين في الخدمة
+      const openShifts=shiftsArr.filter(s=>s.status==='open'&&vis(s.branchId));
+      const openSites=new Set(openShifts.map(s=>s.branchId)).size;
+      const activeStaff=openShifts.length;
+      // أعلى المنتجات
+      const topProds=Object.entries(prodRev).map(([pid,rev])=>{ const p=products.find(x=>x.id===pid); return {name:p?p.name:'—', rev}; }).sort((a,b)=>b.rev-a.rev).slice(0,5);
+      // نقص المخزون
+      const lowList=[];
+      invAll.forEach(i=>{ const th=i.threshold||0; if((i.qty||0)<=th){ const p=products.find(x=>x.id===i.productId); if(p) lowList.push({name:p.name, barcode:p.barcode||'', qty:i.qty||0, th}); } });
+      lowList.sort((a,b)=>a.qty-b.qty);
+      // ===== UI =====
+      const fmtDate=ts=>new Date(ts).toISOString().slice(0,10);
+      const card=(label,val,sub,ico,col)=>`<div style="background:#fff;border:1px solid var(--ivory-dark);border-radius:14px;padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;"><div style="font-size:10px;letter-spacing:0.5px;color:rgba(26,26,26,0.5);font-weight:700;text-transform:uppercase;">${label}</div><div style="width:26px;height:26px;border-radius:8px;background:${col||'rgba(31,58,46,0.1)'};display:flex;align-items:center;justify-content:center;font-size:13px;">${ico}</div></div>
+        <div class="num" style="font-size:21px;font-weight:800;margin:6px 0 2px;color:var(--charcoal);">${val}</div>
+        <div style="font-size:11px;color:rgba(26,26,26,0.5);">${sub}</div></div>`;
+      const cur=t('currency');
+      const rangeBtn=(m,lbl)=>`<button class="dash-r" data-m="${m}" style="flex:1;padding:10px 0;border-radius:10px;font-weight:700;font-family:inherit;font-size:13px;cursor:pointer;border:1px solid ${dashRange.mode===m?'var(--forest)':'var(--ivory-dark)'};background:${dashRange.mode===m?'var(--forest)':'#fff'};color:${dashRange.mode===m?'#fff':'var(--charcoal)'};">${lbl}</button>`;
+      let html=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <div><div style="font-size:20px;font-weight:800;">${t('dashboard_tab')}</div><div style="font-size:12px;color:rgba(26,26,26,0.5);">${t('opInsights')}</div></div>
+          <button id="dash-refresh" style="background:var(--forest);color:#fff;border:none;border-radius:10px;padding:9px 14px;font-weight:700;font-family:inherit;cursor:pointer;font-size:13px;">↻ ${t('refreshBtn')}</button>
+        </div>
+        <div style="display:flex;gap:8px;margin:12px 0;">
+          <button id="dash-newsale" class="btn-forest" style="flex:1;padding:12px 0;">🛒 ${t('newSaleBtn')}</button>
+          <button id="dash-addprod" class="btn-secondary" style="flex:1;padding:12px 0;">➕ ${t('addProductBtn')}</button>
+        </div>
+        <div style="background:var(--ivory-dark);border-radius:14px;padding:14px;margin-bottom:14px;">
+          <div style="font-weight:700;font-size:15px;">${t('summaryWindow')}</div>
+          <div style="font-size:12px;color:rgba(26,26,26,0.55);margin:2px 0 10px;">${t('showing')}: ${fmtDate(fromTs)} → ${fmtDate(toTs)}</div>
+          <div style="display:flex;gap:6px;">${rangeBtn('today',t('rToday'))}${rangeBtn('7',t('r7'))}${rangeBtn('30',t('r30'))}${rangeBtn('custom',t('rCustom'))}</div>
+          ${dashRange.mode==='custom'?`<div class="row2" style="margin-top:10px;"><div class="field" style="margin:0;"><label class="lbl">${t('repFrom')}</label><input class="input" id="dash-from" type="date" value="${dashRange.from||fmtDate(fromTs)}"></div><div class="field" style="margin:0;"><label class="lbl">${t('repTo')}</label><input class="input" id="dash-to" type="date" value="${dashRange.to||fmtDate(toTs)}"></div></div>`:''}
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          ${card(t('mSalesRevenue'),fmt(revenue)+' '+cur,t('mNetRevRange'),'💰','rgba(61,115,85,0.15)')}
+          ${card(t('mProfit'),fmt(profit)+' '+cur,t('mAfterCosts'),'٪','rgba(61,115,85,0.15)')}
+          ${card(t('mExpenses'),fmt(expenses)+' '+cur,t('mExpSub'),'💲','rgba(192,72,72,0.12)')}
+          ${card(t('mReturnAmount'),fmt(returnAmt)+' '+cur,returnEntries+' '+t('mReturnEntries'),'↩️','rgba(216,142,42,0.15)')}
+          ${card(t('mTotalDue'),fmt(totalDue)+' '+cur,t('mDueSub'),'⚠️','rgba(192,72,72,0.12)')}
+          ${card(t('mGrossProfit'),fmt(grossProfit)+' '+cur,t('mBeforeExp'),'٪','rgba(61,115,85,0.15)')}
+          ${card(t('mSalesOrders'),orders,t('mCompletedTx'),'🛒','rgba(80,120,200,0.12)')}
+          ${card(t('mItemsSold'),itemsSold,t('mQtySold'),'📦','rgba(140,90,200,0.12)')}
+          ${card(t('mPurchaseValue'),fmt(purchaseValue)+' '+cur,t('mProcVal'),'📈','rgba(80,120,200,0.12)')}
+          ${card(t('mItemsPurchased'),itemsPurchased,t('mIncomingQty'),'📊','rgba(80,150,200,0.12)')}
+          ${card('🏢 '+t('mOpenSites'),openSites,t('mOpenSitesSub'),'🏢','rgba(61,115,85,0.15)')}
+          ${card('👥 '+t('mActiveStaff'),activeStaff,t('mActiveStaffSub'),'👥','rgba(61,115,85,0.15)')}
+        </div>`;
+      // أداء المنتجات
+      html+=`<div style="background:var(--ivory-dark);border-radius:14px;padding:14px;margin-top:14px;">
+        <div style="font-weight:700;font-size:15px;">${t('mItemPerf')}</div>
+        <div style="font-size:12px;color:rgba(26,26,26,0.55);margin-bottom:10px;">${t('mTopByRev')}</div>`;
+      if(topProds.length===0) html+=`<div style="text-align:center;color:rgba(26,26,26,0.45);padding:14px 0;">${t('mNoItemData')}</div>`;
+      else { const mx=Math.max(1,...topProds.map(p=>p.rev)); html+=topProds.map(p=>`<div style="margin-bottom:9px;"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px;"><span style="font-weight:600;">${p.name}</span><span class="num" style="font-weight:700;color:var(--forest);">${fmt(p.rev)} ${cur}</span></div><div style="background:#fff;border-radius:6px;height:7px;overflow:hidden;"><div style="background:var(--forest);height:100%;width:${Math.round(p.rev/mx*100)}%;"></div></div></div>`).join(''); }
+      html+=`</div>`;
+      // نقص المخزون
+      if(lowList.length){
+        html+=`<div style="background:rgba(216,142,42,0.08);border:1px solid rgba(216,142,42,0.3);border-radius:14px;padding:14px;margin-top:14px;">
+          <div style="font-weight:700;font-size:15px;color:var(--amber);margin-bottom:10px;">⚠️ ${t('mLowStock')}</div>`;
+        html+=lowList.slice(0,30).map(x=>`<div style="background:#fff;border-radius:10px;padding:10px 12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:10px;">
+          <div style="min-width:0;"><div style="font-weight:700;font-size:13px;">${x.name}</div><div class="num" style="font-size:11px;color:rgba(26,26,26,0.5);">${x.barcode}</div><div style="font-size:11px;color:var(--amber);">${t('mLimit')}: <span class="num">${x.th}</span> ${t('mPcs')}</div></div>
+          <div class="num" style="font-weight:800;color:${x.qty===0?'var(--red)':'var(--amber)'};white-space:nowrap;">${x.qty} ${t('mPcs')}</div></div>`).join('');
+        html+=`</div>`;
+      }
+      $('content').innerHTML=html;
+      $('dash-refresh').onclick=renderDashboard;
+      $('dash-newsale').onclick=()=>{ activeTab='cassa'; document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab==='cassa')); render(); };
+      $('dash-addprod').onclick=()=>{ if(typeof prodForm==='function') prodForm(null); };
+      document.querySelectorAll('.dash-r').forEach(b=>b.onclick=()=>{ dashRange.mode=b.dataset.m; renderDashboard(); });
+      if(dashRange.mode==='custom'){ const f=$('dash-from'),tt=$('dash-to'); const upd=()=>{ dashRange.from=f.value; dashRange.to=tt.value; renderDashboard(); }; if(f)f.onchange=upd; if(tt)tt.onchange=upd; }
+    }
+
     async function renderReports(){
       $('content').innerHTML=`<div class="spinner"></div><div style="text-align:center;color:rgba(26,26,26,0.5);font-size:13px;">${t('loadingReports')}</div>`;
       // quali branch può vedere
@@ -1622,7 +1846,7 @@
       </div>`;
       // المبيعات حسب الكاشير (نقطة 2 من الباقي) — صافي + عدد فواتير
       const cashMap={};
-      sales.forEach(s=>{ const nm=s.userName||'—'; if(!cashMap[nm])cashMap[nm]={net:0,cnt:0}; cashMap[nm].net+=effTotal(s); if(!s.voided)cashMap[nm].cnt++; });
+      sales.forEach(s=>{ const nm=s.userName||'—'; if(!cashMap[nm])cashMap[nm]={net:0,cnt:0,cash:0,insta:0}; const e=effTotal(s); cashMap[nm].net+=e; if(s.payMethod==='instapay')cashMap[nm].insta+=e; else cashMap[nm].cash+=e; if(!s.voided)cashMap[nm].cnt++; });
       const cashRows=Object.entries(cashMap).map(([nm,v])=>({nm,...v})).sort((a,b)=>b.net-a.net);
       if(cashRows.length){
         const mxC=Math.max(1,...cashRows.map(r=>r.net));
@@ -1630,7 +1854,7 @@
         cashRows.map(r=>`<div style="margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px;"><span style="font-weight:700;">${r.nm}</span><span class="num" style="color:var(--forest);font-weight:700;">${fmt(r.net)} ${t('currency')}</span></div>
           <div style="background:var(--ivory-dark);border-radius:6px;height:7px;overflow:hidden;margin-bottom:2px;"><div style="background:var(--forest);height:100%;width:${Math.round(r.net/mxC*100)}%;"></div></div>
-          <div style="font-size:10px;color:rgba(26,26,26,0.5);"><span class="num">${r.cnt}</span> ${t('invoicesShort')}</div>
+          <div style="font-size:10px;color:rgba(26,26,26,0.5);">💵 ${t('mCash')}: <span class="num">${fmt(r.cash)}</span>${r.insta?` · 📲 ${t('mInstapay')}: <span class="num">${fmt(r.insta)}</span>`:''} · <span class="num">${r.cnt}</span> ${t('invoicesShort')}</div>
         </div>`).join('')+`</div>`;
       }
       // confronto filiali (solo se >1 visibile)
@@ -1756,11 +1980,29 @@
     }
 
     async function shiftSalesTotal(sh){
-      // somma vendite di questo utente nel branch tra openAt e closeAt
+      const sp=await shiftSalesSplit(sh); return sp.total;
+    }
+    // يفصل مبيعات الوردية: كاش / Instapay / الإجمالي
+    // إحصائيات الوردية الحيّة من مصفوفة مبيعات: صافي/كاش/Instapay/فواتير/منتجات/مرتجعات
+    function computeShiftStats(salesArr, sh){
+      const end=sh.closeAt||Date.now();
+      let net=0,cash=0,insta=0,invoices=0,products=0,stornoVal=0,stornoCnt=0;
+      salesArr.forEach(s=>{
+        if(s.userId!==sh.userId || s.branchId!==sh.branchId) return;
+        if(!(s.createdAt>=sh.openAt && s.createdAt<=end)) return;
+        const eff = s.voided?0:Math.max(0,(s.total||0)-(s.refundTotal||0));
+        net+=eff; if(s.payMethod==='instapay') insta+=eff; else cash+=eff;
+        if(!s.voided){ invoices++; (s.items||[]).forEach(it=>products+=(it.qty||0)); (s.returns||[]).forEach(r=>(r.lines||[]).forEach(l=>products-=(l.qty||0))); }
+        if(s.voided){ stornoVal+=(s.total||0); stornoCnt++; }
+        else if(s.refundTotal>0){ stornoVal+=(s.refundTotal||0); stornoCnt++; }
+      });
+      return {net,cash,insta,invoices,products,stornoVal,stornoCnt};
+    }
+    async function shiftSalesSplit(sh){
       const qs=await getDocs(query(collection(db,'sales'),where('branchId','==',sh.branchId),where('userId','==',sh.userId)));
-      let tot=0; const end=sh.closeAt||Date.now();
-      qs.forEach(d=>{ const s=d.data(); if(s.createdAt>=sh.openAt && s.createdAt<=end) tot+=(s.total||0); });
-      return tot;
+      let cash=0, insta=0; const end=sh.closeAt||Date.now();
+      qs.forEach(d=>{ const s=d.data(); if(s.createdAt>=sh.openAt && s.createdAt<=end){ const v=s.total||0; if(s.payMethod==='instapay') insta+=v; else cash+=v; } });
+      return { cash, insta, total:cash+insta };
     }
 
     // ===== العُهدة: تسليم النقدية بين الورديات (بتأكيد المستلِم) =====
@@ -1827,9 +2069,19 @@
           <span style="font-size:13px;font-weight:600;">${t('custCheckbox')}</span>
         </label>
         <button class="btn-forest btn-wide" id="cust-confirm-btn" disabled style="opacity:0.5;">✓ ${t('custConfirmBtn')}</button>
+        <button class="btn-secondary btn-wide" id="cust-reject-btn" style="margin-top:8px;color:var(--red);border-color:rgba(192,72,72,0.3);">✕ ${t('custReject')}</button>
       </div></div>`;
       const chk=$('cust-chk'), btn=$('cust-confirm-btn');
       chk.onchange=()=>{ btn.disabled=!chk.checked; btn.style.opacity=chk.checked?'1':'0.5'; };
+      $('cust-reject-btn').onclick=async()=>{
+        if(!confirm(t('custRejectMsg'))) return;
+        const rb=$('cust-reject-btn'); rb.disabled=true; rb.textContent='...';
+        try{
+          await updateDoc(doc(db,'custodyTransfers',tx.id),{status:'rejected',rejectedAt:Date.now()});
+          root.innerHTML=''; toast(t('custRejectedToast'));
+          await loadCustodyTx(); if(activeTab==='shift') renderShift();
+        }catch(e){ console.error(e); toast(t('errorGen'),true); rb.disabled=false; rb.textContent='✕ '+t('custReject'); }
+      };
       btn.onclick=async()=>{
         if(!chk.checked) return;
         btn.disabled=true; btn.textContent='...';
@@ -1841,10 +2093,16 @@
       };
     }
 
+    let shiftSalesArr=[]; // مبيعات الفرع الحالي (لإحصائيات الورديات الحيّة)
+    async function loadShiftSales(){
+      shiftSalesArr=[];
+      try{ const qs=await getDocs(query(collection(db,'sales'),where('branchId','==',currentBranchId))); qs.forEach(d=>shiftSalesArr.push(d.data())); }catch(e){ console.error('loadShiftSales',e); }
+    }
     async function renderShift(){
       const cb=$('cart-bar-root'); if(cb) cb.innerHTML='';
       $('content').innerHTML=`<div class="empty">…</div>`;
       await loadShifts();
+      await loadShiftSales();
       let html=`<div style="font-size:11px;letter-spacing:1px;color:var(--forest);font-weight:700;margin-bottom:12px;">${t('shift').toUpperCase()}</div>`;
 
       if(!myShift){
@@ -1871,6 +2129,19 @@
           ${onP?`<div style="background:rgba(216,142,42,0.12);border-radius:10px;padding:8px 12px;margin-bottom:12px;text-align:center;font-weight:700;color:var(--amber);">⏸️ ${t('onPause')}</div>`:''}
           <button class="${onP?'btn-gold':'btn-secondary'} btn-wide" id="sh-pause-btn" style="margin-bottom:10px;">${onP?'▶️ '+t('resume'):'⏸️ '+t('pause')}</button>
         </div>
+        ${(()=>{ const st=computeShiftStats(shiftSalesArr,myShift); return `<div class="card">
+          <div class="card-title">📊 ${t('shiftLiveTitle')}</div>
+          <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:90px;background:rgba(61,115,85,0.1);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;color:rgba(26,26,26,0.55);font-weight:700;">${t('liveNet')}</div><div class="num" style="font-size:16px;font-weight:700;margin-top:3px;color:var(--green);">${fmt(st.net)}</div></div>
+            <div style="flex:1;min-width:60px;background:rgba(31,58,46,0.05);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;color:rgba(26,26,26,0.55);font-weight:700;">${t('invoicesShort')}</div><div class="num" style="font-size:16px;font-weight:700;margin-top:3px;">${st.invoices}</div></div>
+            <div style="flex:1;min-width:60px;background:rgba(31,58,46,0.05);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;color:rgba(26,26,26,0.55);font-weight:700;">${t('prodsCount')}</div><div class="num" style="font-size:16px;font-weight:700;margin-top:3px;">${st.products}</div></div>
+          </div>
+          <div style="display:flex;gap:12px;font-size:12px;color:rgba(26,26,26,0.65);flex-wrap:wrap;">
+            <span>💵 ${t('mCash')}: <b class="num" style="color:var(--forest);">${fmt(st.cash)}</b></span>
+            ${st.insta?`<span>📲 ${t('mInstapay')}: <b class="num" style="color:var(--green);">${fmt(st.insta)}</b></span>`:''}
+          </div>
+          ${st.stornoCnt?`<div style="margin-top:8px;background:rgba(192,72,72,0.08);border-radius:10px;padding:8px 11px;font-size:12px;color:var(--red);font-weight:700;">↩️ ${t('stornoLbl')}: <span class="num">${fmt(st.stornoVal)}</span> ${t('currency')} (<span class="num">${st.stornoCnt}</span>)</div>`:''}
+        </div>`; })()}
         <div class="card">
           <div class="card-title">🔴 ${t('closeShift')}</div>
           <div style="font-size:12px;color:rgba(26,26,26,0.55);margin-bottom:12px;">${t('countedCashHint')}</div>
@@ -1886,18 +2157,26 @@
         if(openShifts.length===0) html+=`<div class="empty">${t('noOpenShiftsBranch')}</div>`;
         else html+=openShifts.map(s=>{
           const inS=custInSum(s), outS=custOutSum(s); const pend=custPendingOut(s);
+          const st=computeShiftStats(shiftSalesArr,s);
           return `<div style="padding:10px 0;border-bottom:1px solid var(--ivory-dark);">
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <div style="font-weight:700;font-size:13px;">🟢 ${s.userName||''}</div>
               <button class="hand-btn" data-sh="${s.id}" style="background:var(--forest);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit;">🤝 ${t('handOver')}</button>
             </div>
-            <div style="display:flex;gap:12px;margin-top:5px;font-size:11px;flex-wrap:wrap;color:rgba(26,26,26,0.6);">
+            <div style="display:flex;gap:12px;margin-top:5px;font-size:11px;flex-wrap:wrap;color:rgba(26,26,26,0.65);">
+              <span>📊 ${t('soldSoFar')}: <b class="num" style="color:var(--green);">${fmt(st.net)}</b></span>
+              <span>🧾 <b class="num">${st.invoices}</b> ${t('invoicesShort')}</span>
+              <span>📦 <b class="num">${st.products}</b> ${t('prodsCount')}</span>
+            </div>
+            ${st.stornoCnt?`<div style="font-size:11px;color:var(--red);margin-top:3px;">↩️ ${t('stornoLbl')}: <span class="num">${fmt(st.stornoVal)}</span> (<span class="num">${st.stornoCnt}</span>)</div>`:''}
+            <div style="display:flex;gap:12px;margin-top:3px;font-size:11px;flex-wrap:wrap;color:rgba(26,26,26,0.6);">
               ${inS>0?`<span>📥 ${t('custReceived')}: <b class="num" style="color:var(--green);">${fmt(inS)}</b></span>`:''}
               ${outS>0?`<span>📤 ${t('custHanded')}: <b class="num" style="color:var(--amber);">${fmt(outS)}</b></span>`:''}
             </div>
             ${custodyTx.filter(x=>x.status==='confirmed'&&x.toShiftId===s.id).map(x=>`<div style="font-size:11px;color:rgba(26,26,26,0.5);margin-top:2px;">📥 ${t('custFrom')} ${x.fromUserName}: <span class="num">${fmt(x.amount)}</span> ✓</div>`).join('')}
             ${custodyTx.filter(x=>x.status==='confirmed'&&x.fromShiftId===s.id).map(x=>`<div style="font-size:11px;color:rgba(26,26,26,0.5);margin-top:2px;">📤 ${t('custTo')} ${x.toUserName}: <span class="num">${fmt(x.amount)}</span> ✓</div>`).join('')}
             ${pend.map(x=>`<div style="font-size:11px;color:var(--amber);margin-top:2px;">⏳ ${t('custTo')} ${x.toUserName}: <span class="num">${fmt(x.amount)}</span> — ${t('custPending')}</div>`).join('')}
+            ${custodyTx.filter(x=>x.status==='rejected'&&x.fromShiftId===s.id).map(x=>`<div style="font-size:11px;color:var(--red);margin-top:2px;">✕ ${t('custTo')} ${x.toUserName}: <span class="num">${fmt(x.amount)}</span> — ${t('custRejected')}</div>`).join('')}
           </div>`;
         }).join('');
         html+=`</div>`;
@@ -1958,15 +2237,16 @@
             if(isOnPause(myShift)) ps[ps.length-1].end=Date.now(); // chiudi pausa aperta
             const closeAt=Date.now();
             const shTmp={...myShift,pauses:ps,closeAt};
-            const salesTotal=await shiftSalesTotal(shTmp);
+            const split=await shiftSalesSplit(shTmp);
+            const salesTotal=split.total, cashTotal=split.cash, instaTotal=split.insta;
             const workedMs=workedMsOf(shTmp,closeAt);
             const pausedMs=pausedMsOf(shTmp,closeAt);
-            const expectedCash=(myShift.openCash||0)+salesTotal+custNet(myShift); // + العهدة المستلمة − المسلَّمة
+            const expectedCash=(myShift.openCash||0)+cashTotal+custNet(myShift); // الكاش بس + العهدة (Instapay مايدخلش الدرج)
             const diff=cc-expectedCash;
             const custIn=custInSum(myShift), custOut=custOutSum(myShift);
-            await updateDoc(doc(db,'shifts',myShift.id),{pauses:ps,closeAt,closeCash:cc,status:'closed',salesTotal,workedMs,pausedMs,expectedCash,diff,custodyInTotal:custIn,custodyOutTotal:custOut});
+            await updateDoc(doc(db,'shifts',myShift.id),{pauses:ps,closeAt,closeCash:cc,status:'closed',salesTotal,cashTotal,instaTotal,workedMs,pausedMs,expectedCash,diff,custodyInTotal:custIn,custodyOutTotal:custOut});
             toast(t('shiftClosed'));
-            const full={...shTmp,closeCash:cc,status:'closed',salesTotal,workedMs,pausedMs,expectedCash,diff,custodyInTotal:custIn,custodyOutTotal:custOut};
+            const full={...shTmp,closeCash:cc,status:'closed',salesTotal,cashTotal,instaTotal,workedMs,pausedMs,expectedCash,diff,custodyInTotal:custIn,custodyOutTotal:custOut};
             myShift=null;
             applyBranchLock(); // sblocca il selettore filiale
             showShiftReport(full);
@@ -1993,6 +2273,8 @@
         ${kv(t('worked'),fmtDur(s.workedMs),'var(--forest)')}
         ${kv(t('pausedTime'),fmtDur(s.pausedMs),'var(--amber)')}
         ${kv(t('openCash'),fmt(s.openCash||0)+' '+t('currency'))}
+        ${kv(t('soldCash'),fmt(s.cashTotal!=null?s.cashTotal:(s.salesTotal||0))+' '+t('currency'),'var(--green)')}
+        ${(s.instaTotal)?kv(t('soldInstapay'),fmt(s.instaTotal)+' '+t('currency'),'var(--amber)'):''}
         ${kv(t('shiftSales'),fmt(s.salesTotal||0)+' '+t('currency'))}
         ${kv(t('expectedCash'),fmt(s.expectedCash||0)+' '+t('currency'),'var(--forest)')}
         ${kv(t('countedCash'),fmt(s.closeCash||0)+' '+t('currency'))}
@@ -2056,6 +2338,14 @@
       const ok=(txt)=>{ if(!txt)return; stopScanner(); closeSheet(); onResult(String(txt).trim()); };
       _bcScanner.start({facingMode:'environment'},cfg,ok,()=>{}).catch(()=>{
         Html5Qrcode.getCameras().then(ds=>{ if(ds&&ds.length){ _bcScanner.start(ds[0].id,cfg,ok,()=>{}).catch(()=>{ $('bc-msg').textContent=t('camNoAccess'); }); } else { $('bc-msg').textContent=t('camNoAccess'); } }).catch(()=>{ $('bc-msg').textContent=t('camNoAccess'); });
+      });
+    }
+    // مسح باركود لإنشاء منتج جديد (من الكاشير أو المنتجات): موجود => فتح للتعديل؛ جديد => فورم بالباركود
+    function scanForNewProduct(){
+      openScanner(code=>{
+        const ex=products.find(x=>x.barcode===code);
+        if(ex){ toast(t('prodExistsScan')); prodForm(ex); }
+        else { toast(t('scanNewProd')); prodForm(null, code); }
       });
     }
     // بعد مسح الباركود في الاستلام: موجود => اسأل الكمية؛ جديد => افتح فورم منتج بالباركود
@@ -2149,11 +2439,44 @@
           <button id="wh-transfer" style="${btn}${whSubTab==='transfer'?onSt:offSt}">🔄 ${t('transferTab')}</button>
         </div>`;
       html += whSubTab==='receive' ? whReceiveView(actives) : whSubTab==='count' ? whCountView(actives) : whTransferView(actives);
+      // أدوات المخزن (تصفير/تفريغ) — أدمن فقط، في تبويب الجرد
+      if(whSubTab==='count' && profile.role==='admin'){
+        html+=`<div class="card" style="border:1px solid rgba(192,72,72,0.25);">
+          <div class="card-title" style="color:var(--red);">🧹 ${t('depotTools')}</div>
+          <div style="font-size:12px;color:rgba(26,26,26,0.6);margin-bottom:8px;">${t('softResetDesc')}</div>
+          <button class="btn-secondary btn-wide" id="wh-soft" style="margin-bottom:12px;">♻️ ${t('softReset')}</button>
+          <div style="font-size:12px;color:rgba(26,26,26,0.6);margin-bottom:8px;">${t('hardResetDesc')}</div>
+          <button class="btn-secondary btn-wide" id="wh-hard" style="color:var(--red);border-color:rgba(192,72,72,0.4);">🗑️ ${t('hardReset')}</button>
+        </div>`;
+      }
       $('content').innerHTML=html;
       $('wh-receive').onclick=()=>{whSubTab='receive';renderWarehouse();};
       $('wh-count').onclick=()=>{whSubTab='count';renderWarehouse();};
       $('wh-transfer').onclick=()=>{whSubTab='transfer';renderWarehouse();};
       if(whSubTab==='receive') bindReceive(); else if(whSubTab==='count') bindCount(actives); else bindTransfer(actives);
+      $('wh-soft')&&($('wh-soft').onclick=()=>depotSoftReset($('wh-soft')));
+      $('wh-hard')&&($('wh-hard').onclick=()=>depotHardReset($('wh-hard')));
+    }
+    // تصفير المخزون: كل الكميات صفر، المنتجات تفضل
+    async function depotSoftReset(btn){
+      if(!confirm(t('confirmSoftReset'))) return;
+      btn.disabled=true; btn.textContent=t('resetting');
+      try{
+        const ids=Object.keys(inventory);
+        for(const pid of ids){ const inv=inventory[pid]||{}; await setDoc(doc(db,'inventory',`${currentBranchId}_${pid}`),{branchId:currentBranchId,productId:pid,qty:0,threshold:inv.threshold||20,lastCost:inv.lastCost||0},{merge:true}); inventory[pid]={qty:0,threshold:inv.threshold||20,lastCost:inv.lastCost||0}; }
+        toast(t('resetDone')); renderWarehouse();
+      }catch(e){ console.error(e); toast(t('errorGen'),true); btn.disabled=false; btn.textContent='♻️ '+t('softReset'); }
+    }
+    // تفريغ المخزن: حذف كل أصناف المخزن لهذا الفرع (المنتجات تفضل في الكتالوج)
+    async function depotHardReset(btn){
+      if(!confirm(t('confirmHardReset'))) return;
+      btn.disabled=true; btn.textContent=t('resetting');
+      try{
+        const ids=Object.keys(inventory);
+        for(const pid of ids){ await deleteDoc(doc(db,'inventory',`${currentBranchId}_${pid}`)); }
+        inventory={};
+        toast(t('resetDone')); renderWarehouse();
+      }catch(e){ console.error(e); toast(t('errorGen'),true); btn.disabled=false; btn.textContent='🗑️ '+t('hardReset'); }
     }
 
     function whReceiveView(actives){
@@ -2529,56 +2852,100 @@
       const effTotal=s=>Math.max(0,(s.total||0)-(s.refundTotal||0));
       const rmFn=s=>{ const m={}; if(s.voided)(s.items||[]).forEach(it=>m[it.productId]=(m[it.productId]||0)+it.qty); (s.returns||[]).forEach(r=>(r.lines||[]).forEach(l=>m[l.productId]=(m[l.productId]||0)+l.qty)); return m; };
       const bName=id=>{const b=branches.find(x=>x.id===id);return b?(lang==='ar'?b.nameAr:b.nameEn):id;};
-      // ---- الموردين ----
-      const supMap={};
-      loadsArr.forEach(l=>{ const k=l.supplierName||t('noSupplier'); if(!supMap[k])supMap[k]={qty:0,cost:0,cnt:0}; supMap[k].qty+=(l.qty||0); supMap[k].cost+=(l.total||0); supMap[k].cnt++; });
-      const suppliersRep={ title:t('repSuppliers'), header:[t('supplier'),t('itemsN'),t('purchased'),t('cogs')+'('+t('currency')+')'],
-        rows:Object.entries(supMap).map(([k,v])=>[k,v.cnt,v.qty,fmt(v.cost)]) };
-      // ---- المنتجات ----
+      const pCost=pid=>{const p=products.find(x=>x.id===pid);return p?(p.cost||0):0;};
+      const uName=uid=>{const u=users.find(x=>x.uid===uid);return u?(u.name||u.email):'';};
+      const cur=t('currency');
+      // ===== المبيعات: فاتورة بفاتورة =====
+      const sortedSales=[...sales].sort((a,b)=>a.createdAt-b.createdAt);
+      const invRows=[]; 
+      sortedSales.forEach(s=>{ if(s.voided) return; const rm=rmFn(s);
+        let pc=0, prof=0; (s.items||[]).forEach(it=>{ const net=Math.max(0,it.qty-(rm[it.productId]||0)); pc+=net; prof+=net*((it.price||0)-pCost(it.productId)); });
+        invRows.push([fmtDT(s.createdAt,s.tzo), '#'+(s.receiptNo||''), bName(s.branchId), s.userName||uName(s.userId), s.payMethod==='instapay'?t('mInstapay'):t('mCash'), pc, fmt(effTotal(s)), fmt(prof)]);
+      });
+      const salesByInvoice={ title:t('repSalesByInvoice'), header:[t('colDateTime'),t('colInvoice'),t('branch'),t('cashierLbl'),t('colPayment'),t('colProdCount'),t('colInvTotal'),t('colInvProfit')], rows:invRows };
+      // ===== المبيعات: تفصيل المنتجات (سطر لكل منتج في كل فاتورة) =====
+      const detRows=[];
+      sortedSales.forEach(s=>{ if(s.voided) return; const rm=rmFn(s);
+        (s.items||[]).forEach(it=>{ const net=Math.max(0,it.qty-(rm[it.productId]||0)); if(net<=0) return; const cost=pCost(it.productId);
+          detRows.push([fmtDT(s.createdAt,s.tzo), '#'+(s.receiptNo||''), it.name, fmt(cost), fmt(it.price||0), net, fmt(net*(it.price||0)), fmt(net*((it.price||0)-cost))]);
+        }); });
+      const salesDetail={ title:t('repSalesDetail'), header:[t('colDateTime'),t('colInvoice'),t('colProduct'),t('cost'),t('colSell'),t('colQty'),t('colLineRev'),t('colLineProfit')], rows:detRows };
+      // ---- ملخص بالمنتج ----
       const soldMap={};
-      sales.forEach(s=>{ const rm=rmFn(s); (s.items||[]).forEach(it=>{ const net=Math.max(0,it.qty-(rm[it.productId]||0)); if(!soldMap[it.productId])soldMap[it.productId]={qty:0,rev:0}; soldMap[it.productId].qty+=net; soldMap[it.productId].rev+=net*(it.price||0); }); });
+      sales.forEach(s=>{ if(s.voided)return; const rm=rmFn(s); (s.items||[]).forEach(it=>{ const net=Math.max(0,it.qty-(rm[it.productId]||0)); if(!soldMap[it.productId])soldMap[it.productId]={qty:0,rev:0}; soldMap[it.productId].qty+=net; soldMap[it.productId].rev+=net*(it.price||0); }); });
       const purMap={}; loadsArr.forEach(l=>{ purMap[l.productId]=(purMap[l.productId]||0)+(l.qty||0); });
       const stockMap={}; invAll.forEach(i=>{ stockMap[i.productId]=(stockMap[i.productId]||0)+(i.qty||0); });
       const productsRep={ title:t('repProducts'), header:[t('name'),t('unitsSold'),t('revenue'),t('purchased'),t('stock'),t('cost'),t('price'),t('grossProfit')],
         rows:products.map(p=>{ const sm=soldMap[p.id]||{qty:0,rev:0}; const prof=sm.rev-sm.qty*(p.cost||0);
           return [p.name, sm.qty, fmt(sm.rev), purMap[p.id]||0, stockMap[p.id]||0, fmt(p.cost||0), fmt(p.price||0), fmt(prof)]; }) };
-      // ---- الفروع ----
+      // ===== المشتريات: تفصيل (سطر لكل استلام) =====
+      const sortedLoads=[...loadsArr].sort((a,b)=>a.createdAt-b.createdAt);
+      const purRows=sortedLoads.map(l=>[fmtDT(l.createdAt,l.tzo), l.supplierName||t('noSupplier'), l.name, fmt(l.unitCost||0), l.qty||0, fmt(l.total||0), l.userName||'']);
+      const purchasesDetail={ title:t('repPurchasesDetail'), header:[t('colDateTime'),t('supplier'),t('colProduct'),t('colUnitCost'),t('colQty'),t('colInvTotal'),t('colReceivedBy')], rows:purRows };
+      // ---- ملخص الموردين ----
+      const supMap={};
+      loadsArr.forEach(l=>{ const k=l.supplierName||t('noSupplier'); if(!supMap[k])supMap[k]={qty:0,cost:0,cnt:0}; supMap[k].qty+=(l.qty||0); supMap[k].cost+=(l.total||0); supMap[k].cnt++; });
+      const suppliersRep={ title:t('repSuppliers'), header:[t('supplier'),t('itemsN'),t('purchased'),t('cogs')+'('+cur+')'],
+        rows:Object.entries(supMap).map(([k,v])=>[k,v.cnt,v.qty,fmt(v.cost)]) };
+      // ===== الفروع: تفصيل (سطر لكل منتج في كل فرع) =====
+      const brProd={}; // branchId -> productId -> {qty,rev,prof}
+      sales.forEach(s=>{ if(s.voided)return; const rm=rmFn(s); (s.items||[]).forEach(it=>{ const net=Math.max(0,it.qty-(rm[it.productId]||0)); if(net<=0)return; brProd[s.branchId]=brProd[s.branchId]||{}; const m=brProd[s.branchId]; if(!m[it.productId])m[it.productId]={qty:0,rev:0,prof:0}; m[it.productId].qty+=net; m[it.productId].rev+=net*(it.price||0); m[it.productId].prof+=net*((it.price||0)-pCost(it.productId)); }); });
+      const brDetRows=[];
+      visIds.forEach(bid=>{ const m=brProd[bid]; if(!m)return; Object.entries(m).sort((a,b)=>b[1].rev-a[1].rev).forEach(([pid,v])=>{ const p=products.find(x=>x.id===pid); brDetRows.push([bName(bid), p?p.name:'—', v.qty, fmt(v.rev), fmt(v.prof)]); }); });
+      const branchesDetail={ title:t('repBranchesDetail'), header:[t('branch'),t('colProduct'),t('colQty'),t('revenue'),t('colLineProfit')], rows:brDetRows };
+      // ---- ملخص الفروع ----
       const brRev={}, brCnt={}, brStock={};
       sales.forEach(s=>{ brRev[s.branchId]=(brRev[s.branchId]||0)+effTotal(s); if(!s.voided)brCnt[s.branchId]=(brCnt[s.branchId]||0)+1; });
       invAll.forEach(i=>{ const p=products.find(x=>x.id===i.productId); brStock[i.branchId]=(brStock[i.branchId]||0)+(i.qty||0)*(p?(p.price||0):0); });
       const branchesRep={ title:t('repBranches'), header:[t('branch'),t('revenue'),t('invoicesShort'),t('stockVal')],
         rows:visIds.map(id=>[bName(id), fmt(brRev[id]||0), brCnt[id]||0, fmt(brStock[id]||0)]) };
-      // ---- المستخدمين ----
+      // ===== الموظفين: تفصيل (سطر لكل فاتورة) =====
+      const usrDetRows=[];
+      sortedSales.forEach(s=>{ if(s.voided)return; const rm=rmFn(s); let pc=0,prof=0; (s.items||[]).forEach(it=>{ const net=Math.max(0,it.qty-(rm[it.productId]||0)); pc+=net; prof+=net*((it.price||0)-pCost(it.productId)); });
+        usrDetRows.push([s.userName||uName(s.userId), fmtDT(s.createdAt,s.tzo), '#'+(s.receiptNo||''), s.payMethod==='instapay'?t('mInstapay'):t('mCash'), pc, fmt(effTotal(s)), fmt(prof)]); });
+      usrDetRows.sort((a,b)=>String(a[0]).localeCompare(String(b[0])));
+      const usersDetail={ title:t('repUsersDetail'), header:[t('cashierLbl'),t('colDateTime'),t('colInvoice'),t('colPayment'),t('colProdCount'),t('colInvTotal'),t('colInvProfit')], rows:usrDetRows };
+      // ---- ملخص المستخدمين ----
       const uSales={}, uCnt={}, uMs={};
       sales.forEach(s=>{ uSales[s.userId]=(uSales[s.userId]||0)+effTotal(s); if(!s.voided)uCnt[s.userId]=(uCnt[s.userId]||0)+1; });
       shiftsArr.forEach(s=>{ if(s.status==='closed'&&s.workedMs) uMs[s.userId]=(uMs[s.userId]||0)+s.workedMs; });
       const usersRep={ title:t('repUsers'), header:[t('name'),t('role'),t('revenue'),t('invoicesShort'),t('hoursWorked')],
         rows:users.map(u=>[u.name||u.email, t(u.role), fmt(uSales[u.uid]||0), uCnt[u.uid]||0, ((uMs[u.uid]||0)/3600000).toFixed(1)]) };
-      // ---- الأرباح ----
+      // ===== الأرباح: إجمالي + لكل فرع =====
       const revTot=sales.reduce((a,s)=>a+effTotal(s),0);
-      let cogs=0; sales.forEach(s=>{ const rm=rmFn(s); (s.items||[]).forEach(it=>{ const net=Math.max(0,it.qty-(rm[it.productId]||0)); const p=products.find(x=>x.id===it.productId); cogs+=net*(p?(p.cost||0):0); }); });
+      let cogsTot=0; sales.forEach(s=>{ if(s.voided)return; const rm=rmFn(s); (s.items||[]).forEach(it=>{ const net=Math.max(0,it.qty-(rm[it.productId]||0)); cogsTot+=net*pCost(it.productId); }); });
       const purTot=loadsArr.reduce((a,l)=>a+(l.total||0),0);
-      const profitsRep={ title:t('repProfits'), header:[t('name'),t('currency')],
-        rows:[ [t('revenue'),fmt(revTot)], [t('cogs'),fmt(cogs)], [t('grossProfit'),fmt(revTot-cogs)], [t('purchasesTotal'),fmt(purTot)] ] };
-      return { suppliers:suppliersRep, products:productsRep, branches:branchesRep, users:usersRep, profits:profitsRep };
+      const profRows=[ [t('revenue'),fmt(revTot)], [t('cogs'),fmt(cogsTot)], [t('grossProfit'),fmt(revTot-cogsTot)], [t('purchasesTotal'),fmt(purTot)] ];
+      // تفصيل ربح كل فرع
+      visIds.forEach(bid=>{ let r=0,c=0; sales.forEach(s=>{ if(s.branchId!==bid||s.voided)return; r+=effTotal(s); const rm=rmFn(s); (s.items||[]).forEach(it=>{ const net=Math.max(0,it.qty-(rm[it.productId]||0)); c+=net*pCost(it.productId); }); });
+        if(r>0) profRows.push([bName(bid)+' — '+t('grossProfit'), fmt(r-c)]); });
+      const profitsRep={ title:t('repProfits'), header:[t('name'),cur], rows:profRows };
+      return { salesByInvoice, salesDetail, products:productsRep, purchasesDetail, suppliers:suppliersRep, branchesDetail, branches:branchesRep, usersDetail, users:usersRep, profits:profitsRep };
     }
     let _repCache=null;
     function openFullReports(){
       const now=new Date(); const mStart=new Date(now.getFullYear(),now.getMonth(),1);
       const f=mStart.toISOString().slice(0,10), tt=now.toISOString().slice(0,10);
-      const row=(key,id)=>`<div style="padding:10px 0;border-bottom:1px solid var(--ivory-dark);">
-        <div style="font-weight:700;font-size:13px;margin-bottom:6px;">${t(key)}</div>
+      const row=(key,id)=>`<div style="padding:9px 0;border-bottom:1px solid var(--ivory-dark);">
+        <div style="font-weight:600;font-size:13px;margin-bottom:6px;">${t(key)}</div>
         <div style="display:flex;gap:6px;">
           <button class="btn-secondary rep-btn" data-k="${id}" data-f="pdf" style="flex:1;padding:8px 0;">📄 PDF</button>
           <button class="btn-secondary rep-btn" data-k="${id}" data-f="xls" style="flex:1;padding:8px 0;">📊 Excel</button>
           <button class="btn-secondary rep-btn" data-k="${id}" data-f="csv" style="flex:1;padding:8px 0;">📑 CSV</button>
         </div></div>`;
+      const sec=(title,rows)=>`<div style="font-size:11px;letter-spacing:0.5px;color:var(--forest);font-weight:700;margin:14px 0 4px;">${title}</div>${rows}`;
       $('sheet-root').innerHTML=`<div class="overlay" id="ov"><div class="sheet" onclick="event.stopPropagation()">
         <div class="sheet-head"><div><div class="sheet-sub">${t('fullReports')}</div><div class="sheet-title">📑 ${t('fullReports')}</div></div><button class="close-x" id="cx">×</button></div>
         <div style="font-size:12px;color:rgba(26,26,26,0.55);margin-bottom:10px;">${t('pickRangeHint')}</div>
         <div class="row2"><div class="field"><label class="lbl">${t('repFrom')}</label><input class="input" id="rep-from" type="date" value="${f}"></div>
           <div class="field"><label class="lbl">${t('repTo')}</label><input class="input" id="rep-to" type="date" value="${tt}"></div></div>
-        <div id="rep-list">${row('repSuppliers','suppliers')}${row('repProducts','products')}${row('repBranches','branches')}${row('repUsers','users')}${row('repProfits','profits')}</div>
+        <div id="rep-list">
+          ${sec(t('secSales'), row('salesByInvoice','salesByInvoice')+row('salesDetail','salesDetail')+row('repProducts','products'))}
+          ${sec(t('secPurchases'), row('repPurchasesDetail','purchasesDetail')+row('repSuppliers','suppliers'))}
+          ${sec(t('secBranchesSec'), row('repBranchesDetail','branchesDetail')+row('repBranches','branches'))}
+          ${sec(t('secUsersSec'), row('repUsersDetail','usersDetail')+row('repUsers','users'))}
+          ${sec(t('secProfitsSec'), row('repProfits','profits'))}
+        </div>
         <div id="rep-busy" style="text-align:center;font-size:12px;color:var(--forest);margin-top:8px;"></div>
       </div></div>`;
       $('ov').onclick=closeSheet;$('cx').onclick=closeSheet;
