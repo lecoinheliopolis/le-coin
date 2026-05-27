@@ -263,7 +263,7 @@
         deleteUser:'حذف المستخدم', confirmDelUser:'متأكد إنك عايز تمسح المستخدم؟ هيتمنع من الدخول. (الإيميل هيفضل محجوز في فايربيز ومش هينفع تعيد استخدامه)', userDeleted:'تم حذف المستخدم',
         depotTools:'أدوات المخزن', softReset:'تصفير المخزون (Soft)', hardReset:'تفريغ المخزن (Hard)', softResetDesc:'يصفّر كل الكميات لصفر ويحتفظ بالمنتجات — يسهّل إعادة الإدخال', hardResetDesc:'يمسح كل المنتجات من هذا المخزن نهائياً (المنتجات تفضل في الكتالوج)', confirmSoftReset:'متأكد؟ كل الكميات في هذا الفرع هتبقى صفر (المنتجات تفضل موجودة)', confirmHardReset:'تحذير! ده هيمسح كل أصناف هذا المخزن نهائياً. متأكد؟', resetDone:'تمت العملية', resetting:'بيشتغل...',
         confirmDelCat:'حذف هذه الفئة؟', confirmDelProd:'حذف هذا المنتج؟',
-        addProduct:'منتج جديد', scanAddProduct:'مسح باركود لمنتج جديد', prodExistsScan:'المنتج موجود — هفتحه لك للتعديل', createNewWithBarcode:'الباركود ده مش متسجّل. تعمل منتج جديد بنفس الكود؟', costFallbackHint:'لو سيبته فاضي = آخر سعر شراء', editProduct:'تعديل المنتج', barcode:'الباركود', name:'الاسم (فرنسي)',
+        addProduct:'منتج جديد', scanAddProduct:'مسح باركود لمنتج جديد', prodExistsScan:'المنتج موجود — هفتحه لك للتعديل', createNewWithBarcode:'الباركود ده مش متسجّل. تعمل منتج جديد بنفس الكود؟', costFallbackHint:'لو سيبته فاضي = آخر سعر شراء', scanBtn:'مسح', prodDetails:'تفاصيل المنتج', stockByBranch:'المخزون في كل فرع', recentSales:'آخر المبيعات', lastSold:'آخر مرة اتباع', noSalesYet:'مفيش مبيعات لسه', countAddedByScan:'اتلقط بالمسح', enterPhysCount:'الكمية الفعلية', editProduct:'تعديل المنتج', barcode:'الباركود', name:'الاسم (فرنسي)',
         descAr:'الوصف بالعربية', descEn:'الوصف بالإنجليزية', category:'الفئة', price:'السعر', cost:'التكلفة',
         photo:'صورة المنتج', addPhoto:'إضافة صورة', stock:'المخزون', threshold:'حد الإنذار',
         margin:'الربح', search:'بحث...', noCategories:'لا توجد فئات بعد', noProducts:'لا توجد منتجات بعد',
@@ -366,7 +366,7 @@
         deleteUser:'Delete user', confirmDelUser:'Delete this user? They will be blocked from login. (The email stays reserved in Firebase and cannot be reused)', userDeleted:'User deleted',
         depotTools:'Depot tools', softReset:'Reset stock (Soft)', hardReset:'Empty depot (Hard)', softResetDesc:'Sets all quantities to zero and keeps products — easier re-entry', hardResetDesc:'Permanently removes all products from this depot (products stay in the catalog)', confirmSoftReset:'Sure? All quantities in this branch will become zero (products stay)', confirmHardReset:'Warning! This permanently removes every item in this depot. Sure?', resetDone:'Done', resetting:'Working...',
         confirmDelCat:'Delete this category?', confirmDelProd:'Delete this product?',
-        addProduct:'New product', scanAddProduct:'Scan barcode for new product', prodExistsScan:'Product exists — opening it to edit', createNewWithBarcode:'This barcode is not registered. Create a new product with this code?', costFallbackHint:'Leave empty = last purchase cost', editProduct:'Edit product', barcode:'Barcode', name:'Name (French)',
+        addProduct:'New product', scanAddProduct:'Scan barcode for new product', prodExistsScan:'Product exists — opening it to edit', createNewWithBarcode:'This barcode is not registered. Create a new product with this code?', costFallbackHint:'Leave empty = last purchase cost', scanBtn:'Scan', prodDetails:'Product details', stockByBranch:'Stock by branch', recentSales:'Recent sales', lastSold:'Last sold', noSalesYet:'No sales yet', countAddedByScan:'Set by scan', enterPhysCount:'Physical quantity', editProduct:'Edit product', barcode:'Barcode', name:'Name (French)',
         descAr:'Description (Arabic)', descEn:'Description (English)', category:'Category', price:'Price', cost:'Cost',
         photo:'Product photo', addPhoto:'Add photo', stock:'Stock', threshold:'Low-stock alert',
         margin:'Margin', search:'Search...', noCategories:'No categories yet', noProducts:'No products yet',
@@ -761,14 +761,9 @@
           </div>
         </button>`;
       }).join('');
-      const canAddProd = profile.role==='admin'||profile.role==='manager';
-      const scanBar = `<div style="display:flex;gap:8px;margin-bottom:10px;">
-        <button id="cassa-scan-sell" class="btn-forest" style="flex:1;padding:11px 0;">🛒 ${t('sellByScan')}</button>
-        ${canAddProd?`<button id="cassa-scan-add" class="btn-secondary" style="flex:1;padding:11px 0;">📷 ${t('scanAddProduct')}</button>`:''}
-      </div>`;
+      const scanBar = `<button id="cassa-scan" class="btn-forest btn-wide" style="margin-bottom:10px;">📷 ${t('scanBtn')}</button>`;
       $('content').innerHTML=`${scanBar}<div class="pos-cat-bar">${chips}</div><div class="pos-grid">${grid}</div>`;
-      $('cassa-scan-sell')&&($('cassa-scan-sell').onclick=sellByScan);
-      $('cassa-scan-add')&&($('cassa-scan-add').onclick=scanForNewProduct);
+      $('cassa-scan')&&($('cassa-scan').onclick=()=>smartScan('sell'));
       document.querySelectorAll('.pos-cat-chip').forEach(ch=>ch.onclick=()=>{posCatFilter=ch.dataset.cat;renderCassa();});
       document.querySelectorAll('.pos-card').forEach(c=>c.onclick=()=>{ if(c.disabled)return; addToCart(products.find(p=>p.id===c.dataset.id)); });
       renderCartBar();
@@ -1089,15 +1084,7 @@
         $('rt-sum').innerHTML=`${t('refundedAmount')}: <span class="num" style="color:var(--red);">${fmt(amt)} ${t('currency')}</span>`;
       };
       avail.forEach(it=>$('rt-'+it.productId).oninput=recompute); recompute();
-      $('rt-scan')&&($('rt-scan').onclick=()=>openScanner(code=>{
-        const p=products.find(x=>x.barcode===code);
-        if(!p){ toast(t('prodNotRegistered'),true); return; }
-        const it=avail.find(a=>a.productId===p.id);
-        if(!it){ toast(t('notInThisInvoice'),true); return; }
-        const el=$('rt-'+it.productId); const cur=parseInt(el.value)||0;
-        if(cur+1>it.remain){ toast(t('nothingToReturn'),true); return; }
-        el.value=cur+1; recompute(); toast(`${pName(p)} ×${cur+1}`);
-      }));
+      $('rt-scan')&&($('rt-scan').onclick=()=>smartScan('refund',{avail,recompute}));
       $('rt-do').onclick=async()=>{
         const lines=[];
         for(const it of avail){
@@ -1352,7 +1339,7 @@
       }).join('');
       $('content').innerHTML=html;
       $('add-prod')&&($('add-prod').onclick=()=>prodForm(null));
-      $('scan-prod')&&($('scan-prod').onclick=scanForNewProduct);
+      $('scan-prod')&&($('scan-prod').onclick=()=>smartScan('edit_product'));
       const ps=$('p-search'); if(ps){ps.oninput=()=>{prodSearch=ps.value;const pos=ps.selectionStart;renderProducts();const n=$('p-search');n.focus();n.setSelectionRange(pos,pos);};}
       document.querySelectorAll('.prod-card').forEach(r=>r.onclick=()=>prodForm(products.find(p=>p.id===r.dataset.id)));
     }
@@ -1761,6 +1748,7 @@
         </div>
         <div style="display:flex;gap:8px;margin:12px 0;">
           <button id="dash-newsale" class="btn-forest" style="flex:1;padding:12px 0;">🛒 ${t('newSaleBtn')}</button>
+          <button id="dash-scan" class="btn-secondary" style="flex:1;padding:12px 0;">📷 ${t('scanBtn')}</button>
           <button id="dash-addprod" class="btn-secondary" style="flex:1;padding:12px 0;">➕ ${t('addProductBtn')}</button>
         </div>
         <div style="background:var(--ivory-dark);border-radius:14px;padding:14px;margin-bottom:14px;">
@@ -1802,6 +1790,7 @@
       $('content').innerHTML=html;
       $('dash-refresh').onclick=renderDashboard;
       $('dash-newsale').onclick=()=>{ activeTab='cassa'; document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab==='cassa')); render(); };
+      $('dash-scan')&&($('dash-scan').onclick=()=>smartScan('dashboard'));
       $('dash-addprod').onclick=()=>{ if(typeof prodForm==='function') prodForm(null); };
       document.querySelectorAll('.dash-r').forEach(b=>b.onclick=()=>{ dashRange.mode=b.dataset.m; renderDashboard(); });
       if(dashRange.mode==='custom'){ const f=$('dash-from'),tt=$('dash-to'); const upd=()=>{ dashRange.from=f.value; dashRange.to=tt.value; renderDashboard(); }; if(f)f.onchange=upd; if(tt)tt.onchange=upd; }
@@ -2428,6 +2417,93 @@
       if(!c) return null;
       return products.find(p=>String(p.barcode||'').trim()===c);
     }
+    // ============ المسح الذكي: زرار واحد بسلوك مختلف حسب الصفحة ============
+    function smartScan(ctx, opts){
+      openScanner(code=>{
+        const c=String(code||'').trim();
+        const p=findByBarcode(c);
+        // -- لو المنتج مش موجود --
+        if(!p){
+          if(ctx==='refund'){ toast(t('notInThisInvoice'),true); return; }
+          if(ctx==='edit_product' && activeTab==='products'){ prodSearch=c; renderProducts(); }
+          if(confirm(t('createNewWithBarcode'))) prodForm(null, c);
+          return;
+        }
+        // -- لو موجود: سلوك حسب الصفحة --
+        if(ctx==='sell'){
+          if(p.active===false){ toast(t('outOfStock'),true); return; }
+          addToCart(p);
+          const it=cart.find(i=>i.id===p.id);
+          toast(`${pName(p)} ×${it?it.qty:1}`);
+        }
+        else if(ctx==='edit_product'){ toast(t('prodExistsScan')); prodForm(p); }
+        else if(ctx==='receive'){ askReceiveQty(p); }
+        else if(ctx==='count'){ askCountQty(p); }
+        else if(ctx==='transfer'){
+          const sel=$('tr-prod'); if(sel){ sel.value=p.id; sel.dispatchEvent(new Event('change')); }
+          toast(`${pName(p)}`);
+        }
+        else if(ctx==='refund'){
+          const it=opts&&opts.avail&&opts.avail.find(a=>a.productId===p.id);
+          if(!it){ toast(t('notInThisInvoice'),true); return; }
+          const el=$('rt-'+it.productId); const cur=parseInt(el.value)||0;
+          if(cur+1>it.remain){ toast(t('nothingToReturn'),true); return; }
+          el.value=cur+1; if(opts.recompute) opts.recompute();
+          toast(`${pName(p)} ×${cur+1}`);
+        }
+        else if(ctx==='dashboard'){ showProductDetail(p); }
+      });
+    }
+    // نافذة الجرد السريع لمنتج واحد (لما تمسح في تبويب الجرد)
+    function askCountQty(p){
+      const inv=inventory[p.id]||{qty:0};
+      $('sheet-root').innerHTML=`<div class="overlay" id="ov" onclick="closeSheet()"><div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-head"><div><div class="sheet-sub">${t('countAddedByScan')}</div><div class="sheet-title">${pName(p)}</div></div><button class="close-x" id="cx">×</button></div>
+        <div style="background:rgba(31,58,46,0.06);border-radius:9px;padding:10px;margin-bottom:12px;font-size:13px;">${t('systemQty')}: <span class="num" style="font-weight:700;">${inv.qty||0}</span></div>
+        <div class="field"><label class="lbl">${t('enterPhysCount')}</label><input class="input num" id="cq-qty" type="number" min="0" dir="ltr" autofocus></div>
+        <button class="btn-forest btn-wide" id="cq-save">✓ ${t('save')}</button>
+      </div></div>`;
+      $('cx').onclick=closeSheet;
+      $('cq-save').onclick=()=>{ const v=$('cq-qty').value; if(v===''){ toast(t('required'),true); return; } invCounts[p.id]=v; closeSheet(); if(activeTab==='warehouse') renderWarehouse(); toast(`${pName(p)}: ${v}`); };
+      setTimeout(()=>$('cq-qty')&&$('cq-qty').focus(),50);
+    }
+    // كارت تفاصيل المنتج للـ Dashboard
+    async function showProductDetail(p){
+      $('sheet-root').innerHTML=`<div class="overlay" id="ov" onclick="closeSheet()"><div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-head"><div><div class="sheet-sub">${t('prodDetails')}</div><div class="sheet-title">${pName(p)}</div></div><button class="close-x" id="cx">×</button></div>
+        <div class="card" style="display:grid;gap:8px;font-size:13px;">
+          <div style="display:flex;justify-content:space-between;"><span style="color:rgba(26,26,26,0.6);">${t('barcode')}</span><span class="num">${p.barcode||'—'}</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="color:rgba(26,26,26,0.6);">${t('price')}</span><span class="num" style="font-weight:700;color:var(--forest);">${fmt(p.price||0)} ${t('currency')}</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="color:rgba(26,26,26,0.6);">${t('cost')}</span><span class="num">${fmt(p.cost||0)} ${t('currency')}</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="color:rgba(26,26,26,0.6);">${t('grossProfit')} / ${t('mPcs')}</span><span class="num" style="font-weight:700;color:var(--green);">${fmt((p.price||0)-(p.cost||0))} ${t('currency')}</span></div>
+        </div>
+        <div class="card"><div style="font-size:11px;letter-spacing:0.5px;color:var(--forest);font-weight:700;margin-bottom:8px;">📦 ${t('stockByBranch')}</div><div id="pd-stock"><div class="spinner"></div></div></div>
+        <div class="card"><div style="font-size:11px;letter-spacing:0.5px;color:var(--forest);font-weight:700;margin-bottom:8px;">🛒 ${t('recentSales')}</div><div id="pd-sales"><div class="spinner"></div></div></div>
+      </div></div>`;
+      $('cx').onclick=closeSheet;
+      // المخزون لكل فرع
+      try{
+        const qs=await getDocs(query(collection(db,'inventory'),where('productId','==',p.id)));
+        const visIds = profile.role==='admin' ? branches.map(b=>b.id) : (profile.branchIds||[]);
+        const rows=[];
+        qs.forEach(d=>{ const x=d.data(); if(!visIds.includes(x.branchId)) return; const b=branches.find(y=>y.id===x.branchId); rows.push({name:b?(lang==='ar'?b.nameAr:b.nameEn):x.branchId, qty:x.qty||0}); });
+        if(!rows.length) $('pd-stock').innerHTML=`<div class="empty">${t('noStockAnywhere')}</div>`;
+        else $('pd-stock').innerHTML=rows.map(r=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--ivory-dark);"><span>${r.name}</span><span class="num" style="font-weight:700;color:${(r.qty||0)===0?'var(--red)':'var(--charcoal)'};">${r.qty}</span></div>`).join('');
+      }catch(e){ $('pd-stock').innerHTML=`<div class="empty">${t('errorGen')}</div>`; }
+      // آخر مبيعات (آخر 5)
+      try{
+        let sales=[]; const visIds = profile.role==='admin' ? branches.map(b=>b.id) : (profile.branchIds||[]);
+        if(profile.role==='admin'){ (await getDocs(collection(db,'sales'))).forEach(d=>sales.push(d.data())); }
+        else { for(const b of visIds){ (await getDocs(query(collection(db,'sales'),where('branchId','==',b)))).forEach(d=>sales.push(d.data())); } }
+        sales=sales.filter(s=>!s.voided && (s.items||[]).some(it=>it.productId===p.id));
+        sales.sort((a,b)=>b.createdAt-a.createdAt); sales=sales.slice(0,5);
+        if(!sales.length) $('pd-sales').innerHTML=`<div class="empty">${t('noSalesYet')}</div>`;
+        else $('pd-sales').innerHTML=sales.map(s=>{ const it=(s.items||[]).find(x=>x.productId===p.id); const b=branches.find(y=>y.id===s.branchId);
+          return `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--ivory-dark);font-size:12.5px;">
+            <div><div style="font-weight:600;">#${s.receiptNo||'—'} · ${b?(lang==='ar'?b.nameAr:b.nameEn):''}</div><div style="font-size:11px;color:rgba(26,26,26,0.5);">${fmtDT(s.createdAt,s.tzo)}</div></div>
+            <div class="num" style="font-weight:700;color:var(--forest);">${it.qty} × ${fmt(it.price)} = ${fmt(it.qty*it.price)} ${t('currency')}</div></div>`; }).join('');
+      }catch(e){ $('pd-sales').innerHTML=`<div class="empty">${t('errorGen')}</div>`; }
+    }
     function scanForNewProduct(){
       openScanner(code=>{
         const c=String(code||'').trim();
@@ -2614,7 +2690,7 @@
 
     function bindReceive(){
       const sel=$('rc-prod'), qEl=$('rc-qty'), cEl=$('rc-cost');
-      const scanBtn=$('rc-scan'); if(scanBtn) scanBtn.onclick=()=>openScanner(onReceiveScan);
+      const scanBtn=$('rc-scan'); if(scanBtn) scanBtn.onclick=()=>smartScan('receive');
       const supSel=$('rc-supplier'); if(supSel) supSel.onchange=()=>{ recvSupplier=supSel.value; };
       const refresh=()=>{
         const p=products.find(x=>x.id===sel.value);
@@ -2668,6 +2744,7 @@
         <div class="card-title">🔄 ${t('transferGoods')}</div>
         <div style="font-size:12px;color:rgba(26,26,26,0.55);margin-bottom:12px;">${t('transferHint')}</div>
         <div style="background:rgba(31,58,46,0.06);border-radius:9px;padding:8px 11px;margin-bottom:12px;font-size:13px;">📤 ${t('fromLbl')}: <b>${curName}</b></div>
+        <button class="btn-secondary btn-wide" id="tr-scan" style="margin-bottom:10px;">📷 ${t('scanBtn')}</button>
         <div class="field"><label class="lbl">${t('selectProduct')}</label>
           <select class="input" id="tr-prod"><option value="">${t('selectProduct')}</option>
           ${actives.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}</select></div>
@@ -2693,6 +2770,7 @@
         $('tr-after').textContent = n>0 ? `${p.name}: ${(inv.qty||0)} → ${(inv.qty||0)-n}` : '';
       };
       sel.onchange=refresh; qEl.oninput=refresh;
+      $('tr-scan')&&($('tr-scan').onclick=()=>smartScan('transfer'));
       $('tr-save').onclick=async()=>{
         const p=products.find(x=>x.id===sel.value);
         const dest=dEl.value;
@@ -2763,6 +2841,7 @@
         <div class="card-title">📋 ${t('physInv')}</div>
         <div style="font-size:12px;color:rgba(26,26,26,0.55);margin-bottom:6px;">${t('adjustNote')}</div>
         <div style="font-size:11px;color:rgba(26,26,26,0.45);margin-bottom:10px;">${t('leaveBlank')}</div>
+        <button class="btn-secondary btn-wide" id="cnt-scan" style="margin-bottom:10px;">📷 ${t('scanBtn')}</button>
         ${rows}
         <div id="cnt-sum" style="margin-top:12px;font-size:12px;color:rgba(26,26,26,0.6);"></div>
         <button class="btn-gold btn-wide" id="cnt-apply" style="margin-top:12px;">⚖️ ${t('applyInv')}</button>
@@ -2788,6 +2867,7 @@
         $('cnt-sum').innerHTML=`${t('totalItems')}: <b>${counted}</b> · ${t('surplus')}: <b style="color:var(--amber);">${surplus}</b> · ${t('shortage')}: <b style="color:var(--red);">${shortage}</b><br>${t('valueImpact')}: <b class="num" style="color:${valImpact<0?'var(--red)':'var(--green)'};">${valImpact>0?'+':valImpact<0?'−':''}${fmt(valImpact)} ${t('currency')}</b>`;
       };
       actives.forEach(p=>{ const el=$('cnt-'+p.id); el.oninput=()=>upd(p.id); if(invCounts[p.id]!==undefined) upd(p.id); });
+      $('cnt-scan')&&($('cnt-scan').onclick=()=>smartScan('count'));
       recompSum();
       $('cnt-apply').onclick=async()=>{
         const lines=[];
