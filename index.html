@@ -181,8 +181,8 @@
   <div class="login-wrap" id="login-screen">
     <div class="login-card">
       <div class="login-brand"><img id="login-logo" alt="Le Coin" style="max-width:180px;width:62%;height:auto;display:block;margin:0 auto 10px;border-radius:14px;box-shadow:0 6px 18px rgba(31,58,46,0.18);"><div class="lb-tag">POINT OF SALE</div></div>
-      <div class="field"><label class="lbl" id="l-email-lbl">البريد الإلكتروني</label><input class="input" id="login-email" type="email" autocomplete="username"></div>
-      <div class="field"><label class="lbl" id="l-pass-lbl">كلمة المرور</label><input class="input" id="login-pass" type="password" autocomplete="current-password"></div>
+      <div class="field"><label class="lbl" id="l-email-lbl">البريد الإلكتروني</label><input class="input num" id="login-email" type="text" autocomplete="username" dir="ltr"></div>
+      <div class="field"><label class="lbl" id="l-pass-lbl">كلمة المرور</label><input class="input" id="login-pass" type="password" autocomplete="current-password" dir="ltr"></div>
       <button class="btn-gold btn-wide" id="login-btn" style="margin-top:6px;">دخول</button>
       <div id="login-error" style="color:var(--red);font-size:12px;text-align:center;margin-top:12px;min-height:16px;"></div>
       <div style="border-top:1px solid rgba(31,58,46,0.12);margin:18px 0 0;padding-top:16px;">
@@ -537,12 +537,15 @@
     }
     $('login-lang').onclick=toggleLang;
     $('login-btn').onclick=async()=>{
-      const email=$('login-email').value.trim(), pass=$('login-pass').value;
+      let email=$('login-email').value.trim(); const pass=$('login-pass').value;
       $('login-error').textContent='';
       if(!email||!pass){$('login-error').textContent=t('required');return;}
+      // لو دخل أرقام فقط (تليفون) → حوّل تلقائياً للإيميل الوهمي
+      const onlyDigits=email.replace(/[^0-9]/g,'');
+      if(onlyDigits.length>=8 && !email.includes('@')) email=onlyDigits+'@lecoin-customer.app';
       $('login-btn').textContent='...';
       try{ await signInWithEmailAndPassword(auth,email,pass); }
-      catch(e){ $('login-error').textContent=t('loginErr'); $('login-btn').textContent=t('login'); }
+      catch(e){ console.error('Login error:',e.code); $('login-error').textContent=t('loginErr'); $('login-btn').textContent=t('login'); }
     };
     $('login-pass').addEventListener('keydown',e=>{if(e.key==='Enter')$('login-btn').click();});
     $('client-signup-btn')&&($('client-signup-btn').onclick=openClientSignup);
@@ -3523,9 +3526,10 @@
           catch(e2){ console.error('Signup error:',e2); const code=e2.code||''; if(code.includes('email-already-in-use')) err.textContent=t('emailInUse'); else if(code.includes('invalid-email')) err.textContent=t('invalidEmail')+' ('+loginEmail+')'; else if(code.includes('weak-password')) err.textContent=t('weakPass'); else err.textContent=t('errorGen')+': '+code; b.disabled=false; b.textContent='✓ '+t('clientSignup'); return; }
           await setDoc(doc(db,'customers',cred.user.uid),{name,email:email||'',phone:phone||'',loginEmail,points:0,createdAt:Date.now()});
           await signOut(auth2);
-          closeSheet(); toast(t('signupDone'));
-          // نملا الإيميل في شاشة الدخول
-          $('login-email').value=loginEmail;
+          closeSheet(); 
+          // رسالة واضحة: ادخل برقم التليفون نفسه (لو سجّل بتليفون)
+          toast(t('signupDone'));
+          $('login-email').value = email || phone; // التليفون كما هو — النظام يفهمه
         }catch(e){ console.error(e); err.textContent=t('errorGen'); b.disabled=false; b.textContent='✓ '+t('clientSignup'); }
       };
     }
