@@ -4608,19 +4608,22 @@
         }).join('');
         html+=`</div>`;
       }
-      html+=`<div class="card"><div class="card-title">${t('branchPointsPct')}</div>`;
-      html+=branches.filter(b=>b.active!==false).map(b=>{
-        const pct=b.pointsPct!=null?b.pointsPct:1;
-        // كل ١٠ ج.م = ١ نقطة (لو 10%)؛ كل 5 ج.م = ١ نقطة (لو 20%)...
-        const egpPerPoint = pct>0 ? Math.round(100/pct*100)/100 : 0;
-        return `<div style="padding:8px 0;border-bottom:1px solid var(--ivory-dark);">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <span style="font-weight:600;">${lang==='ar'?b.nameAr:b.nameEn}</span>
-            <span class="num" style="font-weight:700;color:var(--forest);font-size:12.5px;">${fmt2(egpPerPoint)} ${t('currency')} = 1 ${lang==='ar'?'نقطة':'pt'}</span>
-          </div>
-        </div>`;
-      }).join('');
-      html+=`</div>`;
+      // 📍 جدول معدلات الفروع (الافتراضي) — نشيل الفروع اللي العميل ليه فيها معدل مخصص
+      const defaultBranches = branches.filter(b=>b.active!==false && custMap[b.id]==null);
+      if(defaultBranches.length){
+        html+=`<div class="card"><div class="card-title">${t('branchPointsPct')}</div>`;
+        html+=defaultBranches.map(b=>{
+          const pct=b.pointsPct!=null?b.pointsPct:1;
+          const egpPerPoint = pct>0 ? Math.round(100/pct*100)/100 : 0;
+          return `<div style="padding:8px 0;border-bottom:1px solid var(--ivory-dark);">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-weight:600;">${lang==='ar'?b.nameAr:b.nameEn}</span>
+              <span class="num" style="font-weight:700;color:var(--forest);font-size:12.5px;">${fmt2(egpPerPoint)} ${t('currency')} = 1 ${lang==='ar'?'نقطة':'pt'}</span>
+            </div>
+          </div>`;
+        }).join('');
+        html+=`</div>`;
+      }
       html+=`<div class="card"><div class="card-title">💡 ${t('howPointsWork')}</div>
         <div style="display:grid;gap:10px;font-size:13px;line-height:1.5;">
           <div style="display:flex;gap:10px;align-items:flex-start;"><span style="font-size:18px;line-height:1;">①</span><span>${t('pointRule1')}</span></div>
