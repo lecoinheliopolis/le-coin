@@ -1364,12 +1364,13 @@
       const bs=$('branch-select'); if(bs){ bs.innerHTML=branches.map(b=>`<option value="${b.id}">${lang==='ar'?b.nameAr:b.nameEn}</option>`).join(''); bs.value=currentBranchId; }
     }
     function branchForm(br){
-      const f=br||{nameAr:'',nameEn:'',active:true};
+      const f=br||{nameAr:'',nameEn:'',active:true,pointsPct:1};
       let act=f.active!==false;
       $('sheet-root').innerHTML=`<div class="overlay" id="ov"><div class="sheet" onclick="event.stopPropagation()">
         <div class="sheet-head"><div><div class="sheet-sub">${br?t('edit'):t('create')}</div><div class="sheet-title">${br?t('editBranch'):t('addBranch')}</div></div><button class="close-x" id="cx">×</button></div>
         <div class="field"><label class="lbl">${t('nameAr')}</label><input class="input" id="b-ar" value="${f.nameAr||''}" dir="rtl"></div>
         <div class="field"><label class="lbl">${t('nameEn')}</label><input class="input fr" id="b-en" value="${f.nameEn||''}" dir="ltr"></div>
+        <div class="field"><label class="lbl">💎 ${t('branchPointsPct')}</label><input class="input num" id="b-pts" type="number" min="0" max="100" step="0.1" value="${f.pointsPct!=null?f.pointsPct:1}" dir="ltr"></div>
         <div style="background:white;border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--ivory-dark);margin-bottom:12px;"><span style="font-size:13px;font-weight:600;">${t('active')}</span><button class="toggle" id="b-act" style="background:${act?'var(--forest)':'rgba(26,26,26,0.2)'}"><span class="thumb"></span></button></div>
         ${br?`<button class="btn-secondary btn-wide" id="b-del" style="margin-bottom:10px;color:var(--red);border-color:rgba(192,72,72,0.3);">${t('delete')}</button>`:''}
         <button class="btn-forest btn-wide" id="b-save">✓ ${t('save')}</button>
@@ -1379,11 +1380,12 @@
       if(br)$('b-del').onclick=async()=>{ if(!confirm(t('confirmDelBranch')))return; try{await deleteDoc(doc(db,'branches',br.id)); closeSheet(); await refreshBranchSelector(); renderBranches(); toast(t('deleted'));}catch(e){console.error(e);toast(t('errorGen'),true);} };
       $('b-save').onclick=async()=>{
         const nameAr=$('b-ar').value.trim(),nameEn=$('b-en').value.trim();
+        const pointsPct=Math.max(0,parseFloat($('b-pts').value)||0);
         if(!nameAr||!nameEn){toast(t('required'),true);return;}
         $('b-save').textContent='...';
         try{
-          if(br){ await updateDoc(doc(db,'branches',br.id),{nameAr,nameEn,active:act}); }
-          else{ await addDoc(collection(db,'branches'),{nameAr,nameEn,active:act,createdAt:Date.now()}); }
+          if(br){ await updateDoc(doc(db,'branches',br.id),{nameAr,nameEn,active:act,pointsPct}); }
+          else{ await addDoc(collection(db,'branches'),{nameAr,nameEn,active:act,pointsPct,createdAt:Date.now()}); }
           closeSheet(); await refreshBranchSelector(); renderBranches(); toast(t('saved'));
         }catch(e){console.error(e);toast(t('errorGen'),true);$('b-save').textContent='✓ '+t('save');}
       };
@@ -2260,42 +2262,65 @@
         document.querySelectorAll('.ready-ord-btn').forEach(b=>b.onclick=()=>{ const o=arr.find(x=>x.id===b.dataset.oid); if(o) payClientOrder(o); });
       }catch(e){ console.warn('loadReadyOrders',e); }
     }
-    // فتح دفع طلب عميل: نعرض الفاتورة + اختيار طريقة الدفع
+    // فتح دفع طلب عميل: نعرض الفاتورة + خصم النقاط + اختيار طريقة الدفع
     function payClientOrder(order){
-      const items=order.items||[]; const total=items.reduce((a,i)=>a+i.qty*i.price,0);
+      const items=order.items||[]; const subtotal=items.reduce((a,i)=>a+i.qty*i.price,0);
+      const ptsRedeem = order.pointsToRedeem||0;
+      const ptsApplied = Math.min(ptsRedeem, subtotal); // أمان: ما نخصمش أكتر من الفاتورة
+      const total = subtotal - ptsApplied;
       $('sheet-root').innerHTML=`<div class="overlay" id="ov" onclick="closeSheet()"><div class="sheet" onclick="event.stopPropagation()">
         <div class="sheet-head"><div><div class="sheet-sub">💰 ${t('payOrderBtn')}</div><div class="sheet-title">${order.customerName||''}</div></div><button class="close-x" id="cx">×</button></div>
         ${order.customerPhone?`<div class="num" dir="ltr" style="background:rgba(31,58,46,0.06);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:13px;">📞 ${order.customerPhone}</div>`:''}
         <div style="background:#fff;border:1px solid var(--ivory-dark);border-radius:10px;padding:10px;margin-bottom:12px;">
           ${items.map(i=>`<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:13px;"><span>${i.name} ×${i.qty}</span><span class="num">${fmt(i.qty*i.price)} ${t('currency')}</span></div>`).join('')}
-          <div style="display:flex;justify-content:space-between;padding:9px 0 2px;margin-top:6px;border-top:2px solid var(--forest);font-weight:800;font-size:15px;"><span>${t('total')}</span><span class="num" style="color:var(--forest);">${fmt(total)} ${t('currency')}</span></div>
+          <div style="display:flex;justify-content:space-between;padding:7px 0 2px;margin-top:6px;border-top:1px solid var(--ivory-dark);font-size:13px;"><span>${t('total')}</span><span class="num">${fmt(subtotal)} ${t('currency')}</span></div>
+          ${ptsApplied>0?`<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:13px;color:var(--gold);"><span>💎 ${t('loyaltyDiscount')}</span><span class="num">−${fmt(ptsApplied)} ${t('currency')}</span></div>`:''}
+          <div style="display:flex;justify-content:space-between;padding:9px 0 2px;margin-top:6px;border-top:2px solid var(--forest);font-weight:800;font-size:15px;"><span>${t('amountToPay')}</span><span class="num" style="color:var(--forest);">${fmt(total)} ${t('currency')}</span></div>
         </div>
         <div style="display:flex;gap:8px;">
           <button class="btn-forest" id="po-cash" style="flex:1;padding:14px 0;">💵 ${t('mCash')||'كاش'}</button>
-          <button class="btn-gold" id="po-insta" style="flex:1;padding:14px 0;">📲 ${t('mInstapay')||'Instapay'}</button>
+          <button class="btn-gold" id="po-insta" style="flex:1;padding:14px 0;" ${total<=0?'disabled style="opacity:0.4;"':''}>📲 ${t('mInstapay')||'Instapay'}</button>
         </div>
+        ${total<=0?`<div style="font-size:11.5px;color:rgba(26,26,26,0.55);text-align:center;margin-top:8px;">💎 ${t('loyaltyDiscount')} = 100%</div>`:''}
       </div></div>`;
       $('cx').onclick=closeSheet;
-      $('po-cash').onclick=()=>finalizeOrderPayment(order,total,'cash',null);
-      $('po-insta').onclick=()=>openInstapayPay(total, dataUrl=>finalizeOrderPayment(order,total,'instapay',dataUrl||null));
+      // لو الخصم بالنقاط غطّى كل المبلغ → نعدّيه كـ cash بـ 0
+      $('po-cash').onclick=()=>finalizeOrderPayment(order,subtotal,total,ptsApplied,'cash',null);
+      if(total>0) $('po-insta').onclick=()=>openInstapayPay(total, dataUrl=>finalizeOrderPayment(order,subtotal,total,ptsApplied,'instapay',dataUrl||null));
     }
-    async function finalizeOrderPayment(order,total,payMethod,payProof){
+    // إتمام دفع الطلب: تسجيل فاتورة + خصم نقاط مستخدمة + إضافة نقاط جديدة
+    async function finalizeOrderPayment(order,subtotal,paidNow,pointsUsed,payMethod,payProof){
       try{
         const saleBranchId = order.branchId;
         const saleShiftId = (myShift&&myShift.status==='open'&&myShift.branchId===saleBranchId)?myShift.id:'';
         const createdAt=Date.now();
         const receiptNo=Number(String(createdAt).slice(-6));
         const tzo=tzOffsetMin(createdAt);
-        // سجّل الفاتورة
+        // النقاط الجديدة المكتسبة على الجزء المدفوع (كاش/إنستا) — حسب نسبة الفرع
+        const br=branches.find(x=>x.id===saleBranchId);
+        const pct = br && br.pointsPct!=null ? br.pointsPct : 1; // افتراضي 1%
+        const pointsEarned = Math.round((paidNow * pct / 100) * 100) / 100; // قرشين عشريين
+        // 1) سجّل الفاتورة
         const saleRef=await addDoc(collection(db,'sales'),{
           branchId:saleBranchId, shiftId:saleShiftId, userId:user.uid, userName:profile.name||user.email,
-          items:order.items, total, count:(order.items||[]).reduce((a,i)=>a+i.qty,0),
-          receiptNo, paid:total, change:0, payMethod, payProof:payProof||'',
+          items:order.items, total:subtotal, count:(order.items||[]).reduce((a,i)=>a+i.qty,0),
+          receiptNo, paid:paidNow, change:0, payMethod, payProof:payProof||'',
           customerId:order.customerId, customerName:order.customerName, orderId:order.id,
+          pointsUsed:pointsUsed||0, pointsEarned:pointsEarned||0,
           createdAt, tzo
         });
-        // علّم الطلب مدفوع
-        await updateDoc(doc(db,'orders',order.id),{status:'paid',paidAt:Date.now(),saleId:saleRef.id,payMethod});
+        // 2) تحديث رصيد العميل (خصم المستخدم + إضافة المكتسب)
+        if(order.customerId){
+          const csnap=await getDoc(doc(db,'customers',order.customerId));
+          const curr = csnap.exists() ? (csnap.data().points||0) : 0;
+          const newBal = Math.round((curr - (pointsUsed||0) + (pointsEarned||0)) * 100) / 100;
+          await updateDoc(doc(db,'customers',order.customerId),{points:Math.max(0,newBal)});
+          // 3) سجل النقاط
+          if(pointsUsed>0) await addDoc(collection(db,'pointsLedger'),{customerId:order.customerId,branchId:saleBranchId,type:'spend',amount:pointsUsed,saleId:saleRef.id,orderId:order.id,createdAt});
+          if(pointsEarned>0) await addDoc(collection(db,'pointsLedger'),{customerId:order.customerId,branchId:saleBranchId,type:'earn',amount:pointsEarned,saleId:saleRef.id,orderId:order.id,createdAt});
+        }
+        // 4) علّم الطلب مدفوع
+        await updateDoc(doc(db,'orders',order.id),{status:'paid',paidAt:createdAt,saleId:saleRef.id,payMethod,pointsUsed:pointsUsed||0,pointsEarned:pointsEarned||0});
         closeSheet(); toast(t('orderPaid'));
         renderCassa();
       }catch(e){ console.error(e); toast(t('errorGen'),true); }
@@ -3605,6 +3630,11 @@
     function openClientCart(){
       if(!clientCart.length){ toast(t('emptyCartC'),true); return; }
       const total=clientCart.reduce((a,i)=>a+i.qty*i.price,0);
+      const pts=(clientProfile&&clientProfile.points)||0;
+      const canUse = pts>=5;
+      const usePts = canUse && (clientCart.__usePoints===true);
+      const ptsApplied = usePts ? Math.min(pts,total) : 0;
+      const toPay = total - ptsApplied;
       const rows=clientCart.map(i=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--ivory-dark);gap:8px;">
         <div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:13px;">${i.name}</div><div class="num" style="font-size:12px;color:rgba(26,26,26,0.5);">${fmt(i.price)} ${t('currency')}</div></div>
         <div style="display:flex;align-items:center;gap:8px;"><button class="cli-minus" data-pid="${i.id}" style="width:30px;height:30px;border-radius:8px;border:1px solid var(--ivory-dark);background:#fff;font-size:18px;">−</button><span class="num" style="font-weight:700;min-width:20px;text-align:center;">${i.qty}</span><button class="cli-plus" data-pid="${i.id}" style="width:30px;height:30px;border-radius:8px;border:1px solid var(--ivory-dark);background:#fff;font-size:18px;">+</button></div>
@@ -3612,12 +3642,18 @@
       $('sheet-root').innerHTML=`<div class="overlay" id="ov" onclick="closeSheet()"><div class="sheet" onclick="event.stopPropagation()">
         <div class="sheet-head"><div><div class="sheet-sub">🛒</div><div class="sheet-title">${t('myCart')}</div></div><button class="close-x" id="cx">×</button></div>
         ${rows}
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;font-weight:800;font-size:17px;"><span>${t('total')}</span><span class="num" style="color:var(--forest);">${fmt(total)} ${t('currency')}</span></div>
+        ${canUse?`<label style="display:flex;align-items:center;gap:10px;background:rgba(201,168,76,0.12);border:1px solid var(--gold);border-radius:10px;padding:11px;margin:10px 0;cursor:pointer;">
+          <input type="checkbox" id="cli-usepts" ${usePts?'checked':''} style="width:20px;height:20px;">
+          <div style="flex:1;"><div style="font-weight:700;color:var(--forest);font-size:13.5px;">💎 ${t('usePoints')}</div><div class="num" style="font-size:12px;color:rgba(26,26,26,0.6);">${t('pointsBalance')}: ${fmt(pts)} ${t('currency')}</div></div>
+        </label>`:''}
+        ${ptsApplied>0?`<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:var(--gold);"><span>💎 ${t('loyaltyDiscount')}</span><span class="num">−${fmt(ptsApplied)} ${t('currency')}</span></div>`:''}
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;font-weight:800;font-size:17px;border-top:1px solid var(--ivory-dark);margin-top:6px;"><span>${t('total')}</span><span class="num" style="color:var(--forest);">${fmt(toPay)} ${t('currency')}</span></div>
         <button class="btn-forest btn-wide" id="cli-send" style="padding:14px;">📤 ${t('sendOrder')}</button>
       </div></div>`;
       $('cx').onclick=closeSheet;
       document.querySelectorAll('.cli-plus').forEach(b=>b.onclick=()=>{ const it=clientCart.find(i=>i.id===b.dataset.pid); if(it){it.qty++; openClientCart();} });
       document.querySelectorAll('.cli-minus').forEach(b=>b.onclick=()=>{ const it=clientCart.find(i=>i.id===b.dataset.pid); if(it){ it.qty--; if(it.qty<=0) clientCart=clientCart.filter(x=>x.id!==it.id); openClientCart(); } });
+      $('cli-usepts')&&($('cli-usepts').onchange=e=>{ clientCart.__usePoints=e.target.checked; openClientCart(); });
       $('cli-send').onclick=sendClientOrder;
     }
     async function sendClientOrder(){
@@ -3626,10 +3662,13 @@
       const b=$('cli-send'); if(b){ b.disabled=true; b.textContent='...'; }
       try{
         const total=clientCart.reduce((a,i)=>a+i.qty*i.price,0);
+        const pts=(clientProfile&&clientProfile.points)||0;
+        const usePoints = clientCart.__usePoints===true && pts>=5;
+        const pointsToRedeem = usePoints ? Math.min(pts,total) : 0;
         await addDoc(collection(db,'orders'),{
           branchId:clientBranchId, customerId:clientProfile.id, customerName:clientProfile.name,
           customerPhone:clientProfile.phone||'', items:clientCart.map(i=>({productId:i.id,name:i.name,price:i.price,qty:i.qty})),
-          total, status:'pending', usePoints:false, createdAt:Date.now()
+          total, status:'pending', usePoints, pointsToRedeem, createdAt:Date.now()
         });
         clientCart=[]; closeSheet(); toast(t('orderSent'));
         clientTab='orders'; document.querySelectorAll('#client-nav .nav-btn').forEach(x=>x.classList.remove('active'));
