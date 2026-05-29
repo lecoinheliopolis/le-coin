@@ -669,7 +669,7 @@
         tabs.push({k:'users',ico:'👥',l:t('users')});
       }
       if(profile.role==='admin') tabs.push({k:'branches',ico:'🏢',l:t('branches_tab')});
-      if(profile.role==='admin') tabs.push({k:'customers',ico:'🛍️',l:t('customers_tab')});
+      if(profile.role==='admin') tabs.push({k:'customers',ico:'👥',l:t('customers_tab')});
       // landing page: الكاشير يفتح على الوردية، المدير/الأدمن على لوحة التحكم
       if(profile.role==='cashier') activeTab='shift';
       else activeTab='dashboard';
@@ -811,15 +811,17 @@
           </div>
         </button>`;
       }).join('');
-      const scanBar = `<button id="cassa-scan" class="btn-forest btn-wide" style="margin-bottom:10px;">📷 ${t('scanBtn')}</button>`;
-      // شريط العميل المختار (لو الكاشير اختار عميل ياخد طلبه باسمه)
-      const custBar = currentCustomer
-        ? `<div style="background:rgba(201,168,76,0.15);border:2px solid var(--gold);border-radius:10px;padding:10px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;">
-            <div style="flex:1;min-width:0;"><div style="font-size:11px;color:rgba(26,26,26,0.55);font-weight:700;">🛍️ ${t('orderingFor')}</div><div style="font-weight:700;font-size:14px;">${currentCustomer.name||''}</div>${currentCustomer.phone?`<div class="num" dir="ltr" style="font-size:11.5px;color:rgba(26,26,26,0.55);">${currentCustomer.phone}</div>`:''}<div class="num" style="font-size:11.5px;color:var(--gold);font-weight:700;">💎 ${fmt(currentCustomer.points||0)} ${t('currency')}</div></div>
-            <button class="btn-secondary" id="cust-clear" style="padding:8px 12px;color:var(--red);border-color:rgba(192,72,72,0.3);">✕</button>
+      // أزرار فوق الكاشير: مسح + بدء طلب لعميل (شكل أنيق متوازن)
+      const topBar = currentCustomer
+        ? `<div style="background:linear-gradient(135deg,rgba(201,168,76,0.18),rgba(201,168,76,0.08));border:2px solid var(--gold);border-radius:12px;padding:11px 12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;">
+            <div style="flex:1;min-width:0;"><div style="font-size:10.5px;color:rgba(26,26,26,0.55);font-weight:700;letter-spacing:0.4px;">🛍️ ${t('orderingFor').toUpperCase()}</div><div style="font-weight:800;font-size:14px;color:var(--forest);">${currentCustomer.name||''}</div>${currentCustomer.phone?`<div class="num" dir="ltr" style="font-size:11.5px;color:rgba(26,26,26,0.55);">${currentCustomer.phone}</div>`:''}<div class="num" style="font-size:11.5px;color:var(--gold);font-weight:700;">💎 ${fmt(currentCustomer.points||0)} ${t('currency')}</div></div>
+            <div style="display:flex;flex-direction:column;gap:6px;"><button id="cassa-scan" class="btn-forest" style="padding:8px 14px;font-size:12px;white-space:nowrap;">📷 ${t('scanBtn')}</button><button id="cust-clear" class="btn-secondary" style="padding:8px 14px;font-size:12px;color:var(--red);border-color:rgba(192,72,72,0.3);">✕</button></div>
           </div>`
-        : `<button id="cust-pick" class="btn-gold btn-wide" style="margin-bottom:10px;">🛍️ ${t('startOrderForCustomer')}</button>`;
-      $('content').innerHTML=`${custBar}${scanBar}<div class="pos-cat-bar">${chips}</div><div class="pos-grid">${grid}</div>`;
+        : `<div style="display:flex;gap:8px;margin-bottom:10px;">
+            <button id="cust-pick" class="btn-gold" style="flex:1;padding:11px 8px;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;"><span style="font-size:18px;">🛍️</span><span>${t('startOrderForCustomer')}</span></button>
+            <button id="cassa-scan" class="btn-forest" style="flex:0 0 auto;width:52px;padding:11px 0;font-size:20px;" title="${t('scanBtn')}">📷</button>
+          </div>`;
+      $('content').innerHTML=`${topBar}<div class="pos-cat-bar">${chips}</div><div class="pos-grid">${grid}</div>`;
       $('cassa-scan')&&($('cassa-scan').onclick=()=>smartScan('sell'));
       $('cust-pick')&&($('cust-pick').onclick=openCustomerPicker);
       $('cust-clear')&&($('cust-clear').onclick=()=>{ currentCustomer=null; renderCassa(); });
@@ -985,17 +987,21 @@
         const pct = br && br.pointsPct!=null ? br.pointsPct : 1;
         const pointsEarned = currentCustomer ? (Math.round(finalTotal * pct / 100 * 100)/100) : 0;
         const custFields = currentCustomer ? {customerId:currentCustomer.id,customerName:currentCustomer.name||''} : {};
-        const ref=await addDoc(collection(db,'sales'),{
-          branchId:saleBranchId, shiftId:saleShiftId, userId:user.uid, userName:profile.name||user.email,
-          items, total:subtotal, count:cartCount(), receiptNo, paid:paidActual, change:changeFinal, payMethod, payProof:payProofDataUrl||'',
-          pointsUsed:pointsUsed||0, pointsEarned, ...custFields, createdAt, tzo
-        });
-        // تحديث رصيد نقاط العميل + سجل الحركات
+        // احسب رصيد العميل قبل التحديث (نحفظه في الفاتورة عشان يطلع في الإيصال)
+        let pointsBalanceAfter = null;
         if(currentCustomer){
           const csnap=await getDoc(doc(db,'customers',currentCustomer.id));
           const curr = csnap.exists() ? (csnap.data().points||0) : 0;
-          const newBal = Math.round((curr - (pointsUsed||0) + pointsEarned) * 100) / 100;
-          await updateDoc(doc(db,'customers',currentCustomer.id),{points:Math.max(0,newBal), pointsRequest:null});
+          pointsBalanceAfter = Math.max(0, Math.round((curr - (pointsUsed||0) + pointsEarned) * 100) / 100);
+        }
+        const ref=await addDoc(collection(db,'sales'),{
+          branchId:saleBranchId, shiftId:saleShiftId, userId:user.uid, userName:profile.name||user.email,
+          items, total:subtotal, count:cartCount(), receiptNo, paid:paidActual, change:changeFinal, payMethod, payProof:payProofDataUrl||'',
+          pointsUsed:pointsUsed||0, pointsEarned, pointsBalanceAfter, ...custFields, createdAt, tzo
+        });
+        // تحديث رصيد نقاط العميل + سجل الحركات
+        if(currentCustomer){
+          await updateDoc(doc(db,'customers',currentCustomer.id),{points:pointsBalanceAfter, pointsRequest:null});
           if(pointsUsed>0) await addDoc(collection(db,'pointsLedger'),{customerId:currentCustomer.id,branchId:saleBranchId,type:'spend',amount:pointsUsed,saleId:ref.id,createdAt});
           if(pointsEarned>0) await addDoc(collection(db,'pointsLedger'),{customerId:currentCustomer.id,branchId:saleBranchId,type:'earn',amount:pointsEarned,saleId:ref.id,createdAt});
         }
@@ -1146,6 +1152,12 @@
         <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0 4px;"><span style="font-size:15px;font-weight:700;">${t('total')}</span><span class="num" style="font-size:22px;font-weight:700;color:var(--forest);">${fmt(sale.total||0)} ${t('currency')}</span></div>
         ${(sale.paid!=null)?`<div style="display:flex;justify-content:space-between;font-size:12px;color:rgba(26,26,26,0.6);padding:2px 0;"><span>${t('received')}</span><span class="num">${fmt(sale.paid)} ${t('currency')}</span></div>
         <div style="display:flex;justify-content:space-between;font-size:12px;color:rgba(26,26,26,0.6);padding:2px 0;"><span>${t('changeDue')}</span><span class="num" style="font-weight:700;">${fmt(sale.change||0)} ${t('currency')}</span></div>`:''}
+        ${(sale.pointsUsed>0||sale.pointsEarned>0||sale.pointsBalanceAfter!=null)?`<div style="background:rgba(201,168,76,0.10);border-radius:10px;padding:9px 12px;margin:6px 0;font-size:12px;">
+          ${sale.customerName?`<div style="font-weight:700;color:var(--forest);margin-bottom:4px;">👤 ${sale.customerName}</div>`:''}
+          ${sale.pointsUsed>0?`<div style="display:flex;justify-content:space-between;color:var(--gold);"><span>💎 ${t('pointsUsed')}</span><span class="num" style="font-weight:700;">− ${fmt(sale.pointsUsed)} ${t('currency')}</span></div>`:''}
+          ${sale.pointsEarned>0?`<div style="display:flex;justify-content:space-between;color:var(--green);"><span>✨ ${t('pointsEarned')}</span><span class="num" style="font-weight:700;">+ ${fmt(sale.pointsEarned)} ${t('currency')}</span></div>`:''}
+          ${sale.pointsBalanceAfter!=null?`<div style="display:flex;justify-content:space-between;border-top:1px dashed rgba(201,168,76,0.4);padding-top:5px;margin-top:5px;"><span style="font-weight:700;">💎 ${t('pointsBalance')}</span><span class="num" style="font-weight:800;color:var(--forest);">${fmt(sale.pointsBalanceAfter)} ${t('currency')}</span></div>`:''}
+        </div>`:''}
         ${(sale.refundTotal>0||sale.voided)?`<div style="background:rgba(192,72,72,0.08);border-radius:10px;padding:8px 12px;margin:4px 0 8px;font-size:12px;">
           <div style="display:flex;justify-content:space-between;"><span style="color:var(--red);font-weight:700;">${sale.voided?t('voidedLbl'):t('refundedLbl')}</span><span class="num" style="color:var(--red);font-weight:700;">− ${fmt(sale.refundTotal||0)} ${t('currency')}</span></div>
           <div style="display:flex;justify-content:space-between;margin-top:3px;"><span style="font-weight:700;">${t('netTotal')}</span><span class="num" style="font-weight:700;color:var(--forest);">${fmt(Math.max(0,(sale.total||0)-(sale.refundTotal||0)))} ${t('currency')}</span></div>
@@ -2421,21 +2433,25 @@
         const br=branches.find(x=>x.id===saleBranchId);
         const pct = br && br.pointsPct!=null ? br.pointsPct : 1; // افتراضي 1%
         const pointsEarned = Math.round((paidNow * pct / 100) * 100) / 100; // قرشين عشريين
+        // احسب رصيد العميل بعد العملية (نحفظه في الفاتورة عشان يطلع في الإيصال)
+        let pointsBalanceAfter = null;
+        if(order.customerId){
+          const csnap=await getDoc(doc(db,'customers',order.customerId));
+          const curr = csnap.exists() ? (csnap.data().points||0) : 0;
+          pointsBalanceAfter = Math.max(0, Math.round((curr - (pointsUsed||0) + (pointsEarned||0)) * 100) / 100);
+        }
         // 1) سجّل الفاتورة
         const saleRef=await addDoc(collection(db,'sales'),{
           branchId:saleBranchId, shiftId:saleShiftId, userId:user.uid, userName:profile.name||user.email,
           items:order.items, total:subtotal, count:(order.items||[]).reduce((a,i)=>a+i.qty,0),
           receiptNo, paid:paidNow, change:0, payMethod, payProof:payProof||'',
           customerId:order.customerId, customerName:order.customerName, orderId:order.id,
-          pointsUsed:pointsUsed||0, pointsEarned:pointsEarned||0,
+          pointsUsed:pointsUsed||0, pointsEarned:pointsEarned||0, pointsBalanceAfter,
           createdAt, tzo
         });
         // 2) تحديث رصيد العميل (خصم المستخدم + إضافة المكتسب)
         if(order.customerId){
-          const csnap=await getDoc(doc(db,'customers',order.customerId));
-          const curr = csnap.exists() ? (csnap.data().points||0) : 0;
-          const newBal = Math.round((curr - (pointsUsed||0) + (pointsEarned||0)) * 100) / 100;
-          await updateDoc(doc(db,'customers',order.customerId),{points:Math.max(0,newBal)});
+          await updateDoc(doc(db,'customers',order.customerId),{points:pointsBalanceAfter});
           // 3) سجل النقاط
           if(pointsUsed>0) await addDoc(collection(db,'pointsLedger'),{customerId:order.customerId,branchId:saleBranchId,type:'spend',amount:pointsUsed,saleId:saleRef.id,orderId:order.id,createdAt});
           if(pointsEarned>0) await addDoc(collection(db,'pointsLedger'),{customerId:order.customerId,branchId:saleBranchId,type:'earn',amount:pointsEarned,saleId:saleRef.id,orderId:order.id,createdAt});
@@ -2842,7 +2858,9 @@
       $('ov').onclick=close; $('cx').onclick=close;
       $('bc-manual-ok').onclick=()=>{ const v=$('bc-manual').value.trim(); if(v){ beep(); close(); onResult(v); } };
       if(typeof Html5Qrcode==='undefined'){ $('bc-msg').textContent=t('camNoAccess'); return; }
-      const cfg={ fps:10, qrbox:{width:260,height:150}, formatsToSupport:[
+      // إطار المسح يتكيّف مع الشاشة: كبير لتسهيل المسح
+      const qrboxFn = (vw, vh) => { const m=Math.min(vw,vh); const s=Math.floor(m*0.78); return { width:Math.max(260,s), height:Math.max(220,Math.floor(s*0.82)) }; };
+      const cfg={ fps:10, qrbox:qrboxFn, formatsToSupport:[
         Html5QrcodeSupportedFormats.EAN_13,Html5QrcodeSupportedFormats.EAN_8,Html5QrcodeSupportedFormats.UPC_A,
         Html5QrcodeSupportedFormats.UPC_E,Html5QrcodeSupportedFormats.CODE_128,Html5QrcodeSupportedFormats.CODE_39,
         Html5QrcodeSupportedFormats.CODE_93,Html5QrcodeSupportedFormats.ITF,Html5QrcodeSupportedFormats.CODABAR,Html5QrcodeSupportedFormats.QR_CODE ] };
