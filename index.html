@@ -1989,8 +1989,8 @@
       // حمّل البيانات
       let sales=[], loadsArr=[], invAll=[], shiftsArr=[];
       try{
-        if(profile.role==='admin'){ (await getDocs(collection(db,'sales'))).forEach(d=>sales.push(d.data())); }
-        else { for(const b of visIds){ (await getDocs(query(collection(db,'sales'),where('branchId','==',b)))).forEach(d=>sales.push(d.data())); } }
+        if(profile.role==='admin'){ (await getDocs(collection(db,'sales'))).forEach(d=>sales.push({id:d.id,...d.data()})); }
+        else { for(const b of visIds){ (await getDocs(query(collection(db,'sales'),where('branchId','==',b)))).forEach(d=>sales.push({id:d.id,...d.data()})); } }
         (await getDocs(collection(db,'loads'))).forEach(d=>loadsArr.push(d.data()));
         (await getDocs(collection(db,'inventory'))).forEach(d=>invAll.push(d.data()));
         (await getDocs(collection(db,'shifts'))).forEach(d=>shiftsArr.push(d.data()));
@@ -2110,11 +2110,11 @@
         // admin: tutte le vendite; manager: solo i suoi branch (query per branch)
         if(profile.role==='admin'){
           const qs=await getDocs(collection(db,'sales'));
-          qs.forEach(d=>sales.push(d.data()));
+          qs.forEach(d=>sales.push({id:d.id,...d.data()}));
         } else {
           for(const bid of visibleBranchIds){
             const qs=await getDocs(query(collection(db,'sales'),where('branchId','==',bid)));
-            qs.forEach(d=>sales.push(d.data()));
+            qs.forEach(d=>sales.push({id:d.id,...d.data()}));
           }
         }
       }catch(e){ console.error(e); $('content').innerHTML=`<div class="card"><div class="empty">${t('errorGen')}</div></div>`; return; }
@@ -2786,7 +2786,7 @@
     let shiftSalesArr=[]; // مبيعات الفرع الحالي (لإحصائيات الورديات الحيّة)
     async function loadShiftSales(){
       shiftSalesArr=[];
-      try{ const qs=await getDocs(query(collection(db,'sales'),where('branchId','==',currentBranchId))); qs.forEach(d=>shiftSalesArr.push(d.data())); }catch(e){ console.error('loadShiftSales',e); }
+      try{ const qs=await getDocs(query(collection(db,'sales'),where('branchId','==',currentBranchId))); qs.forEach(d=>shiftSalesArr.push({id:d.id,...d.data()})); }catch(e){ console.error('loadShiftSales',e); }
     }
     async function renderShift(){
       const cb=$('cart-bar-root'); if(cb) cb.innerHTML='';
@@ -3457,8 +3457,8 @@
       // آخر مبيعات (آخر 5)
       try{
         let sales=[]; const visIds = profile.role==='admin' ? branches.map(b=>b.id) : (profile.branchIds||[]);
-        if(profile.role==='admin'){ (await getDocs(collection(db,'sales'))).forEach(d=>sales.push(d.data())); }
-        else { for(const b of visIds){ (await getDocs(query(collection(db,'sales'),where('branchId','==',b)))).forEach(d=>sales.push(d.data())); } }
+        if(profile.role==='admin'){ (await getDocs(collection(db,'sales'))).forEach(d=>sales.push({id:d.id,...d.data()})); }
+        else { for(const b of visIds){ (await getDocs(query(collection(db,'sales'),where('branchId','==',b)))).forEach(d=>sales.push({id:d.id,...d.data()})); } }
         sales=sales.filter(s=>!s.voided && (s.items||[]).some(it=>it.productId===p.id));
         sales.sort((a,b)=>b.createdAt-a.createdAt); sales=sales.slice(0,5);
         if(!sales.length) $('pd-sales').innerHTML=`<div class="empty">${t('noSalesYet')}</div>`;
@@ -4039,8 +4039,8 @@
       const visIds = profile.role==='admin' ? branches.map(b=>b.id) : (profile.branchIds||[]);
       // حمّل المبيعات + الاستلامات + الورديات + كل المخزون
       let sales=[], loadsArr=[], shiftsArr=[], invAll=[];
-      if(profile.role==='admin'){ (await getDocs(collection(db,'sales'))).forEach(d=>sales.push(d.data())); }
-      else { for(const b of visIds){ (await getDocs(query(collection(db,'sales'),where('branchId','==',b)))).forEach(d=>sales.push(d.data())); } }
+      if(profile.role==='admin'){ (await getDocs(collection(db,'sales'))).forEach(d=>sales.push({id:d.id,...d.data()})); }
+      else { for(const b of visIds){ (await getDocs(query(collection(db,'sales'),where('branchId','==',b)))).forEach(d=>sales.push({id:d.id,...d.data()})); } }
       (await getDocs(collection(db,'loads'))).forEach(d=>loadsArr.push(d.data()));
       (await getDocs(collection(db,'shifts'))).forEach(d=>shiftsArr.push(d.data()));
       (await getDocs(collection(db,'inventory'))).forEach(d=>invAll.push(d.data()));
