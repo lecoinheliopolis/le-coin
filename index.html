@@ -532,6 +532,9 @@
     const fmtDate = (ts, tzo) => { const off=(tzo!=null)?tzo:tzOffsetMin(ts); const d=new Date(ts+off*60000); return `${_p2(d.getUTCDate())}/${_p2(d.getUTCMonth()+1)}/${d.getUTCFullYear()}`; };
     function toast(m, err=false){ $('toast-root').innerHTML=`<div class="toast ${err?'err':''}">${err?'⚠':'✓'} ${m}</div>`; setTimeout(()=>$('toast-root').innerHTML='',2400); }
     function closeSheet(){ $('sheet-root').innerHTML=''; }
+    // أهم سطر في الفايل: نعرّض الدوال على window عشان onclick="..." في الـ HTML inline يلاقيهم
+    // (الـ script في module scope ومش بيتشاركوا تلقائياً)
+    window.closeSheet = closeSheet;
 
     // ============ LOGIN ============
     function refreshLoginLabels(){
