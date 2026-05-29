@@ -185,6 +185,10 @@
       <div class="field"><label class="lbl" id="l-pass-lbl">كلمة المرور</label><input class="input" id="login-pass" type="password" autocomplete="current-password"></div>
       <button class="btn-gold btn-wide" id="login-btn" style="margin-top:6px;">دخول</button>
       <div id="login-error" style="color:var(--red);font-size:12px;text-align:center;margin-top:12px;min-height:16px;"></div>
+      <div style="border-top:1px solid rgba(31,58,46,0.12);margin:18px 0 0;padding-top:16px;">
+        <div style="text-align:center;font-size:12px;color:rgba(26,26,26,0.5);margin-bottom:10px;" id="client-signup-hint">عميل جديد؟</div>
+        <button class="btn-secondary btn-wide" id="client-signup-btn" style="border-color:var(--gold);color:var(--forest);font-weight:700;">🛍️ <span id="client-signup-lbl">تسجيل عميل جديد</span></button>
+      </div>
       <button class="lang-btn" id="login-lang" style="display:block;margin:14px auto 0;background:rgba(31,58,46,0.08);color:var(--forest);">EN</button>
     </div>
   </div>
@@ -212,11 +216,27 @@
     <nav><div class="nav-inner" id="nav-inner"></div></nav>
   </div>
 
+  <!-- CLIENT APP (شاشة العميل المنفصلة تماماً) -->
+  <div id="client-app" class="hidden">
+    <header>
+      <div class="header-inner">
+        <img id="client-logo" class="brand-name" alt="Le Coin" style="height:56px;width:auto;border-radius:11px;">
+        <div class="header-ctrl">
+          <select class="branch-sel" id="client-branch-select"></select>
+          <button class="lang-btn" id="client-lang">EN</button>
+        </div>
+      </div>
+    </header>
+    <main><div id="client-content"></div></main>
+    <nav><div class="nav-inner" id="client-nav"></div></nav>
+  </div>
+
   <div id="sheet-root"></div>
   <div id="toast-root"></div>
 
   <!-- libreria scanner barcode (camera) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, updatePassword, EmailAuthProvider, reauthenticateWithCredential, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
@@ -263,7 +283,7 @@
         deleteUser:'حذف المستخدم', confirmDelUser:'متأكد إنك عايز تمسح المستخدم؟ هيتمنع من الدخول. (الإيميل هيفضل محجوز في فايربيز ومش هينفع تعيد استخدامه)', userDeleted:'تم حذف المستخدم',
         depotTools:'أدوات المخزن', softReset:'تصفير المخزون (Soft)', hardReset:'تفريغ المخزن (Hard)', softResetDesc:'يصفّر كل الكميات لصفر ويحتفظ بالمنتجات — يسهّل إعادة الإدخال', hardResetDesc:'يمسح كل المنتجات من هذا المخزن نهائياً (المنتجات تفضل في الكتالوج)', confirmSoftReset:'متأكد؟ كل الكميات في هذا الفرع هتبقى صفر (المنتجات تفضل موجودة)', confirmHardReset:'تحذير! ده هيمسح كل أصناف هذا المخزن نهائياً. متأكد؟', resetDone:'تمت العملية', resetting:'بيشتغل...',
         confirmDelCat:'حذف هذه الفئة؟', confirmDelProd:'حذف هذا المنتج؟',
-        addProduct:'منتج جديد', scanAddProduct:'مسح باركود لمنتج جديد', prodExistsScan:'المنتج موجود — هفتحه لك للتعديل', createNewWithBarcode:'الباركود ده مش متسجّل. تعمل منتج جديد بنفس الكود؟', costFallbackHint:'لو سيبته فاضي = آخر سعر شراء', scanBtn:'مسح', prodDetails:'تفاصيل المنتج', stockByBranch:'المخزون في كل فرع', recentSales:'آخر المبيعات', lastSold:'آخر مرة اتباع', noSalesYet:'مفيش مبيعات لسه', countAddedByScan:'اتلقط بالمسح', enterPhysCount:'الكمية الفعلية', openForEdit:'فتح المنتج للتعديل', closeBtn:'إغلاق', instapayTitle:'إعداد Instapay', instapayQr:'صورة الـ QR', instapayAlias:'اسم المستخدم (alias)', uploadQr:'رفع QR', saveCfg:'حفظ', instapayShowTitle:'دفع بـ Instapay', instapayHint:'اطلب من العميل يمسح الـ QR ويدفع المبلغ', amountToPay:'المبلغ المطلوب', received:'تم الاستلام', skipPhoto:'تأكيد بدون صورة', takeProof:'تصوير إثبات الدفع', noQrSet:'لسه ما اتحطش QR — افتح الإعدادات', payProofLbl:'إثبات الدفع', cleanGhostTitle:'تنظيف سجلات الفروع المقفولة', cleanGhostHint:'يمسح سجلات مخزون لفروع اتشالت من النظام', cleanGhostBtn:'فحص ومسح السجلات الخرافية', ghostFound:'لقينا سجلات خرافية', ghostNone:'مفيش سجلات خرافية 👍', ghostDeleted:'تم مسح السجلات الخرافية', reorderLevel:'حد الطلب', reorderSaved:'تم حفظ حد الطلب', lowInBranches:'ناقص في', qtyByBranch:'الكمية في كل فرع', totalAllBranches:'الإجمالي بكل الفروع', valueByCost:'القيمة (تكلفة)', editProduct:'تعديل المنتج', barcode:'الباركود', name:'الاسم (فرنسي)',
+        addProduct:'منتج جديد', scanAddProduct:'مسح باركود لمنتج جديد', prodExistsScan:'المنتج موجود — هفتحه لك للتعديل', createNewWithBarcode:'الباركود ده مش متسجّل. تعمل منتج جديد بنفس الكود؟', costFallbackHint:'لو سيبته فاضي = آخر سعر شراء', scanBtn:'مسح', prodDetails:'تفاصيل المنتج', stockByBranch:'المخزون في كل فرع', recentSales:'آخر المبيعات', lastSold:'آخر مرة اتباع', noSalesYet:'مفيش مبيعات لسه', countAddedByScan:'اتلقط بالمسح', enterPhysCount:'الكمية الفعلية', openForEdit:'فتح المنتج للتعديل', closeBtn:'إغلاق', instapayTitle:'إعداد Instapay', instapayQr:'صورة الـ QR', instapayAlias:'اسم المستخدم (alias)', uploadQr:'رفع QR', saveCfg:'حفظ', instapayShowTitle:'دفع بـ Instapay', instapayHint:'اطلب من العميل يمسح الـ QR ويدفع المبلغ', amountToPay:'المبلغ المطلوب', received:'تم الاستلام', skipPhoto:'تأكيد بدون صورة', takeProof:'تصوير إثبات الدفع', noQrSet:'لسه ما اتحطش QR — افتح الإعدادات', payProofLbl:'إثبات الدفع', empPhoto:'صورة الموظف', empBirthdate:'تاريخ الميلاد', empGender:'النوع', empMale:'ذكر', empFemale:'أنثى', empNationalId:'الرقم القومي', empAddress:'عنوان السكن', empPhone:'رقم التليفون', empHireDate:'تاريخ التعيين', empPersonalData:'البيانات الشخصية (اختياري)', empCall:'اتصال', empWhatsapp:'واتساب', empPrintCard:'طباعة البطاقة', empSendCard:'إرسال البطاقة', uploadPhoto:'رفع صورة', empContact:'التواصل', showChart:'📈 رسم بياني', chartRevenue:'الإيراد', chartProfit:'الربح', chartTopProducts:'أعلى المنتجات', chartBranches:'مقارنة الفروع', chartStaff:'مقارنة الموظفين', chartByCategory:'القيمة بالفئة', noChartData:'مفيش بيانات للرسم', cleanGhostTitle:'تنظيف سجلات الفروع المقفولة', cleanGhostHint:'يمسح سجلات مخزون لفروع اتشالت من النظام', cleanGhostBtn:'فحص ومسح السجلات الخرافية', ghostFound:'لقينا سجلات خرافية', ghostNone:'مفيش سجلات خرافية 👍', ghostDeleted:'تم مسح السجلات الخرافية', reorderLevel:'حد الطلب', reorderSaved:'تم حفظ حد الطلب', lowInBranches:'ناقص في', qtyByBranch:'الكمية في كل فرع', totalAllBranches:'الإجمالي بكل الفروع', valueByCost:'القيمة (تكلفة)', editProduct:'تعديل المنتج', barcode:'الباركود', name:'الاسم (فرنسي)', clientSignup:'تسجيل عميل جديد', clientLogin:'دخول العملاء', staffLogin:'دخول الموظفين', clientName:'الاسم', emailOrPhone:'إيميل أو تليفون', emailOpt:'الإيميل (اختياري)', phoneOpt:'التليفون (اختياري)', needEmailOrPhone:'لازم تدخل إيميل أو تليفون', nameTaken:'الاسم ده متسجّل قبل كده — ميّزه بإضافة لقب أو رقم', chooseBranch:'اختر الفرع', clientWelcome:'أهلاً بيك', myOrders:'طلباتي', myPoints:'نقاطي', pointsBalance:'رصيد النقاط', shopNow:'اطلب دلوقتي', browseProducts:'تصفّح المنتجات', clientLogout:'خروج', signupDone:'تم التسجيل! ادخل دلوقتي', notAvailable:'غير متاح', addToCartC:'أضف للسلة', myCart:'سلة الطلبات', sendOrder:'إرسال الطلب', orderSent:'تم إرسال طلبك للفرع', emptyCartC:'سلتك فاضية', usePoints:'استخدام نقاط الولاء', orderHoldMin:'مدة انتظار الطلب (دقائق)', branchPointsPct:'نسبة نقاط الولاء (٪)', newOrderTitle:'طلب جديد من عميل', orderReady:'طلبك جاهز! تعالى استلمه وادفع', orderPreparing:'بيتجهّز', orderStatusPending:'مستني', orderStatusPreparing:'بيتجهّز', orderStatusReady:'جاهز', orderStatusPaid:'مدفوع', orderStatusCancelled:'ملغي', orderStatusHold:'في الانتظار', prepareOrder:'تجهيز الطلب', confirmReady:'تم التجهيز — جاهز للاستلام', cancelItem:'إلغاء الصنف', cancelOrder:'إلغاء الطلب', loyaltyDiscount:'خصم نقاط الولاء',
         descAr:'الوصف بالعربية', descEn:'الوصف بالإنجليزية', category:'الفئة', price:'السعر', cost:'التكلفة',
         photo:'صورة المنتج', addPhoto:'إضافة صورة', stock:'المخزون', threshold:'حد الإنذار',
         margin:'الربح', search:'بحث...', noCategories:'لا توجد فئات بعد', noProducts:'لا توجد منتجات بعد',
@@ -331,7 +351,7 @@
         suppliers_tab:'الموردين', addSupplier:'مورد جديد', editSupplier:'تعديل المورد', supplierName:'اسم المورد', supplierPhone:'التليفون', supplierNote:'ملاحظات', noSuppliers:'مفيش موردين لسه', supplier:'المورد', noSupplier:'بدون مورد', supplierHistory:'تاريخ التعامل', confirmDelSupplier:'متأكد إنك عايز تمسح المورد؟', callSupplier:'اتصال',
         backupTitle:'النسخة الاحتياطية', exportData:'تصدير كل البيانات', importData:'استيراد البيانات', exporting:'بيصدّر...', importing:'بيستورد...', exportDone:'تم تصدير كل البيانات', importDone:'تم استيراد البيانات', importConfirm:'ده هيكتب فوق البيانات الحالية بالكامل. متأكد؟', importBad:'الملف مش صالح', backupHint:'صدّر نسخة من كل بياناتك، أو استورد نسخة قديمة',
         myAccount:'حسابي', changeName:'تغيير الاسم', changePassword:'تغيير كلمة المرور', currentPassword:'كلمة المرور الحالية', newPassword:'كلمة المرور الجديدة', newPasswordAgain:'تأكيد كلمة المرور الجديدة', pwdTooShort:'كلمة المرور لازم 6 حروف على الأقل', pwdMismatch:'كلمتا المرور مش متطابقتين', pwdWrong:'كلمة المرور الحالية غلط', pwdChanged:'تم تغيير كلمة المرور', nameChanged:'تم تغيير الاسم', sendResetEmail:'إرسال إيميل تغيير كلمة المرور', resetSent:'تم إرسال إيميل تغيير كلمة المرور', resetSentHint:'هيوصل للموظف إيميل فيه رابط لتغيير كلمة المرور بنفسه', noEmailUser:'الموظف ده مفيهوش إيميل',
-        dbResetTitle:'تصفير قاعدة البيانات', dbResetHint:'امسح الحركات المختارة نهائياً. خطر — اعمل Export احتياطي الأول!', selectAll:'تحديد الكل', rSales:'المبيعات (والريفاند والمرتجعات)', rLoads:'الاستلام (التوريد)', rTransfers:'التحويلات بين الفروع', rShifts:'الورديات', rCustody:'العُهد', rInventoryZero:'تصفير المخزون (الكميات صفر)', dbResetBtn:'تصفير المحدد', dbResetNothing:'اختر حاجة تمسحها الأول', typeResetWord:'اكتب RESET للتأكيد', dbResetConfirm1:'متأكد إنك عايز تمسح المحدد نهائياً؟ مفيش رجوع.', dbResetConfirm2:'تأكيد أخير: ده هيمسح البيانات المختارة نهائياً. متابعة؟', dbResetWordWrong:'لازم تكتب RESET بالظبط', dbResetDone:'تم التصفير', dbResetting:'بيمسح...',
+        dbResetTitle:'تصفير قاعدة البيانات', dbResetHint:'امسح الحركات المختارة نهائياً. خطر — اعمل Export احتياطي الأول!', selectAll:'تحديد الكل', rSales:'المبيعات (والريفاند والمرتجعات)', rLoads:'الاستلام (التوريد)', rTransfers:'التحويلات بين الفروع', rShifts:'الورديات', rCustody:'العُهد', rInventoryZero:'تصفير المخزون (الكميات صفر)', rInventories:'سجلات الجرد', dbResetBtn:'تصفير المحدد', dbResetNothing:'اختر حاجة تمسحها الأول', typeResetWord:'اكتب RESET للتأكيد', dbResetConfirm1:'متأكد إنك عايز تمسح المحدد نهائياً؟ مفيش رجوع.', dbResetConfirm2:'تأكيد أخير: ده هيمسح البيانات المختارة نهائياً. متابعة؟', dbResetWordWrong:'لازم تكتب RESET بالظبط', dbResetDone:'تم التصفير', dbResetting:'بيمسح...',
         fullReports:'التقارير الشاملة', reportsBtn:'تقارير', repSuppliers:'تقرير الموردين', repProducts:'تقرير المنتجات', repBranches:'تقرير الفروع', repUsers:'تقرير المستخدمين', repProfits:'تقرير الأرباح', repFrom:'من تاريخ', repTo:'إلى تاريخ', purchased:'المشتريات', cogs:'تكلفة المباع', grossProfit:'إجمالي الربح', purchasesTotal:'إجمالي المشتريات', hoursWorked:'ساعات العمل', pickRangeHint:'اختر الفترة، وبعدين نزّل التقرير بالشكل اللي تحبه', reportsHubHint:'تقارير مرتبة جاهزة للتصدير PDF / Excel / CSV',
         repSalesByInvoice:'المبيعات — فاتورة بفاتورة', repSalesDetail:'المبيعات — تفصيل المنتجات', repPurchasesDetail:'المشتريات — تفصيل', repBranchesDetail:'الفروع — تفصيل', repUsersDetail:'الموظفين — تفصيل', secSales:'المبيعات', secPurchases:'المشتريات', secBranchesSec:'الفروع', secUsersSec:'الموظفين', secProfitsSec:'الأرباح',
         colDateTime:'التاريخ/الوقت', colInvoice:'رقم الفاتورة', colProduct:'المنتج', colSell:'سعر البيع', colQty:'الكمية', colLineRev:'إيراد السطر', colLineProfit:'ربح المنتج', colInvProfit:'ربح الفاتورة', colProdCount:'عدد المنتجات', colUnitCost:'تكلفة الوحدة', colReceivedBy:'استلمها', colPayment:'الدفع', colInvTotal:'إجمالي الفاتورة',
@@ -366,7 +386,7 @@
         deleteUser:'Delete user', confirmDelUser:'Delete this user? They will be blocked from login. (The email stays reserved in Firebase and cannot be reused)', userDeleted:'User deleted',
         depotTools:'Depot tools', softReset:'Reset stock (Soft)', hardReset:'Empty depot (Hard)', softResetDesc:'Sets all quantities to zero and keeps products — easier re-entry', hardResetDesc:'Permanently removes all products from this depot (products stay in the catalog)', confirmSoftReset:'Sure? All quantities in this branch will become zero (products stay)', confirmHardReset:'Warning! This permanently removes every item in this depot. Sure?', resetDone:'Done', resetting:'Working...',
         confirmDelCat:'Delete this category?', confirmDelProd:'Delete this product?',
-        addProduct:'New product', scanAddProduct:'Scan barcode for new product', prodExistsScan:'Product exists — opening it to edit', createNewWithBarcode:'This barcode is not registered. Create a new product with this code?', costFallbackHint:'Leave empty = last purchase cost', scanBtn:'Scan', prodDetails:'Product details', stockByBranch:'Stock by branch', recentSales:'Recent sales', lastSold:'Last sold', noSalesYet:'No sales yet', countAddedByScan:'Set by scan', enterPhysCount:'Physical quantity', openForEdit:'Open product to edit', closeBtn:'Close', instapayTitle:'Instapay setup', instapayQr:'QR image', instapayAlias:'Username (alias)', uploadQr:'Upload QR', saveCfg:'Save', instapayShowTitle:'Pay with Instapay', instapayHint:'Ask the customer to scan the QR and pay the amount', amountToPay:'Amount to pay', received:'Received', skipPhoto:'Confirm without photo', takeProof:'Capture payment proof', noQrSet:'QR not set yet — open settings', payProofLbl:'Payment proof', cleanGhostTitle:'Clean closed-branch records', cleanGhostHint:'Deletes stock records for branches removed from the system', cleanGhostBtn:'Scan & delete ghost records', ghostFound:'Ghost records found', ghostNone:'No ghost records 👍', ghostDeleted:'Ghost records deleted', reorderLevel:'Reorder level', reorderSaved:'Reorder level saved', lowInBranches:'Low in', qtyByBranch:'Quantity by branch', totalAllBranches:'Total across branches', valueByCost:'Value (cost)', editProduct:'Edit product', barcode:'Barcode', name:'Name (French)',
+        addProduct:'New product', scanAddProduct:'Scan barcode for new product', prodExistsScan:'Product exists — opening it to edit', createNewWithBarcode:'This barcode is not registered. Create a new product with this code?', costFallbackHint:'Leave empty = last purchase cost', scanBtn:'Scan', prodDetails:'Product details', stockByBranch:'Stock by branch', recentSales:'Recent sales', lastSold:'Last sold', noSalesYet:'No sales yet', countAddedByScan:'Set by scan', enterPhysCount:'Physical quantity', openForEdit:'Open product to edit', closeBtn:'Close', instapayTitle:'Instapay setup', instapayQr:'QR image', instapayAlias:'Username (alias)', uploadQr:'Upload QR', saveCfg:'Save', instapayShowTitle:'Pay with Instapay', instapayHint:'Ask the customer to scan the QR and pay the amount', amountToPay:'Amount to pay', received:'Received', skipPhoto:'Confirm without photo', takeProof:'Capture payment proof', noQrSet:'QR not set yet — open settings', payProofLbl:'Payment proof', empPhoto:'Employee photo', empBirthdate:'Date of birth', empGender:'Gender', empMale:'Male', empFemale:'Female', empNationalId:'National ID', empAddress:'Home address', empPhone:'Phone number', empHireDate:'Hire date', empPersonalData:'Personal data (optional)', empCall:'Call', empWhatsapp:'WhatsApp', empPrintCard:'Print card', empSendCard:'Send card', uploadPhoto:'Upload photo', empContact:'Contact', showChart:'📈 Chart', chartRevenue:'Revenue', chartProfit:'Profit', chartTopProducts:'Top products', chartBranches:'Branches comparison', chartStaff:'Staff comparison', chartByCategory:'Value by category', noChartData:'No data to chart', cleanGhostTitle:'Clean closed-branch records', cleanGhostHint:'Deletes stock records for branches removed from the system', cleanGhostBtn:'Scan & delete ghost records', ghostFound:'Ghost records found', ghostNone:'No ghost records 👍', ghostDeleted:'Ghost records deleted', reorderLevel:'Reorder level', reorderSaved:'Reorder level saved', lowInBranches:'Low in', qtyByBranch:'Quantity by branch', totalAllBranches:'Total across branches', valueByCost:'Value (cost)', editProduct:'Edit product', barcode:'Barcode', name:'Name (French)', clientSignup:'New customer signup', clientLogin:'Customer login', staffLogin:'Staff login', clientName:'Name', emailOrPhone:'Email or phone', emailOpt:'Email (optional)', phoneOpt:'Phone (optional)', needEmailOrPhone:'You must enter an email or phone', nameTaken:'This name is already registered — please differentiate it', chooseBranch:'Choose branch', clientWelcome:'Welcome', myOrders:'My orders', myPoints:'My points', pointsBalance:'Points balance', shopNow:'Order now', browseProducts:'Browse products', clientLogout:'Logout', signupDone:'Registered! Log in now', notAvailable:'Not available', addToCartC:'Add to cart', myCart:'Cart', sendOrder:'Send order', orderSent:'Your order was sent to the branch', emptyCartC:'Your cart is empty', usePoints:'Use loyalty points', orderHoldMin:'Order hold time (minutes)', branchPointsPct:'Loyalty points rate (%)', newOrderTitle:'New customer order', orderReady:'Your order is ready! Come collect and pay', orderPreparing:'Preparing', orderStatusPending:'Pending', orderStatusPreparing:'Preparing', orderStatusReady:'Ready', orderStatusPaid:'Paid', orderStatusCancelled:'Cancelled', orderStatusHold:'On hold', prepareOrder:'Prepare order', confirmReady:'Prepared — ready for pickup', cancelItem:'Cancel item', cancelOrder:'Cancel order', loyaltyDiscount:'Loyalty points discount',
         descAr:'Description (Arabic)', descEn:'Description (English)', category:'Category', price:'Price', cost:'Cost',
         photo:'Product photo', addPhoto:'Add photo', stock:'Stock', threshold:'Low-stock alert',
         margin:'Margin', search:'Search...', noCategories:'No categories yet', noProducts:'No products yet',
@@ -434,7 +454,7 @@
         suppliers_tab:'Suppliers', addSupplier:'New supplier', editSupplier:'Edit supplier', supplierName:'Supplier name', supplierPhone:'Phone', supplierNote:'Notes', noSuppliers:'No suppliers yet', supplier:'Supplier', noSupplier:'No supplier', supplierHistory:'Purchase history', confirmDelSupplier:'Delete this supplier?', callSupplier:'Call',
         backupTitle:'Backup', exportData:'Export all data', importData:'Import data', exporting:'Exporting...', importing:'Importing...', exportDone:'All data exported', importDone:'Data imported', importConfirm:'This will fully overwrite current data. Sure?', importBad:'Invalid file', backupHint:'Export a copy of all your data, or import an old backup',
         myAccount:'My account', changeName:'Change name', changePassword:'Change password', currentPassword:'Current password', newPassword:'New password', newPasswordAgain:'Confirm new password', pwdTooShort:'Password must be at least 6 characters', pwdMismatch:'Passwords do not match', pwdWrong:'Current password is wrong', pwdChanged:'Password changed', nameChanged:'Name changed', sendResetEmail:'Send password reset email', resetSent:'Password reset email sent', resetSentHint:'The user will receive an email with a link to set a new password', noEmailUser:'This user has no email',
-        dbResetTitle:'Database reset', dbResetHint:'Permanently delete selected records. Danger — Export a backup first!', selectAll:'Select all', rSales:'Sales (incl. refunds & returns)', rLoads:'Supply (loads)', rTransfers:'Branch transfers', rShifts:'Shifts', rCustody:'Custody transfers', rInventoryZero:'Reset stock (qty to zero)', dbResetBtn:'Reset selected', dbResetNothing:'Select something to delete first', typeResetWord:'Type RESET to confirm', dbResetConfirm1:'Sure you want to permanently delete the selection? No undo.', dbResetConfirm2:'Final confirm: this permanently deletes the selected data. Continue?', dbResetWordWrong:'You must type RESET exactly', dbResetDone:'Reset done', dbResetting:'Deleting...',
+        dbResetTitle:'Database reset', dbResetHint:'Permanently delete selected records. Danger — Export a backup first!', selectAll:'Select all', rSales:'Sales (incl. refunds & returns)', rLoads:'Supply (loads)', rTransfers:'Branch transfers', rShifts:'Shifts', rCustody:'Custody transfers', rInventoryZero:'Reset stock (qty to zero)', rInventories:'Inventory count records', dbResetBtn:'Reset selected', dbResetNothing:'Select something to delete first', typeResetWord:'Type RESET to confirm', dbResetConfirm1:'Sure you want to permanently delete the selection? No undo.', dbResetConfirm2:'Final confirm: this permanently deletes the selected data. Continue?', dbResetWordWrong:'You must type RESET exactly', dbResetDone:'Reset done', dbResetting:'Deleting...',
         fullReports:'Full reports', reportsBtn:'Reports', repSuppliers:'Suppliers report', repProducts:'Products report', repBranches:'Branches report', repUsers:'Users report', repProfits:'Profits report', repFrom:'From date', repTo:'To date', purchased:'Purchased', cogs:'Cost of goods sold', grossProfit:'Gross profit', purchasesTotal:'Total purchases', hoursWorked:'Hours worked', pickRangeHint:'Pick the period, then download the report in the format you like', reportsHubHint:'Organized reports ready to export as PDF / Excel / CSV',
         repSalesByInvoice:'Sales — by invoice', repSalesDetail:'Sales — product detail', repPurchasesDetail:'Purchases — detail', repBranchesDetail:'Branches — detail', repUsersDetail:'Users — detail', secSales:'Sales', secPurchases:'Purchases', secBranchesSec:'Branches', secUsersSec:'Users', secProfitsSec:'Profits',
         colDateTime:'Date/Time', colInvoice:'Invoice no.', colProduct:'Product', colSell:'Sell price', colQty:'Qty', colLineRev:'Line revenue', colLineProfit:'Product profit', colInvProfit:'Invoice profit', colProdCount:'Products count', colUnitCost:'Unit cost', colReceivedBy:'Received by', colPayment:'Payment', colInvTotal:'Invoice total',
@@ -474,6 +494,7 @@
     let saleBranchSel=null; // فرع البيع المختار للأدمن/المدير اللي بيبيع من غير وردية
     let categories=[], products=[], inventory={}, users=[], activeTab='products';
     let instapayCfg={qrDataUrl:'', alias:''}; // إعداد Instapay (يحفظه الأدمن)
+    let clientProfile=null, clientBranchId=null, clientCart=[]; // حالة العميل
     let suppliers=[]; // الموردين
     let myShift=null, shifts=[]; // myShift = vacanza... turno aperto del cassiere; shifts = storico
     let custodyTx=[]; // تحويلات العهدة (pending/confirmed) للفرع الحالي
@@ -511,6 +532,8 @@
     function refreshLoginLabels(){
       $('l-email-lbl').textContent=t('email'); $('l-pass-lbl').textContent=t('pass');
       $('login-btn').textContent=t('login');
+      const sl=$('client-signup-lbl'); if(sl) sl.textContent=t('clientSignup');
+      const sh=$('client-signup-hint'); if(sh) sh.textContent=lang==='ar'?'عميل جديد؟':'New customer?';
     }
     $('login-lang').onclick=toggleLang;
     $('login-btn').onclick=async()=>{
@@ -522,6 +545,7 @@
       catch(e){ $('login-error').textContent=t('loginErr'); $('login-btn').textContent=t('login'); }
     };
     $('login-pass').addEventListener('keydown',e=>{if(e.key==='Enter')$('login-btn').click();});
+    $('client-signup-btn')&&($('client-signup-btn').onclick=openClientSignup);
 
     // ============ AUTH STATE ============
     onAuthStateChanged(auth, async u=>{
@@ -529,7 +553,19 @@
       user=u;
       try{
         const snap=await getDoc(doc(db,'users',u.uid));
-        if(!snap.exists()){ $('login-error').textContent=t('noProfile'); await signOut(auth); $('login-btn').textContent=t('login'); return; }
+        // لو مش موظف، نشوف لو عميل (collection منفصلة)
+        if(!snap.exists()){
+          const csnap=await getDoc(doc(db,'customers',u.uid));
+          if(csnap.exists()){
+            clientProfile={id:u.uid,...csnap.data()};
+            $('login-screen').classList.add('hidden'); $('app').classList.add('hidden'); $('client-app').classList.remove('hidden');
+            $('login-btn').textContent=t('login');
+            await loadBranches(true); // كل الفروع النشطة للعميل
+            startClientApp();
+            return;
+          }
+          $('login-error').textContent=t('noProfile'); await signOut(auth); $('login-btn').textContent=t('login'); return;
+        }
         profile=snap.data();
         if(profile.active===false){ $('login-error').textContent=t('inactive'); await signOut(auth); $('login-btn').textContent=t('login'); return; }
         await loadBranches();
@@ -548,9 +584,9 @@
     });
 
     // ============ DATA LOADERS ============
-    async function loadBranches(){
+    async function loadBranches(allActive){
       branches=[];
-      if(profile.role==='admin'){
+      if(allActive || profile&&profile.role==='admin'){
         const qs=await getDocs(query(collection(db,'branches'),where('active','==',true)));
         qs.forEach(d=>branches.push({id:d.id,...d.data()}));
       } else {
@@ -1487,16 +1523,42 @@
       $('add-user')&&($('add-user').onclick=()=>userForm(null));
       document.querySelectorAll('.cat-row[data-uid]').forEach(r=>r.onclick=()=>userForm(users.find(u=>u.uid===r.dataset.uid)));
     }
+    // طباعة/إرسال بطاقة الموظف (أدمن)
+    function printEmployeeCard(u, photo){
+      if(!u) return;
+      const g=u.gender==='m'?t('empMale'):u.gender==='f'?t('empFemale'):'—';
+      const rowsHtml=[
+        [t('role'),t(u.role||'')],[t('empPhone'),u.phone||'—'],[t('empBirthdate'),u.birthdate||'—'],
+        [t('empGender'),g],[t('empNationalId'),u.nationalId||'—'],[t('empAddress'),u.address||'—'],
+        [t('empHireDate'),u.hireDate||'—'],[t('userEmail'),u.email||'—']
+      ].map(r=>`<tr><td style="padding:8px 10px;color:#666;border-bottom:1px solid #eee;">${r[0]}</td><td style="padding:8px 10px;font-weight:600;border-bottom:1px solid #eee;text-align:${lang==='ar'?'left':'right'};" dir="ltr">${r[1]}</td></tr>`).join('');
+      const html=`<div style="font-family:system-ui,Arial;max-width:480px;margin:0 auto;padding:24px;color:#1A1A1A;">
+        <div style="text-align:center;margin-bottom:18px;">
+          <div style="width:110px;height:110px;border-radius:50%;overflow:hidden;margin:0 auto 12px;background:#eee;display:flex;align-items:center;justify-content:center;font-size:46px;">${photo||u.photoUrl?`<img src="${photo||u.photoUrl}" style="width:100%;height:100%;object-fit:cover;">`:'👤'}</div>
+          <div style="font-size:22px;font-weight:800;color:#1F3A2E;">${u.name||''}</div>
+          <div style="font-size:13px;color:#888;">Le Coin — ${t(u.role||'')}</div>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:14px;">${rowsHtml}</table>
+      </div>`;
+      const w=window.open('','_blank');
+      if(!w){ toast(t('errorGen'),true); return; }
+      w.document.write(`<!DOCTYPE html><html dir="${lang==='ar'?'rtl':'ltr'}"><head><meta charset="utf-8"><title>${u.name||'card'}</title></head><body onload="window.print()">${html}</body></html>`);
+      w.document.close();
+    }
+
     function userForm(u){
       const isEdit=!!u; const isSelf=u&&u.uid===user.uid;
       // ruoli che l'utente corrente può assegnare
       let roleOpts;
       if(profile.role==='admin') roleOpts=['admin','manager','cashier'];
       else roleOpts=['cashier']; // manager crea solo cashier
-      const f=u||{name:'',email:'',role:roleOpts[0],branchIds:[],active:true};
+      const f=u||{name:'',email:'',role:roleOpts[0],branchIds:[],active:true,photoUrl:'',birthdate:'',gender:'',nationalId:'',address:'',phone:'',hireDate:''};
       let act=f.active!==false;
       let selRole=f.role||roleOpts[0];
       let selBranches=[...(f.branchIds||[])];
+      let empPhoto=f.photoUrl||'';
+      const isAdmin=profile.role==='admin';
+      const isMgr=profile.role==='manager';
       // i branch selezionabili: admin tutti, manager solo i suoi
       const availBranches = profile.role==='admin'?branches:branches.filter(b=>(profile.branchIds||[]).includes(b.id));
       const roleSelHtml=roleOpts.map(r=>`<option value="${r}" ${selRole===r?'selected':''}>${t(r)}</option>`).join('');
@@ -1510,7 +1572,31 @@
         <div class="field"><label class="lbl">${t('branchesField')}</label><div style="background:white;border:1px solid var(--ivory-dark);border-radius:10px;padding:8px 12px;">${branchChecks||`<div style="font-size:12px;color:rgba(26,26,26,0.5);padding:6px 0;">—</div>`}</div></div>
         <div style="background:white;border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--ivory-dark);margin-bottom:12px;"><span style="font-size:13px;font-weight:600;">${t('active')}</span><button class="toggle" id="u-act" style="background:${act?'var(--forest)':'rgba(26,26,26,0.2)'}" ${isSelf?'disabled':''}><span class="thumb"></span></button></div>
         ${isSelf?`<div style="font-size:11px;color:var(--red);margin-bottom:10px;text-align:center;">${t('noEditSelf')}</div>`:''}
+        ${isAdmin?`
+        <div class="card" style="display:grid;gap:10px;margin-bottom:12px;">
+          <div style="font-size:11px;letter-spacing:0.5px;color:var(--forest);font-weight:700;">👤 ${t('empPersonalData')}</div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div id="u-photo-box" style="width:72px;height:72px;border-radius:50%;background:var(--ivory-dark);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;flex:0 0 auto;">${empPhoto?`<img src="${empPhoto}" style="width:100%;height:100%;object-fit:cover;">`:'📷'}</div>
+            <button class="btn-secondary" id="u-photo-btn" style="flex:1;">📷 ${t('uploadPhoto')}</button>
+            <input type="file" id="u-photo-input" accept="image/*" class="hidden">
+          </div>
+          <div class="row2"><div class="field" style="margin:0;"><label class="lbl">${t('empBirthdate')}</label><input class="input" id="u-bd" type="date" value="${f.birthdate||''}"></div>
+            <div class="field" style="margin:0;"><label class="lbl">${t('empGender')}</label><select class="input" id="u-gender"><option value="">—</option><option value="m" ${f.gender==='m'?'selected':''}>${t('empMale')}</option><option value="f" ${f.gender==='f'?'selected':''}>${t('empFemale')}</option></select></div></div>
+          <div class="field" style="margin:0;"><label class="lbl">${t('empPhone')}</label><input class="input num" id="u-phone" type="tel" dir="ltr" value="${f.phone||''}"></div>
+          <div class="field" style="margin:0;"><label class="lbl">${t('empNationalId')}</label><input class="input num" id="u-nid" dir="ltr" value="${(f.nationalId||'').replace(/"/g,'&quot;')}"></div>
+          <div class="field" style="margin:0;"><label class="lbl">${t('empAddress')}</label><input class="input" id="u-addr" value="${(f.address||'').replace(/"/g,'&quot;')}"></div>
+          <div class="field" style="margin:0;"><label class="lbl">${t('empHireDate')}</label><input class="input" id="u-hire" type="date" value="${f.hireDate||''}"></div>
+        </div>`:''}
+        ${(isMgr && isEdit)?`
+        <div class="card" style="display:grid;gap:10px;margin-bottom:12px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:60px;height:60px;border-radius:50%;background:var(--ivory-dark);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:24px;flex:0 0 auto;">${f.photoUrl?`<img src="${f.photoUrl}" style="width:100%;height:100%;object-fit:cover;">`:'👤'}</div>
+            <div style="flex:1;min-width:0;"><div style="font-weight:700;">${f.name||''}</div>${f.phone?`<div class="num" dir="ltr" style="font-size:13px;color:rgba(26,26,26,0.6);">${f.phone}</div>`:''}</div>
+          </div>
+          ${f.phone?`<div style="display:flex;gap:8px;"><a href="tel:${f.phone}" class="btn-secondary" style="flex:1;text-align:center;text-decoration:none;padding:10px 0;">📞 ${t('empCall')}</a><a href="https://wa.me/${(f.phone||'').replace(/[^0-9]/g,'')}" target="_blank" class="btn-secondary" style="flex:1;text-align:center;text-decoration:none;padding:10px 0;color:#25D366;">💬 ${t('empWhatsapp')}</a></div>`:''}
+        </div>`:''}
         <button class="btn-forest btn-wide" id="u-save">✓ ${t('save')}</button>
+        ${(isEdit && isAdmin)?`<button class="btn-secondary btn-wide" id="u-card" style="margin-top:8px;">🖨️ ${t('empPrintCard')}</button>`:''}
         ${(isEdit && profile.role==='admin' && u.email)?`<button class="btn-secondary btn-wide" id="u-reset" style="margin-top:8px;">📧 ${t('sendResetEmail')}</button><div style="font-size:11px;color:rgba(26,26,26,0.55);margin-top:4px;text-align:center;">${t('resetSentHint')}</div>`:''}
         ${(isEdit && !isSelf && profile.role==='admin')?`<button class="btn-secondary btn-wide" id="u-del" style="margin-top:8px;color:var(--red);border-color:rgba(192,72,72,0.3);">🗑️ ${t('deleteUser')}</button>`:''}
       </div></div>`;
@@ -1527,6 +1613,12 @@
       }
       if(!isSelf) setToggle('u-act',act,v=>act=v);
       $('u-role').onchange=()=>{selRole=$('u-role').value;};
+      if(isAdmin){
+        $('u-photo-btn')&&($('u-photo-btn').onclick=()=>$('u-photo-input').click());
+        $('u-photo-box')&&($('u-photo-box').onclick=()=>$('u-photo-input').click());
+        $('u-photo-input')&&($('u-photo-input').onchange=async e=>{ const ff=e.target.files&&e.target.files[0]; if(!ff)return; try{ empPhoto=await compress(ff,400,0.8); $('u-photo-box').innerHTML=`<img src="${empPhoto}" style="width:100%;height:100%;object-fit:cover;">`; }catch(err){ console.error(err); toast(t('errorGen'),true); } });
+        $('u-card')&&($('u-card').onclick=()=>printEmployeeCard(u, empPhoto));
+      }
       $('ov').onclick=closeSheet;$('cx').onclick=closeSheet;
       $('u-save').onclick=async()=>{
         const name=$('u-name').value.trim();
@@ -1539,8 +1631,8 @@
         $('u-save').textContent='...';
         try{
           if(isEdit){
-            // aggiorna solo il documento Firestore (email e password non si cambiano qui)
-            await updateDoc(doc(db,'users',u.uid),{name,role,branchIds:chosen,active:isSelf?true:act});
+            const extra = isAdmin ? { photoUrl:empPhoto, birthdate:$('u-bd').value, gender:$('u-gender').value, nationalId:$('u-nid').value.trim(), address:$('u-addr').value.trim(), phone:$('u-phone').value.trim(), hireDate:$('u-hire').value } : {};
+            await updateDoc(doc(db,'users',u.uid),{name,role,branchIds:chosen,active:isSelf?true:act,...extra});
             closeSheet(); renderUsers(); toast(t('saved'));
           } else {
             const pass=$('u-pass').value;
@@ -1557,7 +1649,8 @@
               $('u-save').textContent='✓ '+t('save'); return;
             }
             const newUid=cred.user.uid;
-            await setDoc(doc(db,'users',newUid),{name,email,role,branchIds:chosen,active:true,createdAt:Date.now()});
+            const extra = isAdmin ? { photoUrl:empPhoto, birthdate:$('u-bd').value, gender:$('u-gender').value, nationalId:$('u-nid').value.trim(), address:$('u-addr').value.trim(), phone:$('u-phone').value.trim(), hireDate:$('u-hire').value } : {};
+            await setDoc(doc(db,'users',newUid),{name,email,role,branchIds:chosen,active:true,createdAt:Date.now(),...extra});
             await signOut(auth2); // chiude la sessione secondaria
             closeSheet(); renderUsers(); toast(t('userCreated'));
           }
@@ -2207,7 +2300,10 @@
         // turno aperto -> stato + pausa + chiusura
         const onP=isOnPause(myShift);
         html+=`<div class="card">
-          <div class="card-title">🟢 ${t('shiftOpen')}</div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+            <div style="width:54px;height:54px;border-radius:50%;overflow:hidden;background:var(--ivory-dark);display:flex;align-items:center;justify-content:center;font-size:22px;flex:0 0 auto;">${profile.photoUrl?`<img src="${profile.photoUrl}" style="width:100%;height:100%;object-fit:cover;">`:'👤'}</div>
+            <div style="flex:1;min-width:0;"><div style="font-weight:800;font-size:16px;">${profile.name||user.email}</div><div style="font-size:12px;color:var(--green);font-weight:700;">🟢 ${t('shiftOpen')}</div></div>
+          </div>
           <div style="background:rgba(31,58,46,0.06);border-radius:10px;padding:9px 12px;margin-bottom:12px;font-size:13px;font-weight:700;color:var(--forest);">📍 ${t('sellingIn')}: ${(()=>{const b=branches.find(x=>x.id===myShift.branchId);return b?(lang==='ar'?b.nameAr:b.nameEn):myShift.branchId;})()}</div>
           <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
             <div style="flex:1;min-width:90px;background:rgba(31,58,46,0.05);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;color:rgba(26,26,26,0.55);font-weight:700;">${t('openedAt')}</div><div class="num" style="font-size:14px;font-weight:700;margin-top:3px;">${fmtTime(myShift.openAt)}</div></div>
@@ -3095,7 +3191,7 @@
     }
     async function resetDatabase(opts, btn){
       // opts: {sales,loads,transfers,shifts,custody,inventoryZero}
-      const any=opts.sales||opts.loads||opts.transfers||opts.shifts||opts.custody||opts.inventoryZero;
+      const any=opts.sales||opts.loads||opts.transfers||opts.shifts||opts.custody||opts.inventories||opts.inventoryZero;
       if(!any){ toast(t('dbResetNothing'),true); return; }
       if(btn){ btn.disabled=true; btn.textContent=t('dbResetting'); }
       try{
@@ -3104,6 +3200,7 @@
         if(opts.transfers) await wipeCollection('transfers'); // التحويلات
         if(opts.shifts) await wipeCollection('shifts');       // الورديات
         if(opts.custody) await wipeCollection('custodyTransfers'); // العُهد
+        if(opts.inventories) await wipeCollection('inventories'); // سجلات الجرد
         if(opts.inventoryZero){                               // تصفير كل المخزون لكل الفروع
           const qs=await getDocs(collection(db,'inventory'));
           for(const d of qs.docs){ const x=d.data(); await setDoc(doc(db,'inventory',d.id),{branchId:x.branchId,productId:x.productId,qty:0,threshold:x.threshold||20,lastCost:x.lastCost||0}); }
@@ -3201,6 +3298,35 @@
       return { salesByInvoice, salesDetail, products:productsRep, purchasesDetail, suppliers:suppliersRep, branchesDetail, branches:branchesRep, usersDetail, users:usersRep, profits:profitsRep };
     }
     let _repCache=null;
+    // يبني إعداد الرسم البياني المناسب لكل قسم (يستخدم Chart.js)
+    function chartConfigFor(section, data){
+      const GREEN='#1F3A2E', GOLD='#C9A84C', G2='#3D7355', toNum=v=>parseFloat(String(v).replace(/[^0-9.\-]/g,''))||0;
+      if(section==='products'){
+        // أعلى 8 منتجات بالإيراد (من تقرير المنتجات: [اسم, مباع, إيراد,...])
+        const rows=[...(data.products.rows||[])].map(r=>({name:r[0],rev:toNum(r[2])})).filter(x=>x.rev>0).sort((a,b)=>b.rev-a.rev).slice(0,8);
+        if(!rows.length) return null;
+        return { type:'bar', data:{ labels:rows.map(r=>r.name), datasets:[{ label:t('chartRevenue'), data:rows.map(r=>r.rev), backgroundColor:GREEN }] }, options:{ indexAxis:'y', plugins:{legend:{display:false},title:{display:true,text:t('chartTopProducts')}}, responsive:true } };
+      }
+      if(section==='shifts'){
+        // مقارنة الفروع بالإيراد (من ملخص الفروع: [فرع, إيراد, فواتير, قيمة مخزون])
+        const rows=(data.branches.rows||[]).map(r=>({name:r[0],rev:toNum(r[1])}));
+        if(!rows.length || rows.every(r=>r.rev===0)) return null;
+        return { type:'bar', data:{ labels:rows.map(r=>r.name), datasets:[{ label:t('chartRevenue'), data:rows.map(r=>r.rev), backgroundColor:[GREEN,GOLD,G2,'#D88E2A','#C04848'] }] }, options:{ plugins:{legend:{display:false},title:{display:true,text:t('chartBranches')}}, responsive:true } };
+      }
+      if(section==='sales'){
+        // المبيعات: إجمالي كل فاتورة (آخر 12)
+        const rows=(data.salesByInvoice.rows||[]).slice(-12);
+        if(!rows.length) return null;
+        return { type:'bar', data:{ labels:rows.map(r=>r[1]), datasets:[{ label:t('chartRevenue'), data:rows.map(r=>toNum(r[6])), backgroundColor:G2 }] }, options:{ plugins:{legend:{display:false},title:{display:true,text:t('chartRevenue')}}, responsive:true } };
+      }
+      if(section==='suppliers'){
+        // المشتريات حسب المورد (من ملخص الموردين: [مورد, عدد, كمية, تكلفة])
+        const rows=(data.suppliers.rows||[]).map(r=>({name:r[0],val:toNum(r[3])})).filter(x=>x.val>0);
+        if(!rows.length) return null;
+        return { type:'bar', data:{ labels:rows.map(r=>r.name), datasets:[{ label:t('purchasesTotal'), data:rows.map(r=>r.val), backgroundColor:GOLD }] }, options:{ indexAxis:'y', plugins:{legend:{display:false},title:{display:true,text:t('secPurchases')}}, responsive:true } };
+      }
+      return null;
+    }
     function openFullReports(section){
       const now=new Date(); const mStart=new Date(now.getFullYear(),now.getMonth(),1);
       const f=mStart.toISOString().slice(0,10), tt=now.toISOString().slice(0,10);
@@ -3226,10 +3352,26 @@
         <div style="font-size:12px;color:rgba(26,26,26,0.55);margin-bottom:10px;">${t('pickRangeHint')}</div>
         <div class="row2"><div class="field"><label class="lbl">${t('repFrom')}</label><input class="input" id="rep-from" type="date" value="${f}"></div>
           <div class="field"><label class="lbl">${t('repTo')}</label><input class="input" id="rep-to" type="date" value="${tt}"></div></div>
+        ${section?`<button class="btn-secondary btn-wide" id="rep-chart-btn" style="margin-bottom:10px;">${t('showChart')}</button><div id="rep-chart-wrap" style="display:none;background:#fff;border:1px solid var(--ivory-dark);border-radius:12px;padding:12px;margin-bottom:12px;"><canvas id="rep-chart" height="220"></canvas></div>`:''}
         <div id="rep-list">${listHtml}</div>
         <div id="rep-busy" style="text-align:center;font-size:12px;color:var(--forest);margin-top:8px;"></div>
       </div></div>`;
       $('ov').onclick=closeSheet;$('cx').onclick=closeSheet;
+      let _chart=null;
+      $('rep-chart-btn')&&($('rep-chart-btn').onclick=async()=>{
+        const fromTs=dayStart(new Date($('rep-from').value+'T00:00:00').getTime());
+        const toTs=new Date($('rep-to').value+'T23:59:59').getTime();
+        $('rep-busy').textContent='...';
+        try{
+          const data=await buildReportData(fromTs,toTs);
+          const cfg=chartConfigFor(section, data);
+          $('rep-busy').textContent='';
+          if(!cfg){ toast(t('noChartData'),true); return; }
+          $('rep-chart-wrap').style.display='block';
+          if(_chart) _chart.destroy();
+          _chart=new Chart($('rep-chart').getContext('2d'), cfg);
+        }catch(e){ console.error(e); $('rep-busy').textContent=''; toast(t('errorGen'),true); }
+      });
       document.querySelectorAll('.rep-btn').forEach(b=>b.onclick=async()=>{
         const fromTs=dayStart(new Date($('rep-from').value+'T00:00:00').getTime());
         const toTs=new Date($('rep-to').value+'T23:59:59').getTime();
@@ -3247,6 +3389,147 @@
     }
 
     // ===== إدارة الحساب: تغيير اسم/كلمة مرور (للأدمن نفسه) + إيميل reset للموظفين =====
+    // ============ شاشة العميل (منفصلة تماماً) ============
+    function startClientApp(){
+      // اللوجو واللغة
+      if(LOGO){ $('client-logo').src=LOGO; }
+      $('client-lang').textContent=lang==='ar'?'EN':'ع';
+      $('client-lang').onclick=()=>{ lang=lang==='ar'?'en':'ar'; applyLang(); startClientApp(); };
+      // اختيار الفرع (وقت الدخول)
+      const sel=$('client-branch-select');
+      sel.innerHTML=`<option value="">${t('chooseBranch')}</option>`+branches.map(b=>`<option value="${b.id}" ${clientBranchId===b.id?'selected':''}>${lang==='ar'?b.nameAr:b.nameEn}</option>`).join('');
+      sel.onchange=()=>{ clientBranchId=sel.value||null; renderClientHome(); };
+      // شريط تنقل العميل
+      const tabs=[{k:'home',ico:'🏠',l:t('shopNow')},{k:'orders',ico:'🧾',l:t('myOrders')},{k:'points',ico:'💎',l:t('myPoints')}];
+      $('client-nav').innerHTML=tabs.map(x=>`<button class="nav-btn ${x.k==='home'?'active':''}" data-ctab="${x.k}"><span class="ico">${x.ico}</span><span class="lbl2">${x.l}</span></button>`).join('')
+        +`<button class="nav-btn" id="client-logout-btn"><span class="ico">🚪</span><span class="lbl2">${t('clientLogout')}</span></button>`;
+      document.querySelectorAll('[data-ctab]').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#client-nav .nav-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); clientTab=b.dataset.ctab; renderClientTab(); });
+      $('client-logout-btn').onclick=async()=>{ await signOut(auth); clientProfile=null; clientBranchId=null; clientCart=[]; $('client-app').classList.add('hidden'); $('login-screen').classList.remove('hidden'); };
+      clientTab='home';
+      renderClientHome();
+    }
+    let clientTab='home';
+    function renderClientTab(){ if(clientTab==='home') renderClientHome(); else if(clientTab==='orders') renderClientOrders(); else if(clientTab==='points') renderClientPoints(); }
+    async function renderClientHome(){
+      const c=$('client-content');
+      const pts=(clientProfile&&clientProfile.points)||0;
+      let html=`<div class="card" style="background:linear-gradient(135deg,var(--forest),var(--green));color:var(--ivory);">
+        <div style="font-size:13px;opacity:0.85;">${t('clientWelcome')}</div>
+        <div style="font-size:22px;font-weight:800;margin:2px 0;">${clientProfile.name||''}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+          <span style="font-size:13px;opacity:0.85;">💎 ${t('pointsBalance')}</span>
+          <span class="num" style="font-size:20px;font-weight:800;color:var(--gold);">${fmt(pts)} ${t('currency')}</span>
+        </div></div>`;
+      if(!clientBranchId){
+        c.innerHTML=html+`<div class="empty" style="margin-top:14px;">⬆️ ${t('chooseBranch')}</div>`;
+        return;
+      }
+      c.innerHTML=html+`<div id="cli-prods"><div class="spinner"></div></div>`;
+      // نحمّل منتجات الفرع المختار + مخزونه
+      try{
+        if(!products.length) await loadCatalog();
+        const invSnap=await getDocs(query(collection(db,'inventory'),where('branchId','==',clientBranchId)));
+        const stock={}; invSnap.forEach(d=>{ const x=d.data(); stock[x.productId]=x.qty||0; });
+        const actives=products.filter(p=>p.active!==false);
+        let grid=actives.map(p=>{
+          const q=stock[p.id]||0; const out=q<=0;
+          const inCart=clientCart.find(i=>i.id===p.id);
+          return `<div style="background:#fff;border:1px solid var(--ivory-dark);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:6px;${out?'opacity:0.55;':''}">
+            <div style="font-weight:700;font-size:13px;min-height:34px;">${pName(p)}</div>
+            <div class="num" style="font-weight:800;color:var(--forest);">${fmt(p.price||0)} ${t('currency')}</div>
+            ${out?`<div style="font-size:12px;color:var(--red);font-weight:700;text-align:center;padding:6px;">${t('notAvailable')}</div>`
+              :`<button class="btn-forest cli-add" data-pid="${p.id}" style="padding:8px 0;font-size:13px;">${inCart?('🛒 ×'+inCart.qty):('+ '+t('addToCartC'))}</button>`}
+          </div>`;
+        }).join('');
+        const cartCount=clientCart.reduce((a,i)=>a+i.qty,0);
+        const cartBar = cartCount>0 ? `<button class="btn-gold btn-wide" id="cli-cart-btn" style="position:sticky;bottom:8px;margin-top:10px;padding:14px;font-size:15px;box-shadow:0 4px 14px rgba(201,168,76,0.4);">🛒 ${t('myCart')} (${cartCount}) — ${fmt(clientCart.reduce((a,i)=>a+i.qty*i.price,0))} ${t('currency')}</button>` : '';
+        $('cli-prods').innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:6px;">${grid}</div>${cartBar}`;
+        document.querySelectorAll('.cli-add').forEach(b=>b.onclick=()=>{ const p=products.find(x=>x.id===b.dataset.pid); if(!p)return; const it=clientCart.find(i=>i.id===p.id); if(it) it.qty++; else clientCart.push({id:p.id,name:pName(p),price:p.price||0,qty:1}); renderClientHome(); });
+        $('cli-cart-btn')&&($('cli-cart-btn').onclick=openClientCart);
+      }catch(e){ console.error(e); $('cli-prods').innerHTML=`<div class="empty">${t('errorGen')}</div>`; }
+    }
+    function openClientCart(){
+      if(!clientCart.length){ toast(t('emptyCartC'),true); return; }
+      const total=clientCart.reduce((a,i)=>a+i.qty*i.price,0);
+      const rows=clientCart.map(i=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--ivory-dark);gap:8px;">
+        <div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:13px;">${i.name}</div><div class="num" style="font-size:12px;color:rgba(26,26,26,0.5);">${fmt(i.price)} ${t('currency')}</div></div>
+        <div style="display:flex;align-items:center;gap:8px;"><button class="cli-minus" data-pid="${i.id}" style="width:30px;height:30px;border-radius:8px;border:1px solid var(--ivory-dark);background:#fff;font-size:18px;">−</button><span class="num" style="font-weight:700;min-width:20px;text-align:center;">${i.qty}</span><button class="cli-plus" data-pid="${i.id}" style="width:30px;height:30px;border-radius:8px;border:1px solid var(--ivory-dark);background:#fff;font-size:18px;">+</button></div>
+      </div>`).join('');
+      $('sheet-root').innerHTML=`<div class="overlay" id="ov" onclick="closeSheet()"><div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-head"><div><div class="sheet-sub">🛒</div><div class="sheet-title">${t('myCart')}</div></div><button class="close-x" id="cx">×</button></div>
+        ${rows}
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;font-weight:800;font-size:17px;"><span>${t('total')}</span><span class="num" style="color:var(--forest);">${fmt(total)} ${t('currency')}</span></div>
+        <button class="btn-forest btn-wide" id="cli-send" style="padding:14px;">📤 ${t('sendOrder')}</button>
+      </div></div>`;
+      $('cx').onclick=closeSheet;
+      document.querySelectorAll('.cli-plus').forEach(b=>b.onclick=()=>{ const it=clientCart.find(i=>i.id===b.dataset.pid); if(it){it.qty++; openClientCart();} });
+      document.querySelectorAll('.cli-minus').forEach(b=>b.onclick=()=>{ const it=clientCart.find(i=>i.id===b.dataset.pid); if(it){ it.qty--; if(it.qty<=0) clientCart=clientCart.filter(x=>x.id!==it.id); openClientCart(); } });
+      $('cli-send').onclick=sendClientOrder;
+    }
+    async function sendClientOrder(){
+      if(!clientCart.length){ toast(t('emptyCartC'),true); return; }
+      if(!clientBranchId){ toast(t('chooseBranch'),true); return; }
+      const b=$('cli-send'); if(b){ b.disabled=true; b.textContent='...'; }
+      try{
+        const total=clientCart.reduce((a,i)=>a+i.qty*i.price,0);
+        await addDoc(collection(db,'orders'),{
+          branchId:clientBranchId, customerId:clientProfile.id, customerName:clientProfile.name,
+          customerPhone:clientProfile.phone||'', items:clientCart.map(i=>({productId:i.id,name:i.name,price:i.price,qty:i.qty})),
+          total, status:'pending', usePoints:false, createdAt:Date.now()
+        });
+        clientCart=[]; closeSheet(); toast(t('orderSent'));
+        clientTab='orders'; document.querySelectorAll('#client-nav .nav-btn').forEach(x=>x.classList.remove('active'));
+        renderClientTab();
+      }catch(e){ console.error(e); toast(t('errorGen'),true); if(b){ b.disabled=false; b.textContent='📤 '+t('sendOrder'); } }
+    }
+    function renderClientOrders(){ $('client-content').innerHTML=`<div class="empty">${t('myOrders')}</div>`; }
+    function renderClientPoints(){
+      const pts=(clientProfile&&clientProfile.points)||0;
+      let html=`<div class="card"><div class="card-title">💎 ${t('myPoints')}</div>
+        <div style="text-align:center;padding:14px;"><div class="num" style="font-size:34px;font-weight:800;color:var(--gold);">${fmt(pts)}</div><div style="font-size:13px;color:rgba(26,26,26,0.6);">${t('currency')}</div></div></div>`;
+      html+=`<div class="card"><div class="card-title">${t('branchPointsPct')}</div>`;
+      html+=branches.map(b=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--ivory-dark);"><span>${lang==='ar'?b.nameAr:b.nameEn}</span><span class="num" style="font-weight:700;color:var(--forest);">${(b.pointsPct!=null?b.pointsPct:1)}%</span></div>`).join('');
+      html+=`</div>`;
+      $('client-content').innerHTML=html;
+    }
+    // ===== تسجيل عميل جديد =====
+    function openClientSignup(){
+      $('sheet-root').innerHTML=`<div class="overlay" id="ov"><div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-head"><div><div class="sheet-sub">🛍️</div><div class="sheet-title">${t('clientSignup')}</div></div><button class="close-x" id="cx">×</button></div>
+        <div class="field"><label class="lbl">${t('clientName')}</label><input class="input" id="cs-name"></div>
+        <div class="field"><label class="lbl">${t('emailOpt')}</label><input class="input num" id="cs-email" type="email" dir="ltr"></div>
+        <div class="field"><label class="lbl">${t('phoneOpt')}</label><input class="input num" id="cs-phone" type="tel" dir="ltr"></div>
+        <div class="field"><label class="lbl">${t('userPass')}</label><input class="input num" id="cs-pass" type="text" dir="ltr" placeholder="${t('passHint')}"></div>
+        <div style="font-size:11px;color:rgba(26,26,26,0.55);margin-bottom:10px;">${t('needEmailOrPhone')}</div>
+        <button class="btn-gold btn-wide" id="cs-save">✓ ${t('clientSignup')}</button>
+        <div id="cs-err" style="color:var(--red);font-size:12px;text-align:center;margin-top:10px;min-height:14px;"></div>
+      </div></div>`;
+      $('ov').onclick=closeSheet; $('cx').onclick=closeSheet;
+      $('cs-save').onclick=async()=>{
+        const name=$('cs-name').value.trim(), email=$('cs-email').value.trim(), phone=$('cs-phone').value.trim(), pass=$('cs-pass').value;
+        const err=$('cs-err'); err.textContent='';
+        if(!name){ err.textContent=t('required'); return; }
+        if(!email && !phone){ err.textContent=t('needEmailOrPhone'); return; }
+        if(!pass||pass.length<6){ err.textContent=t('weakPass'); return; }
+        const b=$('cs-save'); b.disabled=true; b.textContent='...';
+        try{
+          // فحص تكرار الاسم
+          const dup=await getDocs(query(collection(db,'customers'),where('name','==',name)));
+          if(!dup.empty){ err.textContent=t('nameTaken'); b.disabled=false; b.textContent='✓ '+t('clientSignup'); return; }
+          // إيميل وهمي داخلي لو دخل تليفون بس
+          const loginEmail = email || (phone.replace(/[^0-9]/g,'')+'@lecoin.local');
+          let cred;
+          try{ cred=await createUserWithEmailAndPassword(auth2,loginEmail,pass); }
+          catch(e2){ const code=e2.code||''; if(code.includes('email-already-in-use')) err.textContent=t('emailInUse'); else if(code.includes('invalid-email')) err.textContent=t('invalidEmail'); else err.textContent=t('errorGen'); b.disabled=false; b.textContent='✓ '+t('clientSignup'); return; }
+          await setDoc(doc(db,'customers',cred.user.uid),{name,email:email||'',phone:phone||'',loginEmail,points:0,createdAt:Date.now()});
+          await signOut(auth2);
+          closeSheet(); toast(t('signupDone'));
+          // نملا الإيميل في شاشة الدخول
+          $('login-email').value=loginEmail;
+        }catch(e){ console.error(e); err.textContent=t('errorGen'); b.disabled=false; b.textContent='✓ '+t('clientSignup'); }
+      };
+    }
+
     async function changeMyName(newName){
       newName=(newName||'').trim(); if(!newName){ toast(t('required'),true); return false; }
       try{ await updateDoc(doc(db,'users',user.uid),{name:newName}); profile.name=newName; toast(t('nameChanged')); return true; }
@@ -3326,6 +3609,7 @@
           <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" class="rs-chk" id="rs-transfers"> ${t('rTransfers')}</label>
           <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" class="rs-chk" id="rs-shifts"> ${t('rShifts')}</label>
           <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" class="rs-chk" id="rs-custody"> ${t('rCustody')}</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" class="rs-chk" id="rs-inventories"> ${t('rInventories')}</label>
           <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" class="rs-chk" id="rs-inv"> ${t('rInventoryZero')}</label>
           <input class="input" id="rs-word" placeholder="${t('typeResetWord')}" style="margin-top:6px;text-align:center;font-weight:700;letter-spacing:2px;">
           <button class="btn-secondary btn-wide" id="rs-do" style="color:var(--red);border-color:rgba(192,72,72,0.4);">🧨 ${t('dbResetBtn')}</button>
@@ -3339,8 +3623,8 @@
         $('imp-input').onchange=e=>{ const f=e.target.files[0]; if(f) importAllData(f,$('imp-btn')); };
         $('rs-all').onchange=()=>{ document.querySelectorAll('.rs-chk').forEach(c=>c.checked=$('rs-all').checked); };
         $('rs-do').onclick=()=>{
-          const opts={ sales:$('rs-sales').checked, loads:$('rs-loads').checked, transfers:$('rs-transfers').checked, shifts:$('rs-shifts').checked, custody:$('rs-custody').checked, inventoryZero:$('rs-inv').checked };
-          if(!(opts.sales||opts.loads||opts.transfers||opts.shifts||opts.custody||opts.inventoryZero)){ toast(t('dbResetNothing'),true); return; }
+          const opts={ sales:$('rs-sales').checked, loads:$('rs-loads').checked, transfers:$('rs-transfers').checked, shifts:$('rs-shifts').checked, custody:$('rs-custody').checked, inventories:$('rs-inventories').checked, inventoryZero:$('rs-inv').checked };
+          if(!(opts.sales||opts.loads||opts.transfers||opts.shifts||opts.custody||opts.inventories||opts.inventoryZero)){ toast(t('dbResetNothing'),true); return; }
           if(($('rs-word').value||'').trim().toUpperCase()!=='RESET'){ toast(t('dbResetWordWrong'),true); return; }
           if(!confirm(t('dbResetConfirm1'))) return;
           if(!confirm(t('dbResetConfirm2'))) return;
