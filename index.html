@@ -582,7 +582,8 @@
         await loadInstapayCfg(); // إعداد Instapay (يستخدمه الكاشير في الدفع)
         render();
         checkPendingCustody(); // فحص فوري للعُهد المستنية
-        clearInterval(window.__custTimer); window.__custTimer=setInterval(checkPendingCustody,15000); // شبه فوري كل 15 ثانية
+        checkPendingOrders(); // فحص فوري للطلبات الواردة
+        clearInterval(window.__custTimer); window.__custTimer=setInterval(()=>{ checkPendingCustody(); checkPendingOrders(); },10000); // كل 10 ثواني
       }catch(e){ console.error(e); $('login-error').textContent=t('errorGen'); await signOut(auth); }
     });
 
@@ -2232,6 +2233,89 @@
 
     // فحص دوري للعُهد المستنية تأكيد المستخدم الحالي (شبه فوري)
     let _custodyChecking=false;
+    // ============ فحص الطلبات الواردة للكاشير/المدير/الأدمن ============
+    let _ordersChecking=false, _shownOrderId=null, _orderSoundCtx=null;
+    function playOrderSound(){
+      try{
+        _orderSoundCtx = _orderSoundCtx || new (window.AudioContext||window.webkitAudioContext)();
+        const ctx=_orderSoundCtx;
+        [0,180,360].forEach(delay=>{
+          setTimeout(()=>{ const o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g);g.connect(ctx.destination); o.frequency.value=880; g.gain.value=0.15; o.start(); setTimeout(()=>{o.stop();},150); },delay);
+        });
+      }catch(e){}
+    }
+    async function checkPendingOrders(){
+      if(!user||_ordersChecking||!profile) return; _ordersChecking=true;
+      try{
+        // إيه الفروع اللي اليوزر مسؤول عنها؟
+        const branchIds = profile.role==='admin' ? branches.map(b=>b.id) : (profile.branchIds||[]);
+        if(!branchIds.length){ _ordersChecking=false; return; }
+        // الكاشير يشوف بس طلبات الفرع اللي فاتح فيه وردية
+        let lookBranches=branchIds;
+        if(profile.role==='cashier'){
+          if(!myShift||myShift.status!=='open'){ _ordersChecking=false; return; }
+          lookBranches=[myShift.branchId];
+        }
+        // ندوّر على أقدم طلب pending في فروعنا
+        let oldest=null;
+        for(const bid of lookBranches){
+          const qs=await getDocs(query(collection(db,'orders'),where('branchId','==',bid),where('status','==','pending')));
+          qs.forEach(d=>{ const x={id:d.id,...d.data()}; if(!oldest||x.createdAt<oldest.createdAt) oldest=x; });
+        }
+        if(oldest && oldest.id!==_shownOrderId && !document.getElementById('order-popup-ov')){
+          _shownOrderId=oldest.id; playOrderSound(); showIncomingOrder(oldest);
+        }
+      }catch(e){ console.error('checkPendingOrders',e); } finally{ _ordersChecking=false; }
+    }
+    function showIncomingOrder(order){
+      const b=branches.find(x=>x.id===order.branchId);
+      const bn=b?(lang==='ar'?b.nameAr:b.nameEn):order.branchId;
+      let items=(order.items||[]).map(it=>`<div class="ord-item" data-pid="${it.productId}" style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid var(--ivory-dark);gap:8px;">
+        <div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:13px;">${it.name}</div><div class="num" style="font-size:11.5px;color:rgba(26,26,26,0.55);">${it.qty} × ${fmt(it.price)} = <b>${fmt(it.qty*it.price)} ${t('currency')}</b></div></div>
+        <button class="btn-secondary ord-remove" data-pid="${it.productId}" style="padding:6px 10px;color:var(--red);border-color:rgba(192,72,72,0.3);font-size:12px;">✕</button>
+      </div>`).join('');
+      $('sheet-root').innerHTML=`<div class="overlay" id="order-popup-ov"><div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-head"><div><div class="sheet-sub">📲 ${t('newOrderTitle')}</div><div class="sheet-title">${order.customerName||''}</div></div></div>
+        <div style="background:rgba(31,58,46,0.07);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:13px;">
+          <div>📍 <b>${bn}</b></div>
+          ${order.customerPhone?`<div class="num" dir="ltr" style="margin-top:4px;">📞 ${order.customerPhone}</div>`:''}
+        </div>
+        <div id="ord-items">${items}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;font-weight:800;font-size:16px;"><span>${t('total')}</span><span class="num" id="ord-total" style="color:var(--forest);">${fmt(order.total||0)} ${t('currency')}</span></div>
+        <button class="btn-forest btn-wide" id="ord-confirm" style="padding:14px;">✓ ${t('confirmReady')}</button>
+        <button class="btn-secondary btn-wide" id="ord-cancel" style="margin-top:8px;color:var(--red);border-color:rgba(192,72,72,0.3);">✕ ${t('cancelOrder')}</button>
+      </div></div>`;
+      // إلغاء صنف
+      const recomp=()=>{ const tot=(order.items||[]).reduce((a,i)=>a+i.qty*i.price,0); order.total=tot; $('ord-total').innerHTML=`${fmt(tot)} ${t('currency')}`; };
+      document.querySelectorAll('.ord-remove').forEach(btn=>btn.onclick=()=>{
+        const pid=btn.dataset.pid; order.items=order.items.filter(x=>x.productId!==pid);
+        const row=btn.closest('.ord-item'); if(row) row.remove(); recomp();
+        if(!order.items.length){ $('ord-confirm').disabled=true; $('ord-confirm').style.opacity='0.5'; }
+      });
+      // تأكيد التجهيز → خصم المخزون + تغيير الحالة
+      $('ord-confirm').onclick=async()=>{
+        const cb=$('ord-confirm'); cb.disabled=true; cb.textContent='...';
+        try{
+          if(!order.items.length){ toast(t('emptyCartC'),true); return; }
+          // 1) فحص توفّر كل الأصناف في مخزون الفرع
+          const stock={}; const invSnap=await getDocs(query(collection(db,'inventory'),where('branchId','==',order.branchId)));
+          invSnap.forEach(d=>{ const x=d.data(); stock[x.productId]={id:d.id,qty:x.qty||0}; });
+          for(const it of order.items){ const s=stock[it.productId]; if(!s || s.qty<it.qty){ toast(`${it.name}: ${t('outOfStock')}`,true); cb.disabled=false; cb.textContent='✓ '+t('confirmReady'); return; } }
+          // 2) خصم المخزون
+          for(const it of order.items){ const s=stock[it.productId]; await updateDoc(doc(db,'inventory',s.id),{qty:s.qty-it.qty}); }
+          // 3) تحديث الطلب → ready
+          await updateDoc(doc(db,'orders',order.id),{status:'ready',items:order.items,total:order.total,preparedBy:user.uid,preparedByName:profile.name||user.email,preparedAt:Date.now()});
+          closeSheet(); _shownOrderId=null; toast(t('orderReady'));
+        }catch(e){ console.error(e); toast(t('errorGen'),true); cb.disabled=false; cb.textContent='✓ '+t('confirmReady'); }
+      };
+      // إلغاء الطلب كله
+      $('ord-cancel').onclick=async()=>{
+        if(!confirm(t('cancelOrder')+'?')) return;
+        try{ await updateDoc(doc(db,'orders',order.id),{status:'cancelled',cancelledBy:user.uid,cancelledAt:Date.now()}); closeSheet(); _shownOrderId=null; toast(t('orderStatusCancelled')); }
+        catch(e){ console.error(e); toast(t('errorGen'),true); }
+      };
+    }
+
     async function checkPendingCustody(){
       if(!user||_custodyChecking) return; _custodyChecking=true;
       try{
@@ -3485,7 +3569,37 @@
         renderClientTab();
       }catch(e){ console.error(e); toast(t('errorGen'),true); if(b){ b.disabled=false; b.textContent='📤 '+t('sendOrder'); } }
     }
-    function renderClientOrders(){ $('client-content').innerHTML=`<div class="empty">${t('myOrders')}</div>`; }
+    async function renderClientOrders(){
+      const c=$('client-content'); c.innerHTML=`<div class="spinner"></div>`;
+      try{
+        const qs=await getDocs(query(collection(db,'orders'),where('customerId','==',clientProfile.id)));
+        const arr=[]; qs.forEach(d=>arr.push({id:d.id,...d.data()}));
+        arr.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+        if(!arr.length){ c.innerHTML=`<div class="empty">${t('myOrders')}</div>`; return; }
+        const statusColor={pending:'var(--amber)',preparing:'var(--amber)',ready:'var(--green)',paid:'var(--forest)',cancelled:'var(--red)',hold:'rgba(26,26,26,0.4)'};
+        const statusLabel={pending:t('orderStatusPending'),preparing:t('orderStatusPreparing'),ready:t('orderStatusReady'),paid:t('orderStatusPaid'),cancelled:t('orderStatusCancelled'),hold:t('orderStatusHold')};
+        c.innerHTML=arr.map(o=>{
+          const b=branches.find(x=>x.id===o.branchId);
+          const bn=b?(lang==='ar'?b.nameAr:b.nameEn):o.branchId;
+          const col=statusColor[o.status]||'rgba(26,26,26,0.4)';
+          const lbl=statusLabel[o.status]||o.status;
+          const isReady=o.status==='ready';
+          return `<div class="card" style="${isReady?'border:2px solid var(--green);background:rgba(61,115,85,0.05);':''}">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+              <div style="flex:1;min-width:0;"><div style="font-weight:700;">${bn}</div><div style="font-size:11.5px;color:rgba(26,26,26,0.55);">${fmtDT(o.createdAt,0)}</div></div>
+              <span style="background:${col};color:#fff;font-size:11.5px;padding:4px 10px;border-radius:8px;font-weight:700;white-space:nowrap;">${lbl}</span>
+            </div>
+            ${isReady?`<div style="background:var(--gold);color:#fff;padding:8px;border-radius:8px;text-align:center;margin:8px 0;font-weight:700;font-size:13px;">🎉 ${t('orderReady')}</div>`:''}
+            <div style="font-size:12.5px;color:rgba(26,26,26,0.7);margin-top:6px;">
+              ${(o.items||[]).map(i=>`<div style="display:flex;justify-content:space-between;padding:3px 0;"><span>${i.name} ×${i.qty}</span><span class="num">${fmt(i.qty*i.price)} ${t('currency')}</span></div>`).join('')}
+            </div>
+            <div style="display:flex;justify-content:space-between;padding-top:8px;margin-top:6px;border-top:1px solid var(--ivory-dark);font-weight:800;">
+              <span>${t('total')}</span><span class="num" style="color:var(--forest);">${fmt(o.total||0)} ${t('currency')}</span>
+            </div>
+          </div>`;
+        }).join('');
+      }catch(e){ console.error(e); c.innerHTML=`<div class="empty">${t('errorGen')}</div>`; }
+    }
     function renderClientPoints(){
       const pts=(clientProfile&&clientProfile.points)||0;
       let html=`<div class="card"><div class="card-title">💎 ${t('myPoints')}</div>
