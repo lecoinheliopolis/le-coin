@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#1F3A2E">
   <meta name="theme-color" content="#1F3A2E">
   <link rel="manifest" href="manifest.json">
-  <title>Le Coin · POS</title>
+  <title>Le Coin · POS · v2.5</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@1,400;1,500&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
@@ -200,6 +200,7 @@
         <div style="display:flex;align-items:center;gap:10px;">
           <button class="menu-btn" id="menu-btn" aria-label="menu" style="background:rgba(255,255,255,0.12);border:none;color:var(--ivory);width:42px;height:42px;border-radius:11px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:0 0 auto;">☰</button>
           <img id="header-logo" class="brand-name" alt="Le Coin" style="height:62px;width:auto;border-radius:11px;">
+          <span style="font-size:9px;color:rgba(255,255,255,0.45);font-weight:700;letter-spacing:0.5px;">v2.5</span>
         </div>
         <div class="header-ctrl">
           <select class="branch-sel" id="branch-select"></select>
@@ -669,7 +670,7 @@
         tabs.push({k:'users',ico:'👥',l:t('users')});
       }
       if(profile.role==='admin') tabs.push({k:'branches',ico:'🏢',l:t('branches_tab')});
-      if(profile.role==='admin') tabs.push({k:'customers',ico:'👥',l:t('customers_tab')});
+      if(profile.role==='admin') tabs.push({k:'customers',ico:'👥',l: (lang==='ar'?'العملاء':'Customers')});
       // landing page: الكاشير يفتح على الوردية، المدير/الأدمن على لوحة التحكم
       if(profile.role==='cashier') activeTab='shift';
       else activeTab='dashboard';
@@ -1943,9 +1944,11 @@
       // أعلى المنتجات
       const topProds=Object.entries(prodRev).map(([pid,rev])=>{ const p=products.find(x=>x.id===pid); return {name:p?p.name:'—', rev}; }).sort((a,b)=>b.rev-a.rev).slice(0,5);
       // نقص المخزون — لكل فرع حده المستقل؛ سطر واحد للمنتج بكل الفروع الناقصة
+      // (نتجاهل سجلات الفروع غير الموجودة أو غير النشطة)
       const lowList=[];
       const byProd={}; // productId -> [{branchId, qty, th}]
       invAll.forEach(i=>{ const th=i.threshold||0; if(th<=0) return; if((i.qty||0)>th) return;
+        const br = branches.find(y=>y.id===i.branchId); if(!br || br.active===false) return;
         (byProd[i.productId]=byProd[i.productId]||[]).push({branchId:i.branchId, qty:i.qty||0, th}); });
       Object.entries(byProd).forEach(([pid,arr])=>{
         const p=products.find(x=>x.id===pid); if(!p||p.active===false) return;
