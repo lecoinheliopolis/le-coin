@@ -2806,14 +2806,14 @@
           <div class="card-title">📊 ${t('shiftLiveTitle')}</div>
           <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
             <div style="flex:1;min-width:90px;background:rgba(61,115,85,0.1);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;color:rgba(26,26,26,0.55);font-weight:700;">${t('liveNet')}</div><div class="num" style="font-size:16px;font-weight:700;margin-top:3px;color:var(--green);">${fmt(st.net)}</div></div>
-            <div style="flex:1;min-width:60px;background:rgba(31,58,46,0.05);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;color:rgba(26,26,26,0.55);font-weight:700;">${t('invoicesShort')}</div><div class="num" style="font-size:16px;font-weight:700;margin-top:3px;">${st.invoices}</div></div>
-            <div style="flex:1;min-width:60px;background:rgba(31,58,46,0.05);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:10px;color:rgba(26,26,26,0.55);font-weight:700;">${t('prodsCount')}</div><div class="num" style="font-size:16px;font-weight:700;margin-top:3px;">${st.products}</div></div>
+            <button class="shift-card-btn" data-shiftkey="orders" style="flex:1;min-width:60px;background:rgba(31,58,46,0.05);border-radius:10px;padding:10px;text-align:center;border:none;font-family:inherit;cursor:pointer;"><div style="font-size:10px;color:rgba(26,26,26,0.55);font-weight:700;">${t('invoicesShort')} ›</div><div class="num" style="font-size:16px;font-weight:700;margin-top:3px;">${st.invoices}</div></button>
+            <button class="shift-card-btn" data-shiftkey="items" style="flex:1;min-width:60px;background:rgba(31,58,46,0.05);border-radius:10px;padding:10px;text-align:center;border:none;font-family:inherit;cursor:pointer;"><div style="font-size:10px;color:rgba(26,26,26,0.55);font-weight:700;">${t('prodsCount')} ›</div><div class="num" style="font-size:16px;font-weight:700;margin-top:3px;">${st.products}</div></button>
           </div>
           <div style="display:flex;gap:12px;font-size:12px;color:rgba(26,26,26,0.65);flex-wrap:wrap;">
             <span>💵 ${t('mCash')}: <b class="num" style="color:var(--forest);">${fmt(st.cash)}</b></span>
             ${st.insta?`<span>📲 ${t('mInstapay')}: <b class="num" style="color:var(--green);">${fmt(st.insta)}</b></span>`:''}
           </div>
-          ${st.stornoCnt?`<div style="margin-top:8px;background:rgba(192,72,72,0.08);border-radius:10px;padding:8px 11px;font-size:12px;color:var(--red);font-weight:700;">↩️ ${t('stornoLbl')}: <span class="num">${fmt(st.stornoVal)}</span> ${t('currency')} (<span class="num">${st.stornoCnt}</span>)</div>`:''}
+          ${st.stornoCnt?`<button class="shift-card-btn" data-shiftkey="returns" style="margin-top:8px;background:rgba(192,72,72,0.08);border-radius:10px;padding:8px 11px;font-size:12px;color:var(--red);font-weight:700;border:none;font-family:inherit;cursor:pointer;width:100%;text-align:start;">↩️ ${t('stornoLbl')}: <span class="num">${fmt(st.stornoVal)}</span> ${t('currency')} (<span class="num">${st.stornoCnt}</span>) ›</button>`:''}
         </div>`; })()}
         <div class="card">
           <div class="card-title">🔴 ${t('closeShift')}</div>
@@ -2897,6 +2897,13 @@
           }catch(e){ console.error(e); toast(t('errorGen'),true); b.disabled=false; b.textContent='🕐 '+t('openShift'); }
         };
       } else {
+        // ضغطة على بطاقات الوردية (فاتورة / منتجات / مرتجعات): نفتح popup التفاصيل بنفس popup الـ Dashboard
+        document.querySelectorAll('.shift-card-btn').forEach(btn=>btn.onclick=()=>{
+          // فلترة المبيعات: فقط بتاعت ورديتي
+          const end=myShift.closeAt||Date.now();
+          const mySales = shiftSalesArr.filter(s=>s.userId===myShift.userId && s.branchId===myShift.branchId && s.createdAt>=myShift.openAt && s.createdAt<=end);
+          showDashDetail(btn.dataset.shiftkey, mySales, '🕐 '+t('shiftLiveTitle'));
+        });
         $('sh-pause-btn').onclick=async()=>{
           const ps=myShift.pauses?[...myShift.pauses]:[];
           if(isOnPause(myShift)) ps[ps.length-1].end=Date.now(); else ps.push({start:Date.now(),end:null});
@@ -3110,7 +3117,8 @@
     }
     // كارت تفاصيل المنتج للـ Dashboard
     // 📊 popup تفاصيل بطاقات الـ Dashboard (الربح / الفواتير / المنتجات المباعة)
-    function showDashDetail(key, sales){
+    // customSub: نص اختياري يحل محل "لوحة التحكم" في عنوان الـ popup (مفيد لاستخدامه من شاشة الوردية)
+    function showDashDetail(key, sales, customSub){
       const cur = t('currency');
       // فلتر مساعد: المبيعات الصافية (مش ملغية)
       const validSales = sales.filter(s=>!s.voided);
@@ -3297,7 +3305,7 @@
         </div>`;
       }
       $('sheet-root').innerHTML=`<div class="overlay" id="ov" onclick="closeSheet()"><div class="sheet" onclick="event.stopPropagation()">
-        <div class="sheet-head"><div><div class="sheet-sub">📊 ${t('dashboard_tab')}</div><div class="sheet-title">${title}</div></div><button class="close-x" id="cx">×</button></div>
+        <div class="sheet-head"><div><div class="sheet-sub">${customSub || ('📊 '+t('dashboard_tab'))}</div><div class="sheet-title">${title}</div></div><button class="close-x" id="cx">×</button></div>
         <div style="max-height:65vh;overflow:auto;">${body}</div>
       </div></div>`;
       $('cx').onclick=closeSheet;
