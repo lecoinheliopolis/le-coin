@@ -2400,34 +2400,101 @@
       });
     }
 
-    function payClientOrder(order){
+    async function payClientOrder(order){
       const items=order.items||[]; const subtotal=items.reduce((a,i)=>a+i.qty*i.price,0);
-      const ptsRedeem = order.pointsToRedeem||0;
-      const ptsApplied = Math.min(ptsRedeem, subtotal); // أمان: ما نخصمش أكتر من الفاتورة
-      const total = subtotal - ptsApplied;
-      $('sheet-root').innerHTML=`<div class="overlay" id="ov" onclick="closeSheet()"><div class="sheet" onclick="event.stopPropagation()">
-        <div class="sheet-head"><div><div class="sheet-sub">💰 ${t('payOrderBtn')}</div><div class="sheet-title">${order.customerName||''}</div></div><button class="close-x" id="cx">×</button></div>
-        ${order.customerPhone?`<div class="num" dir="ltr" style="background:rgba(31,58,46,0.06);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:13px;">📞 ${order.customerPhone}</div>`:''}
-        <div style="background:#fff;border:1px solid var(--ivory-dark);border-radius:10px;padding:10px;margin-bottom:12px;">
-          ${items.map(i=>`<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:13px;"><span>${i.name} ×${i.qty}</span><span class="num">${fmt(i.qty*i.price)} ${t('currency')}</span></div>`).join('')}
-          <div style="display:flex;justify-content:space-between;padding:7px 0 2px;margin-top:6px;border-top:1px solid var(--ivory-dark);font-size:13px;"><span>${t('total')}</span><span class="num">${fmt(subtotal)} ${t('currency')}</span></div>
-          ${ptsApplied>0?`<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:13px;color:var(--gold);"><span>💎 ${t('loyaltyDiscount')}</span><span class="num">−${fmt(ptsApplied)} ${t('currency')}</span></div>`:''}
-          <div style="display:flex;justify-content:space-between;padding:9px 0 2px;margin-top:6px;border-top:2px solid var(--forest);font-weight:800;font-size:15px;"><span>${t('amountToPay')}</span><span class="num" style="color:var(--forest);">${fmt(total)} ${t('currency')}</span></div>
-        </div>
-        <div style="display:flex;gap:8px;">
-          <button class="btn-forest" id="po-cash" style="flex:1;padding:14px 0;">💵 ${t('mCash')||'كاش'}</button>
-          <button class="btn-gold" id="po-insta" style="flex:1;padding:14px 0;" ${total<=0?'disabled style="opacity:0.4;"':''}>📲 ${t('mInstapay')||'Instapay'}</button>
-        </div>
-        ${total<=0?`<div style="font-size:11.5px;color:rgba(26,26,26,0.55);text-align:center;margin-top:8px;">💎 ${t('loyaltyDiscount')} = 100%</div>`:''}
-      </div></div>`;
-      $('cx').onclick=closeSheet;
-      // لو الخصم بالنقاط غطّى كل المبلغ → نعدّيه كـ cash بـ 0
-      $('po-cash').onclick=()=>finalizeOrderPayment(order,subtotal,total,ptsApplied,'cash',null);
-      if(total>0) $('po-insta').onclick=()=>openInstapayPay(total, dataUrl=>finalizeOrderPayment(order,subtotal,total,ptsApplied,'instapay',dataUrl||null));
+      // نحمّل رصيد العميل الحالي (لو موجود) عشان نعرض زر استخدام النقاط
+      let custBalance = 0;
+      if(order.customerId){
+        try{ const cs=await getDoc(doc(db,'customers',order.customerId)); if(cs.exists()) custBalance = cs.data().points || 0; }catch(e){}
+      }
+      // النقاط اللي العميل اختار يستخدمها وقت تقديم الطلب (لو فيه)
+      let ptsApplied = Math.min(order.pointsToRedeem||0, subtotal);
+      // حالة الرسم: تتعاد لما الكاشير يستخدم نقاط إضافية
+      const renderPanel=()=>{
+        const total = Math.max(0, subtotal - ptsApplied);
+        // قاعدة عرض زر استخدام النقاط: 
+        // - العميل عنده customerId
+        // - رصيده (بعد ما اختاره وقت الطلب) ≥ MIN_POINTS_REDEEM
+        // - لسه فيه مبلغ يدفعه (total > 0)
+        const remainingPts = custBalance - (order.pointsToRedeem||0); // الرصيد المتبقي بعد اللي اتحجز وقت الطلب
+        const canCashierUsePts = order.customerId && !order.cashierPtsApproved && remainingPts >= MIN_POINTS_REDEEM && total > 0;
+        $('sheet-root').innerHTML=`<div class="overlay" id="ov" onclick="closeSheet()"><div class="sheet" onclick="event.stopPropagation()">
+          <div class="sheet-head"><div><div class="sheet-sub">💰 ${t('payOrderBtn')}</div><div class="sheet-title">${order.customerName||''}</div></div><button class="close-x" id="cx">×</button></div>
+          ${order.customerPhone?`<div class="num" dir="ltr" style="background:rgba(31,58,46,0.06);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:13px;">📞 ${order.customerPhone}</div>`:''}
+          <div style="background:#fff;border:1px solid var(--ivory-dark);border-radius:10px;padding:10px;margin-bottom:12px;">
+            ${items.map(i=>`<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:13px;"><span>${i.name} ×${i.qty}</span><span class="num">${fmt(i.qty*i.price)} ${t('currency')}</span></div>`).join('')}
+            <div style="display:flex;justify-content:space-between;padding:7px 0 2px;margin-top:6px;border-top:1px solid var(--ivory-dark);font-size:13px;"><span>${t('total')}</span><span class="num">${fmt(subtotal)} ${t('currency')}</span></div>
+            ${ptsApplied>0?`<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:13px;color:var(--gold);"><span>💎 ${t('loyaltyDiscount')}</span><span class="num">−${fmt(ptsApplied)} ${t('currency')}</span></div>`:''}
+            <div style="display:flex;justify-content:space-between;padding:9px 0 2px;margin-top:6px;border-top:2px solid var(--forest);font-weight:800;font-size:15px;"><span>${t('amountToPay')}</span><span class="num" style="color:var(--forest);">${fmt(total)} ${t('currency')}</span></div>
+          </div>
+          ${order.customerId?`<div style="background:rgba(201,168,76,0.10);border:1px solid var(--gold);border-radius:10px;padding:9px 12px;margin-bottom:10px;font-size:12px;display:flex;justify-content:space-between;align-items:center;">
+            <span style="color:rgba(26,26,26,0.65);">💎 ${t('pointsBalance')}</span><span class="num" style="font-weight:800;color:var(--gold);">${fmt(custBalance)} ${t('currency')}</span>
+          </div>`:''}
+          ${canCashierUsePts?`<button class="btn-secondary btn-wide" id="poc-use-pts" style="margin-bottom:10px;padding:11px;">💎 ${t('useCustomerPoints')}</button>`:''}
+          ${total>0?`<!-- المبلغ المستلم + الباقي (كاش) -->
+          <div style="background:rgba(31,58,46,0.06);border-radius:10px;padding:10px 12px;margin-bottom:12px;">
+            <div style="font-size:11.5px;color:var(--forest);font-weight:700;margin-bottom:6px;">💵 ${t('cash')||'كاش'}</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <label class="lbl" style="flex:0 0 auto;font-size:12.5px;margin:0;">${t('received')||'المستلم'}</label>
+              <input class="input num" id="poc-amt" type="number" inputmode="decimal" dir="ltr" placeholder="${fmt(total)}" style="flex:1;text-align:end;">
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;">
+              <span style="color:rgba(26,26,26,0.6);">${t('changeDue')||'الباقي'}</span>
+              <span class="num" id="poc-change" style="font-weight:800;font-size:16px;color:var(--green);">${fmt(0)} ${t('currency')}</span>
+            </div>
+          </div>`:''}
+          <div style="display:flex;gap:8px;">
+            <button class="btn-forest" id="po-cash" style="flex:1;padding:14px 0;">💵 ${t('mCash')||'كاش'}</button>
+            <button class="btn-gold" id="po-insta" style="flex:1;padding:14px 0;" ${total<=0?'disabled style="opacity:0.4;"':''}>📲 ${t('mInstapay')||'Instapay'}</button>
+          </div>
+          ${total<=0?`<div style="font-size:11.5px;color:rgba(26,26,26,0.55);text-align:center;margin-top:8px;">💎 ${t('loyaltyDiscount')} = 100%</div>`:''}
+        </div></div>`;
+        $('cx').onclick=closeSheet;
+        // حساب الباقي تلقائياً
+        const amtEl=$('poc-amt'), chEl=$('poc-change');
+        if(amtEl && chEl){
+          amtEl.oninput=()=>{ const v=parseFloat(amtEl.value)||0; const ch=Math.max(0, v - total); chEl.textContent=`${fmt(ch)} ${t('currency')}`; chEl.style.color = v>=total ? 'var(--green)' : 'var(--red)'; };
+        }
+        // كاش
+        $('po-cash').onclick=()=>{
+          if(total<=0){ finalizeOrderPayment(order,subtotal,0,ptsApplied,'cash',null,0,0); return; }
+          const paid = amtEl ? (parseFloat(amtEl.value)||0) : 0;
+          if(paid < total){ toast(t('insufficient'),true); return; }
+          const change = paid - total;
+          finalizeOrderPayment(order,subtotal,total,ptsApplied,'cash',null,change,paid);
+        };
+        if(total>0) $('po-insta').onclick=()=>openInstapayPay(total, dataUrl=>finalizeOrderPayment(order,subtotal,total,ptsApplied,'instapay',dataUrl||null,0,total));
+        // 💎 طلب استخدام نقاط بموافقة العميل
+        const usePtsBtn=$('poc-use-pts');
+        if(usePtsBtn){
+          usePtsBtn.onclick=async()=>{
+            const wantUse = Math.min(remainingPts, total);
+            if(wantUse < MIN_POINTS_REDEEM){ toast(t('minPointsHint')+MIN_POINTS_REDEEM,true); return; }
+            usePtsBtn.disabled=true; usePtsBtn.textContent='⏳ '+t('waitingCustomerApproval');
+            try{
+              const reqId='r'+Date.now();
+              await updateDoc(doc(db,'customers',order.customerId),{pointsRequest:{id:reqId,amount:wantUse,cashierName:profile.name||user.email,branchId:order.branchId,status:'pending',createdAt:Date.now(),expiresAt:Date.now()+90000}});
+              toast(t('requestSent'));
+              const start=Date.now(); const timer=setInterval(async()=>{
+                try{
+                  const cs=await getDoc(doc(db,'customers',order.customerId)); const r=cs.data().pointsRequest;
+                  if(!r || r.id!==reqId){ clearInterval(timer); usePtsBtn.disabled=false; usePtsBtn.textContent='💎 '+t('useCustomerPoints'); return; }
+                  if(r.status==='approved'){ clearInterval(timer); ptsApplied += r.amount; order.cashierPtsApproved=true; toast(t('customerApproved')); renderPanel(); }
+                  else if(r.status==='rejected'){ clearInterval(timer); usePtsBtn.disabled=false; usePtsBtn.textContent='💎 '+t('useCustomerPoints'); toast(t('customerRejected'),true); }
+                  else if(Date.now()-start>90000){ clearInterval(timer); usePtsBtn.disabled=false; usePtsBtn.textContent='💎 '+t('useCustomerPoints'); toast(t('requestTimeout'),true); }
+                }catch(e){ console.warn(e); }
+              },2000);
+            }catch(e){ console.error(e); toast(t('errorGen'),true); usePtsBtn.disabled=false; usePtsBtn.textContent='💎 '+t('useCustomerPoints'); }
+          };
+        }
+      };
+      renderPanel();
     }
     // إتمام دفع الطلب: تسجيل فاتورة + خصم نقاط مستخدمة + إضافة نقاط جديدة
-    async function finalizeOrderPayment(order,subtotal,paidNow,pointsUsed,payMethod,payProof){
+    async function finalizeOrderPayment(order,subtotal,paidNow,pointsUsed,payMethod,payProof,change,paidActual){
       try{
+        change = change || 0;
+        paidActual = (paidActual!=null) ? paidActual : paidNow;
         const saleBranchId = order.branchId;
         const saleShiftId = (myShift&&myShift.status==='open'&&myShift.branchId===saleBranchId)?myShift.id:'';
         const createdAt=Date.now();
@@ -2448,7 +2515,7 @@
         const saleRef=await addDoc(collection(db,'sales'),{
           branchId:saleBranchId, shiftId:saleShiftId, userId:user.uid, userName:profile.name||user.email,
           items:order.items, total:subtotal, count:(order.items||[]).reduce((a,i)=>a+i.qty,0),
-          receiptNo, paid:paidNow, change:0, payMethod, payProof:payProof||'',
+          receiptNo, paid:paidActual, change, payMethod, payProof:payProof||'',
           customerId:order.customerId, customerName:order.customerName, orderId:order.id,
           pointsUsed:pointsUsed||0, pointsEarned:pointsEarned||0, pointsBalanceAfter,
           createdAt, tzo
