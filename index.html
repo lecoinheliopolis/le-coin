@@ -64,7 +64,7 @@
     .nav-btn .ico { font-size:22px; }
     .nav-btn .lbl2 { font-size:10.5px; font-weight:600; white-space:nowrap; }
 
-    .overlay { position:fixed; inset:0; background:rgba(26,26,26,0.55); display:flex; align-items:flex-end; justify-content:center; z-index:50; }
+    .overlay { position:fixed; inset:0; background:rgba(26,26,26,0.45); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); display:flex; align-items:flex-end; justify-content:center; z-index:50; }
     @keyframes sheetin { from{transform:translateY(100%)} to{transform:translateY(0)} }
     .sheet { background:var(--ivory); border-radius:20px 20px 0 0; padding:22px; width:100%; max-width:480px; max-height:92vh; overflow-y:auto; animation:sheetin 0.3s cubic-bezier(0.32,0.72,0,1); }
     .sheet-head { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; }
@@ -588,7 +588,7 @@
         render();
         checkPendingCustody(); // فحص فوري للعُهد المستنية
         checkPendingOrders(); // فحص فوري للطلبات الواردة
-        clearInterval(window.__custTimer); window.__custTimer=setInterval(()=>{ checkPendingCustody(); checkPendingOrders(); },10000); // كل 10 ثواني
+        clearInterval(window.__custTimer); window.__custTimer=setInterval(()=>{ checkPendingCustody(); checkPendingOrders(); },5000); // كل 5 ثواني (أسرع استجابة)
       }catch(e){ console.error(e); $('login-error').textContent=t('errorGen'); await signOut(auth); }
     });
 
@@ -2586,7 +2586,7 @@
       </div>`).join('');
       const isPaid = order.paidByClient===true;
       $('sheet-root').innerHTML=`<div class="overlay" id="order-popup-ov"><div class="sheet" onclick="event.stopPropagation()">
-        <div class="sheet-head"><div><div class="sheet-sub">📲 ${t('newOrderTitle')}</div><div class="sheet-title">${order.customerName||''}</div></div></div>
+        <div class="sheet-head"><div><div class="sheet-sub">📲 ${t('newOrderTitle')}</div><div class="sheet-title">${order.customerName||''}</div></div><button class="close-x" id="ord-x">×</button></div>
         ${isPaid?`<div style="background:linear-gradient(135deg,var(--green),rgba(61,115,85,0.7));color:#fff;border-radius:10px;padding:11px 14px;margin-bottom:12px;text-align:center;font-weight:800;font-size:14px;">✅ ${t('orderPaidAlready')}</div>`:''}
         <div style="background:rgba(31,58,46,0.07);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:13px;">
           <div>📍 <b>${bn}</b></div>
@@ -2602,6 +2602,11 @@
         <button class="btn-secondary btn-wide" id="ord-cancel" style="margin-top:8px;color:var(--red);border-color:rgba(192,72,72,0.3);">✕ ${t('cancelOrder')}</button>
       </div></div>`;
       // إلغاء صنف
+      // ملاحظة: dismiss يدوي مش بيصفّر _shownOrderId عشان نفس الطلب ميظهرش تاني فوراً.
+      // الـ id بيتصفّر بس بعد تجهيز/إلغاء فعلي. لو فيه طلب جديد بـ id مختلف هيظهر طبيعي.
+      const dismiss=()=>{ closeSheet(); };
+      $('ord-x').onclick=dismiss;
+      $('order-popup-ov').onclick=dismiss; // الضغط برّا الشيت بيقفل
       const recomp=()=>{ const tot=(order.items||[]).reduce((a,i)=>a+i.qty*i.price,0); order.total=tot; $('ord-total').innerHTML=`${fmt(tot)} ${t('currency')}`; };
       document.querySelectorAll('.ord-remove').forEach(btn=>btn.onclick=()=>{
         const pid=btn.dataset.pid; order.items=order.items.filter(x=>x.productId!==pid);
@@ -3818,12 +3823,12 @@
       $('client-nav').innerHTML=tabs.map(x=>`<button class="nav-btn ${x.k==='home'?'active':''}" data-ctab="${x.k}"><span class="ico">${x.ico}</span><span class="lbl2">${x.l}</span></button>`).join('')
         +`<button class="nav-btn" id="client-logout-btn"><span class="ico">🚪</span><span class="lbl2">${t('clientLogout')}</span></button>`;
       document.querySelectorAll('[data-ctab]').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#client-nav .nav-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); clientTab=b.dataset.ctab; renderClientTab(); });
-      $('client-logout-btn').onclick=async()=>{ clearInterval(window.__clientPtsTimer); await signOut(auth); clientProfile=null; clientBranchId=null; clientCart=[]; $('client-app').classList.add('hidden'); $('login-screen').classList.remove('hidden'); };
+      $('client-logout-btn').onclick=async()=>{ clearInterval(window.__clientPtsTimer); clearInterval(window.__clientOrdersTimer); await signOut(auth); clientProfile=null; clientBranchId=null; clientCart=[]; $('client-app').classList.add('hidden'); $('login-screen').classList.remove('hidden'); };
       clientTab='home';
       renderClientHome();
       // فحص دوري لأي طلب استخدام نقاط من الكاشير
       clearInterval(window.__clientPtsTimer);
-      window.__clientPtsTimer = setInterval(checkClientPointsRequest, 4000);
+      window.__clientPtsTimer = setInterval(checkClientPointsRequest, 3000);
       checkClientPointsRequest();
     }
     let _ptsReqShownId=null;
@@ -4062,6 +4067,13 @@
     }
     async function renderClientOrders(){
       const c=$('client-content'); c.innerHTML=`<div class="spinner"></div>`;
+      // auto-refresh كل 5 ثواني وانت في تبويب الطلبات (لما الكاشير يجهّز/يدفع تشوف فوراً)
+      clearInterval(window.__clientOrdersTimer);
+      window.__clientOrdersTimer = setInterval(()=>{ if(clientTab==='orders') renderClientOrdersInner(); else clearInterval(window.__clientOrdersTimer); }, 5000);
+      renderClientOrdersInner();
+    }
+    async function renderClientOrdersInner(){
+      const c=$('client-content');
       try{
         const qs=await getDocs(query(collection(db,'orders'),where('customerId','==',clientProfile.id)));
         const arr=[]; qs.forEach(d=>arr.push({id:d.id,...d.data()}));
