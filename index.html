@@ -1228,6 +1228,23 @@
         const refundTotal=sale.total||0; // storno totale
         await updateDoc(doc(db,'sales',sale.id),{voided:true,refundTotal,returns});
         sale.voided=true; sale.refundTotal=refundTotal; sale.returns=returns;
+        // 💎 إذا الفاتورة كانت لعميل: نرجع نقاطه (ضد العملية الأصلية)
+        if(sale.customerId){
+          const used = sale.pointsUsed||0;   // النقاط اللي اتصرفت → نرجّعها للعميل
+          const earned = sale.pointsEarned||0; // النقاط اللي اتكسبت → نسحبها من العميل
+          if(used>0 || earned>0){
+            try{
+              const cs=await getDoc(doc(db,'customers',sale.customerId));
+              const curr = cs.exists() ? (cs.data().points||0) : 0;
+              const newBal = Math.max(0, Math.round((curr + used - earned) * 100) / 100);
+              await updateDoc(doc(db,'customers',sale.customerId),{points:newBal});
+              // قيود عكسية في pointsLedger
+              const ts=Date.now();
+              if(used>0) await addDoc(collection(db,'pointsLedger'),{customerId:sale.customerId,branchId:sale.branchId,type:'void_refund',amount:used,saleId:sale.id,note:'إرجاع نقاط من فاتورة ملغية',createdAt:ts});
+              if(earned>0) await addDoc(collection(db,'pointsLedger'),{customerId:sale.customerId,branchId:sale.branchId,type:'void_revoke',amount:earned,saleId:sale.id,note:'سحب نقاط من فاتورة ملغية',createdAt:ts});
+            }catch(e){ console.warn('void points reversal',e); }
+          }
+        }
         toast(t('returnDone')); showReceipt(sale);
       }catch(e){ console.error(e); toast(t('errorGen'),true); }
     }
@@ -3947,9 +3964,18 @@
       $('pts-no').onclick=()=>finish('rejected');
     }
     let clientTab='home';
+    // 🔄 إعادة تحميل بيانات العميل من قاعدة البيانات (يستدعى قبل عرض كل صفحة عميل)
+    async function refreshClientProfile(){
+      if(!clientProfile||!clientProfile.id) return;
+      try{
+        const cs=await getDoc(doc(db,'customers',clientProfile.id));
+        if(cs.exists()) clientProfile={...clientProfile, ...cs.data(), id:clientProfile.id};
+      }catch(e){ console.warn('refreshClientProfile',e); }
+    }
     function renderClientTab(){ if(clientTab==='home') renderClientHome(); else if(clientTab==='orders') renderClientOrders(); else if(clientTab==='points') renderClientPoints(); else if(clientTab==='mydata') renderClientMyData(); }
     async function renderClientHome(){
       const c=$('client-content');
+      await refreshClientProfile(); // ⭐ نحدّث بيانات العميل عشان نشوف الرصيد الحالي
       const pts=(clientProfile&&clientProfile.points)||0;
       const suspendedBanner = (clientProfile&&clientProfile.suspended) ? `<div class="card" style="background:rgba(192,72,72,0.12);border:1px solid var(--red);color:var(--red);text-align:center;font-weight:700;font-size:13px;">⏸️ ${t('accountSuspended')}</div>` : '';
       let html=suspendedBanner+`<div class="card" style="background:linear-gradient(135deg,var(--forest),var(--green));color:var(--ivory);">
@@ -4188,6 +4214,7 @@
       }catch(e){ console.error(e); c.innerHTML=`<div class="empty">${t('errorGen')}</div>`; }
     }
     async function renderClientPoints(){
+      await refreshClientProfile(); // ⭐ نحدّث بيانات العميل عشان نشوف الرصيد الحالي
       const pts=(clientProfile&&clientProfile.points)||0;
       let html=`<div class="card"><div class="card-title">💎 ${t('myPoints')}</div>
         <div style="text-align:center;padding:14px;"><div class="num" style="font-size:34px;font-weight:800;color:var(--gold);">${fmt(pts)}</div><div style="font-size:13px;color:rgba(26,26,26,0.6);">${t('currency')}</div></div></div>`;
