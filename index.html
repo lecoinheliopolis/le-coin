@@ -2747,6 +2747,8 @@
         <button class="btn-secondary btn-wide" id="cust-reject-btn" style="margin-top:8px;color:var(--red);border-color:rgba(192,72,72,0.3);">✕ ${t('custReject')}</button>
       </div></div>`;
       const chk=$('cust-chk'), btn=$('cust-confirm-btn');
+      // الضغط على البلور حوالين الـ popup يقفله (الـ checkPendingCustody هيعيد فتحه لاحقاً لو لسه pending)
+      $('cust-confirm-ov').addEventListener('click',(e)=>{ if(e.target===e.currentTarget) closeSheet(); });
       chk.onchange=()=>{ btn.disabled=!chk.checked; btn.style.opacity=chk.checked?'1':'0.5'; };
       $('cust-reject-btn').onclick=async()=>{
         if(!confirm(t('custRejectMsg'))) return;
@@ -4197,6 +4199,8 @@
         </div>
       </div></div>`;
       const finish=async(status)=>{ try{ await updateDoc(doc(db,'customers',clientProfile.id),{'pointsRequest.status':status}); }catch(e){ console.error(e); } closeSheet(); _ptsReqShownId=null; };
+      // الضغط على البلور حوالين الـ popup يقفله (الكاشير هيستنّى تيمآوت تلقائي بعد 90 ثانية)
+      $('ptsreq-ov').addEventListener('click',(e)=>{ if(e.target===e.currentTarget){ closeSheet(); _ptsReqShownId=null; } });
       $('pts-yes').onclick=()=>finish('approved');
       $('pts-no').onclick=()=>finish('rejected');
     }
