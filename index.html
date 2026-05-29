@@ -3516,11 +3516,11 @@
           // فحص تكرار الاسم
           const dup=await getDocs(query(collection(db,'customers'),where('name','==',name)));
           if(!dup.empty){ err.textContent=t('nameTaken'); b.disabled=false; b.textContent='✓ '+t('clientSignup'); return; }
-          // إيميل وهمي داخلي لو دخل تليفون بس
-          const loginEmail = email || (phone.replace(/[^0-9]/g,'')+'@lecoin.local');
+          // إيميل وهمي داخلي لو دخل تليفون بس (lecoin-customer.app = TLD حقيقي يقبله Firebase)
+          const loginEmail = email || (phone.replace(/[^0-9]/g,'')+'@lecoin-customer.app');
           let cred;
           try{ cred=await createUserWithEmailAndPassword(auth2,loginEmail,pass); }
-          catch(e2){ const code=e2.code||''; if(code.includes('email-already-in-use')) err.textContent=t('emailInUse'); else if(code.includes('invalid-email')) err.textContent=t('invalidEmail'); else err.textContent=t('errorGen'); b.disabled=false; b.textContent='✓ '+t('clientSignup'); return; }
+          catch(e2){ console.error('Signup error:',e2); const code=e2.code||''; if(code.includes('email-already-in-use')) err.textContent=t('emailInUse'); else if(code.includes('invalid-email')) err.textContent=t('invalidEmail')+' ('+loginEmail+')'; else if(code.includes('weak-password')) err.textContent=t('weakPass'); else err.textContent=t('errorGen')+': '+code; b.disabled=false; b.textContent='✓ '+t('clientSignup'); return; }
           await setDoc(doc(db,'customers',cred.user.uid),{name,email:email||'',phone:phone||'',loginEmail,points:0,createdAt:Date.now()});
           await signOut(auth2);
           closeSheet(); toast(t('signupDone'));
