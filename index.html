@@ -80,6 +80,10 @@
     .spinner { width:34px; height:34px; border:3px solid var(--ivory-dark); border-top-color:var(--gold); border-radius:50%; animation:spin 0.8s linear infinite; margin:30px auto; }
     @keyframes spin { to{transform:rotate(360deg)} }
 
+    /* 🖼️ Lightbox: cursor zoom-in su immagini grandi (segnale visivo) */
+    img:not(.logo):not(.brand-name):not([data-no-zoom]):not(#photo-prev) { transition: opacity .15s; }
+    img.prod-photo { cursor: zoom-in; }
+
     /* CATEGORY ROW */
     .cat-row { background:white; border-radius:10px; padding:12px; display:flex; align-items:center; gap:12px; margin-bottom:6px; cursor:pointer; }
     .cat-order { width:28px; height:28px; border-radius:6px; background:var(--ivory); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
@@ -236,6 +240,7 @@
 
   <div id="sheet-root"></div>
   <div id="toast-root"></div>
+  <div id="lightbox-root"></div>
 
   <!-- libreria scanner barcode (camera) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
@@ -548,6 +553,51 @@
     // (الـ script في module scope ومش بيتشاركوا تلقائياً)
     window.closeSheet = closeSheet;
 
+    // ============ 🖼️ LIGHTBOX (ingrandimento foto al click) ============
+    // Listener delegato globale: ogni click su <img> apre lightbox
+    // Esclusioni: loghi, avatar piccoli (<60px), box upload, immagini con data-no-zoom
+    function _imgShouldZoom(img){
+      if(!img || img.tagName!=='IMG' || !img.src) return false;
+      if(img.hasAttribute('data-no-zoom')) return false;
+      // Esclusioni per id/classe
+      const exIds = ['login-logo','header-logo','client-logo','photo-prev'];
+      if(exIds.includes(img.id)) return false;
+      if(img.classList.contains('logo')) return false; // logo scontrino
+      if(img.classList.contains('brand-name')) return false;
+      if(img.classList.contains('pc-photo')) return false; // foto tile cassa (ha icona ↗ dedicata)
+      // Dentro un upload box (cliccare = aprire file picker)
+      if(img.closest('#photo-box') || img.closest('#u-photo-box') || img.closest('.photo-upload')) return false;
+      // Avatar piccoli (lista clienti, staff inline, ecc.)
+      const r = img.getBoundingClientRect();
+      if(r.width < 60 || r.height < 60) return false;
+      return true;
+    }
+    function openLightbox(src){
+      const root = $('lightbox-root');
+      if(!root) return;
+      root.innerHTML = `<div id="lb-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;cursor:zoom-out;animation:lbFadeIn 0.18s ease;">
+        <button id="lb-close" aria-label="close" style="position:absolute;top:18px;right:18px;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:24px;font-weight:300;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>
+        <img src="${src}" style="max-width:96%;max-height:92vh;object-fit:contain;border-radius:8px;box-shadow:0 12px 40px rgba(0,0,0,0.5);cursor:default;" id="lb-img">
+      </div>
+      <style>@keyframes lbFadeIn{from{opacity:0}to{opacity:1}}</style>`;
+      const overlay = $('lb-overlay');
+      const closeLb = ()=>{ root.innerHTML=''; document.removeEventListener('keydown', escHandler); };
+      const escHandler = (e)=>{ if(e.key==='Escape') closeLb(); };
+      // chiusura: click overlay, click ✕, Escape — NON sull'immagine stessa
+      overlay.onclick = (e)=>{ if(e.target.id==='lb-overlay' || e.target.id==='lb-close') closeLb(); };
+      $('lb-img').onclick = (e)=>e.stopPropagation();
+      document.addEventListener('keydown', escHandler);
+    }
+    // Listener delegato: intercetta TUTTI i click su <img> nel documento
+    document.addEventListener('click', (e)=>{
+      const img = e.target;
+      if(_imgShouldZoom(img)){
+        e.stopPropagation();
+        openLightbox(img.src);
+      }
+    }, true); // useCapture=true → cattura PRIMA di altri handler (es. onclick window.open)
+    window.openLightbox = openLightbox;
+
     // ============ LOGIN ============
     function refreshLoginLabels(){
       $('l-email-lbl').textContent=t('email'); $('l-pass-lbl').textContent=t('pass');
@@ -847,7 +897,10 @@
         const out=(inv.qty||0)<=0; const low=!out&&inv.qty<=(inv.threshold||20);
         const desc=lang==='ar'?(p.descAr||''):(p.descEn||'');
         return `<button class="pos-card" data-id="${p.id}" ${out?'disabled style="opacity:0.45;"':''}>
-          ${p.photoUrl?`<img class="pc-photo" src="${p.photoUrl}">`:`<div class="pc-photo">🍽️</div>`}
+          ${p.photoUrl?`<div class="pc-photo-wrap" style="position:relative;">
+            <img class="pc-photo" src="${p.photoUrl}">
+            <span class="pc-zoom-btn" data-zoom-src="${p.photoUrl}" role="button" aria-label="zoom" style="position:absolute;top:6px;${lang==='ar'?'right:6px;':'left:6px;'}width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,0.55);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;backdrop-filter:blur(4px);z-index:2;">🔍</span>
+          </div>`:`<div class="pc-photo">🍽️</div>`}
           <div class="pc-body">
             <div class="pc-name">${pName(p)}</div>
             ${pName2(p)?`<div class="pc-desc fr" dir="ltr">${pName2(p)}</div>`:desc?`<div class="pc-desc">${desc}</div>`:`<div class="pc-desc"></div>`}
@@ -869,7 +922,12 @@
       $('cassa-scan')&&($('cassa-scan').onclick=()=>smartScan('sell'));
       $('cust-clear')&&($('cust-clear').onclick=()=>{ currentCustomer=null; renderCassa(); });
       document.querySelectorAll('.pos-cat-chip').forEach(ch=>ch.onclick=()=>{posCatFilter=ch.dataset.cat;renderCassa();});
-      document.querySelectorAll('.pos-card').forEach(c=>c.onclick=()=>{ if(c.disabled)return; addToCart(products.find(p=>p.id===c.dataset.id)); });
+      // 🔍 click sull'icona zoom: apre lightbox, NON aggiunge al carrello
+      document.querySelectorAll('.pos-card .pc-zoom-btn').forEach(btn=>btn.onclick=(ev)=>{
+        ev.preventDefault(); ev.stopPropagation();
+        const src = btn.dataset.zoomSrc; if(src) openLightbox(src);
+      });
+      document.querySelectorAll('.pos-card').forEach(c=>c.onclick=(ev)=>{ if(c.disabled)return; if(ev.target.closest('.pc-zoom-btn')) return; addToCart(products.find(p=>p.id===c.dataset.id)); });
       renderCartBar();
     }
     function openPaymentSheet(){
@@ -1249,7 +1307,7 @@
           <div style="display:flex;justify-content:space-between;"><span style="color:var(--red);font-weight:700;">${sale.voided?t('voidedLbl'):t('refundedLbl')}</span><span class="num" style="color:var(--red);font-weight:700;">− ${fmt(sale.refundTotal||0)} ${t('currency')}</span></div>
           <div style="display:flex;justify-content:space-between;margin-top:3px;"><span style="font-weight:700;">${t('netTotal')}</span><span class="num" style="font-weight:700;color:var(--forest);">${fmt(Math.max(0,(sale.total||0)-(sale.refundTotal||0)))} ${t('currency')}</span></div>
         </div>`:''}
-        ${sale.payProof?`<div style="margin:8px 0;text-align:center;"><div style="font-size:11px;color:rgba(26,26,26,0.55);margin-bottom:4px;">📲 ${t('payProofLbl')}</div><img src="${sale.payProof}" style="max-width:200px;width:60%;height:auto;border-radius:8px;border:1px solid var(--ivory-dark);cursor:pointer;" onclick="window.open(this.src,'_blank')"></div>`:''}
+        ${sale.payProof?`<div style="margin:8px 0;text-align:center;"><div style="font-size:11px;color:rgba(26,26,26,0.55);margin-bottom:4px;">📲 ${t('payProofLbl')}</div><img src="${sale.payProof}" style="max-width:200px;width:60%;height:auto;border-radius:8px;border:1px solid var(--ivory-dark);cursor:pointer;"></div>`:''}
         <div style="text-align:center;font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--gold);font-size:16px;margin:14px 0;">${t('thankYou')}</div>
         <div style="display:flex;gap:8px;">
           <button class="btn-forest btn-wide" id="rc-print">🖨️ ${t('print')}</button>
@@ -2746,7 +2804,7 @@
         <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;font-weight:800;font-size:16px;"><span>${t('total')}</span><span class="num" id="ord-total" style="color:var(--forest);">${fmt(order.total||0)} ${t('currency')}</span></div>
         ${isPaid && order.payProof?`<div style="margin:6px 0 12px;text-align:center;">
           <div style="font-size:11.5px;color:rgba(26,26,26,0.55);margin-bottom:5px;">📷 ${t('payProofLbl')}</div>
-          <img src="${order.payProof}" style="max-width:240px;width:75%;height:auto;border-radius:8px;border:1px solid var(--ivory-dark);cursor:pointer;" onclick="window.open(this.src,'_blank')">
+          <img src="${order.payProof}" style="max-width:240px;width:75%;height:auto;border-radius:8px;border:1px solid var(--ivory-dark);cursor:pointer;">
         </div>`:''}
         <button class="btn-forest btn-wide" id="ord-confirm" style="padding:14px;">✓ ${t('confirmReady')}</button>
         <button class="btn-secondary btn-wide" id="ord-cancel" style="margin-top:8px;color:var(--red);border-color:rgba(192,72,72,0.3);">✕ ${t('cancelOrder')}</button>
