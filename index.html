@@ -539,6 +539,10 @@
     // ============ STATE ============
     let user=null, profile=null, branches=[], currentBranchId=null;
     let saleBranchSel=null; // فرع البيع المختار للأدمن/المدير اللي بيبيع من غير وردية
+    // 🆕 v2.7.2 — Persistenza tab attiva tra refresh (soft refresh torna alla stessa pagina)
+    const _SAVED_TAB_KEY = 'leCoin.activeTab';
+    function _saveActiveTab(tab){ try{ localStorage.setItem(_SAVED_TAB_KEY, tab||''); }catch(e){} }
+    function _getSavedTab(){ try{ return localStorage.getItem(_SAVED_TAB_KEY)||''; }catch(e){ return ''; } }
     let categories=[], products=[], inventory={}, users=[], activeTab='products';
     let instapayCfg={qrDataUrl:'', alias:''}; // إعداد Instapay (يحفظه الأدمن)
     const MIN_POINTS_REDEEM = 50; // الحد الأدنى من رصيد النقاط لاستخدامها (ج.م)
@@ -972,6 +976,8 @@
       const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
       // ====== Determina filiale di riferimento ======
       // Cliente loggato + filiale scelta → quella. Altrimenti, prima filiale attiva.
+      // 🆕 v2.7.2 — Distingue tra branchId per dati (orari/stato) e per filtri (nuovi/offerte)
+      const isClientChoice = !!clientBranchId; // true solo se il cliente ha scelto attivamente una filiale
       let branchId = clientBranchId || null;
       if(!branchId){
         const firstActive = branches.find(b=>b.active!==false);
@@ -1068,7 +1074,9 @@
       // === 🆕 SEZIONE NUOVI ARRIVI (Stage 3) ===
       let newArrivalsHtml = '';
       if(branchId && products.length){
-        const arrivals = getNewArrivals(branchId, 7, 6);
+        // 🆕 v2.7.2 — Se il cliente non ha scelto filiale, ignora il filtro clientCategoryIds (passa null)
+        const arrivalsBranchId = isClientChoice ? branchId : null;
+        const arrivals = getNewArrivals(arrivalsBranchId, 7, 6);
         if(arrivals.length){
           const currency = t('currency');
           const cardsHtml = arrivals.map((p,i)=>{
@@ -1097,7 +1105,8 @@
           const allOffers = await loadActiveOffers();
           const branchOffers = allOffers.filter(o => {
             if(o.productId == null) return false;
-            if(Array.isArray(o.branchIds) && o.branchIds.length>0){
+            // 🆕 v2.7.2 — Se il cliente non ha scelto filiale, mostra tutte le offerte (no filtro filiale)
+            if(isClientChoice && Array.isArray(o.branchIds) && o.branchIds.length>0){
               if(!o.branchIds.includes('all') && !o.branchIds.includes(branchId)) return false;
             }
             return true;
@@ -1316,7 +1325,7 @@
       </div></div>`;
       $('ov').onclick=closeSheet; $('cx').onclick=closeSheet;
       document.querySelectorAll('.menu-tile').forEach(b=>b.onclick=()=>{
-        activeTab=b.dataset.tab; closeSheet();
+        activeTab=b.dataset.tab; _saveActiveTab(activeTab); closeSheet();
         document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x.dataset.tab===activeTab));
         const av=document.querySelector('.nav-btn.active'); if(av) av.scrollIntoView({inline:'center',block:'nearest'});
         render();
@@ -1359,13 +1368,21 @@
       if(profile.role==='admin') tabs.push({k:'branches',ico:'🏢',l:t('branches_tab')});
       if(profile.role==='admin') tabs.push({k:'customers',ico:'👥',l: (lang==='ar'?'العملاء':'Customers')});
       // 🗑️ v2.6.0: tab 'reports' rimosso, accessibile via drill-down dall'Analytics
-      // landing page: الكاشير يفتح على الوردية، المدير/الأدمن على المركز التحليلي
-      if(profile.role==='cashier') activeTab='shift';
-      else activeTab='analytics';
+      // 🆕 v2.7.2 — Prova a ripristinare l'ultima tab attiva (se valida per il ruolo corrente)
+      // Fallback: cashier→shift, altri→analytics
+      const _saved = _getSavedTab();
+      const _validTabKeys = tabs.map(x=>x.k);
+      if(_saved && _validTabKeys.includes(_saved)){
+        activeTab = _saved;
+      } else if(profile.role==='cashier'){
+        activeTab='shift';
+      } else {
+        activeTab='analytics';
+      }
       navTabs=tabs; // عشان قائمة الأقسام تستخدمها
       $('nav-inner').style.gridTemplateColumns=`repeat(${tabs.length},1fr)`;
       $('nav-inner').innerHTML=tabs.map(x=>`<button class="nav-btn ${x.k===activeTab?'active':''}" data-tab="${x.k}"><span class="ico">${x.ico}</span><span class="lbl2">${x.l}</span></button>`).join('');
-      document.querySelectorAll('.nav-btn').forEach(b=>b.onclick=()=>{activeTab=b.dataset.tab;document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x===b));b.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});render();});
+      document.querySelectorAll('.nav-btn').forEach(b=>b.onclick=()=>{activeTab=b.dataset.tab;_saveActiveTab(activeTab);document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x===b));b.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});render();});
       const av=document.querySelector('.nav-btn.active'); if(av) av.scrollIntoView({inline:'center',block:'nearest'});
     }
 
@@ -1537,7 +1554,7 @@
           <div style="font-weight:700;font-size:16px;margin-bottom:8px;">${t('needShiftToSell')}</div>
           <button class="btn-gold btn-wide" id="go-shift" style="margin-top:10px;">🕐 ${t('openShiftNow')}</button>
         </div>`;
-        const g=$('go-shift'); if(g) g.onclick=()=>{ activeTab='shift'; document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab==='shift')); render(); };
+        const g=$('go-shift'); if(g) g.onclick=()=>{ activeTab='shift'; _saveActiveTab(activeTab); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab==='shift')); render(); };
         return;
       }
       const actives=products.filter(p=>p.active!==false);
@@ -2853,7 +2870,7 @@
         </div>
       </div>`;
     }
-    function bindSeg(){ document.querySelectorAll('.seg').forEach(b=>b.onclick=()=>{ staffView=b.dataset.v; renderStaff(); }); $('staff-back')&&($('staff-back').onclick=()=>{ activeTab='shift'; render(); }); }
+    function bindSeg(){ document.querySelectorAll('.seg').forEach(b=>b.onclick=()=>{ staffView=b.dataset.v; renderStaff(); }); $('staff-back')&&($('staff-back').onclick=()=>{ activeTab='shift'; _saveActiveTab(activeTab); render(); }); }
 
     // ricalcola top prodotti secondo i filtri (periodo/filiale/prezzo)
     function renderTopProducts(){
@@ -4801,7 +4818,7 @@
       html+=`</div>`;
       $('content').innerHTML=html;
 
-      $('sh-whowhere')&&($('sh-whowhere').onclick=()=>{ activeTab='staff'; render(); });
+      $('sh-whowhere')&&($('sh-whowhere').onclick=()=>{ activeTab='staff'; _saveActiveTab(activeTab); render(); });
       // 🆕 v2.5.6 — listener sh-reports rimosso
       // binding
       if(!myShift){
