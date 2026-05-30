@@ -4017,7 +4017,8 @@
     // 🆕 v2.7.1 — Supporta anche EDIT di una richiesta pending esistente (existing != null)
     async function openHandSheet(fromSh, existing){
       const isEdit = !!existing;
-      const targets=shifts.filter(s=>s.status==='open' && s.branchId===fromSh.branchId && s.id!==fromSh.id);
+      // 🆕 Fix: escludo per userId (non per shiftId), così Ahmed non vede mai sé stesso anche se per qualche motivo avesse più turni
+      const targets=shifts.filter(s=>s.status==='open' && s.branchId===fromSh.branchId && s.userId!==fromSh.userId);
       if(targets.length===0){ toast(t('noOpenColleague'),true); return; }
       // 🆕 v2.7.1 — Calcola cash live in cassa per validare importo (Regola 5)
       let cashLive = 0;
