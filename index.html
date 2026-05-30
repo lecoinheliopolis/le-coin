@@ -4048,6 +4048,8 @@
         const toId=$('hand-to').value;
         const toSh=targets.find(s=>s.id===toId);
         if(amt<=0||!toSh){ toast(t('errorGen'),true); return; }
+        // 🆕 Guard hard: blocco se sender e receiver coincidono (sanity check, oltre al filtro UI)
+        if(toSh.userId === fromSh.userId){ toast(t('errorGen'),true); console.warn('[custody] blocked self-directed transfer attempt'); return; }
         // 🆕 v2.7.1 — Regola 5: blocca se amount > cashLive
         if(amt > cashLive){ toast(t('custInsufficientCash')+' ('+fmt(cashLive)+' '+t('currency')+')',true); return; }
         const b=$('hand-confirm'); b.disabled=true; b.textContent='...';
@@ -4408,6 +4410,15 @@
         // 1) Notifiche al RECEIVER (Sara): richieste pending in entrata
         const qs=await getDocs(query(collection(db,'custodyTransfers'),where('toUserId','==',user.uid),where('status','==','pending')));
         let pend=null; qs.forEach(d=>{ if(!pend) pend={id:d.id,...d.data()}; });
+        // 🆕 Guard: ignora e auto-rifiuta richieste self-directed (corrotte/legacy)
+        if(pend && pend.fromUserId === pend.toUserId){
+          try{
+            await updateDoc(doc(db,'custodyTransfers',pend.id),{status:'rejected',rejectedAt:Date.now(),autoFixed:'self_directed'});
+            console.warn('[custody] auto-fixed self-directed pending:', pend.id);
+          } catch(e){ console.warn('[custody] autoFix self-directed failed:', e); }
+          await loadCustodyTx();
+          pend = null;
+        }
         if(pend && !document.getElementById('cust-confirm-ov') && !document.getElementById('cust-sender-notif-ov')) showCustodyConfirm(pend);
         // 🆕 v2.7.1 — 2) Notifiche al SENDER (Ahmed): sue richieste rifiutate/cancellate/scadute
         // Trova richieste fromUserId === me, in stato finale negativo, e non ancora notificate
