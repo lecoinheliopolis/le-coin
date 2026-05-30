@@ -209,6 +209,7 @@
         </div>
         <div class="header-ctrl">
           <select class="branch-sel" id="branch-select"></select>
+          <button class="lang-btn" id="reports-btn" title="Reports Hub" style="display:none;background:var(--gold);color:var(--forest-dark);font-size:18px;font-weight:800;">📊</button>
           <button class="lang-btn" id="lang-btn">EN</button>
           <button class="user-btn" id="user-btn">⚙</button>
         </div>
@@ -322,7 +323,7 @@
         deleteUser:'حذف المستخدم', confirmDelUser:'متأكد إنك عايز تمسح المستخدم؟ هيتمنع من الدخول. (الإيميل هيفضل محجوز في فايربيز ومش هينفع تعيد استخدامه)', userDeleted:'تم حذف المستخدم',
         depotTools:'أدوات المخزن', softReset:'تصفير المخزون (Soft)', hardReset:'تفريغ المخزن (Hard)', softResetDesc:'يصفّر كل الكميات لصفر ويحتفظ بالمنتجات — يسهّل إعادة الإدخال', hardResetDesc:'يمسح كل المنتجات من هذا المخزن نهائياً (المنتجات تفضل في الكتالوج)', confirmSoftReset:'متأكد؟ كل الكميات في هذا الفرع هتبقى صفر (المنتجات تفضل موجودة)', confirmHardReset:'تحذير! ده هيمسح كل أصناف هذا المخزن نهائياً. متأكد؟', resetDone:'تمت العملية', resetting:'بيشتغل...',
         confirmDelCat:'حذف هذه الفئة؟', confirmDelProd:'حذف هذا المنتج؟',
-        addProduct:'منتج جديد', scanAddProduct:'مسح باركود لمنتج جديد', prodExistsScan:'المنتج موجود — هفتحه لك للتعديل', createNewWithBarcode:'الباركود ده مش متسجّل. تعمل منتج جديد بنفس الكود؟', costFallbackHint:'لو سيبته فاضي = آخر سعر شراء', scanBtn:'مسح', prodDetails:'تفاصيل المنتج', stockByBranch:'المخزون في كل فرع', recentSales:'آخر المبيعات', lastSold:'آخر مرة اتباع', noSalesYet:'مفيش مبيعات لسه', countAddedByScan:'اتلقط بالمسح', enterPhysCount:'الكمية الفعلية', openForEdit:'فتح المنتج للتعديل', closeBtn:'إغلاق', instapayTitle:'إعداد Instapay', instapayQr:'صورة الـ QR', instapayAlias:'اسم المستخدم (alias)', uploadQr:'رفع QR', saveCfg:'حفظ', instapayShowTitle:'دفع بـ Instapay', instapayHint:'اطلب من العميل يمسح الـ QR ويدفع المبلغ', amountToPay:'المبلغ المطلوب', received:'تم الاستلام', skipPhoto:'تأكيد بدون صورة', takeProof:'تصوير إثبات الدفع', noQrSet:'لسه ما اتحطش QR — افتح الإعدادات', payProofLbl:'إثبات الدفع', empPhoto:'صورة الموظف', empBirthdate:'تاريخ الميلاد', empGender:'النوع', empMale:'ذكر', empFemale:'أنثى', empNationalId:'الرقم القومي', empAddress:'عنوان السكن', empPhone:'رقم التليفون', empHireDate:'تاريخ التعيين', empPersonalData:'البيانات الشخصية (اختياري)', empCall:'اتصال', empWhatsapp:'واتساب', empPrintCard:'طباعة البطاقة', empSendCard:'إرسال البطاقة', uploadPhoto:'رفع صورة', empContact:'التواصل', showChart:'📈 رسم بياني', chartRevenue:'الإيراد', chartProfit:'الربح', chartTopProducts:'أعلى المنتجات', chartBranches:'مقارنة الفروع', chartStaff:'مقارنة الموظفين', chartByCategory:'القيمة بالفئة', noChartData:'مفيش بيانات للرسم', cleanGhostTitle:'تنظيف سجلات الفروع المقفولة', cleanGhostHint:'يمسح سجلات مخزون لفروع اتشالت من النظام', cleanGhostBtn:'فحص ومسح السجلات الخرافية', ghostFound:'لقينا سجلات خرافية', ghostNone:'مفيش سجلات خرافية 👍', ghostDeleted:'تم مسح السجلات الخرافية', reorderLevel:'حد الطلب', reorderSaved:'تم حفظ حد الطلب', lowInBranches:'ناقص في', qtyByBranch:'الكمية في كل فرع', totalAllBranches:'الإجمالي بكل الفروع', valueByCost:'القيمة (تكلفة)', editProduct:'تعديل المنتج', barcode:'الباركود', name:'الاسم (فرنسي)', clientSignup:'تسجيل عميل جديد', clientLogin:'دخول العملاء', staffLogin:'دخول الموظفين', clientName:'الاسم', emailOrPhone:'إيميل أو تليفون', emailOpt:'الإيميل (اختياري)', phoneOpt:'التليفون (اختياري)', needEmailOrPhone:'لازم تدخل إيميل أو تليفون', nameTaken:'الاسم ده متسجّل قبل كده — ميّزه بإضافة لقب أو رقم', chooseBranch:'اختر الفرع', clientWelcome:'أهلاً بيك', myOrders:'طلباتي', myPoints:'نقاطي', pointsBalance:'رصيد النقاط', shopNow:'اطلب دلوقتي', browseProducts:'تصفّح المنتجات', clientLogout:'خروج', signupDone:'تم التسجيل! ادخل دلوقتي', notAvailable:'غير متاح', addToCartC:'أضف للسلة', myCart:'سلة الطلبات', sendOrder:'إرسال الطلب', orderSent:'تم إرسال طلبك للفرع', emptyCartC:'سلتك فاضية', usePoints:'استخدام نقاط الولاء', orderHoldMin:'مدة انتظار الطلب (دقائق)', branchPointsPct:'نسبة نقاط الولاء (٪)', newOrderTitle:'طلب جديد من عميل', orderReady:'طلبك جاهز! تعالى استلمه وادفع', orderPreparing:'بيتجهّز', orderStatusPending:'مستني', orderStatusPreparing:'بيتجهّز', orderStatusReady:'جاهز', orderStatusPaid:'مدفوع', orderStatusCancelled:'ملغي', orderStatusHold:'في الانتظار', readyOrdersTitle:'طلبات عملاء جاهزة', orderFromCustomer:'طلب من', payOrderBtn:'استلام ودفع', orderPaid:'تم تسجيل دفع الطلب', favorites:'المفضلات', addFav:'أضف للمفضلات', removeFav:'شيل من المفضلات', noFavorites:'مفيش منتجات مفضلة لسه', minPoints:'الحد الأدنى للنقاط', updateMyData:'تحديث بياناتي', myData:'بياناتي', customers_tab:'العملاء', noCustomers:'مفيش عملاء مسجلين لسه', customerActive:'نشط', customerSuspended:'موقوف', suspendCustomer:'إيقاف العميل', activateCustomer:'تفعيل العميل', deleteCustomer:'حذف العميل', deleteCustomerConfirm:'متأكد عايز تمسح العميل ده نهائياً؟ الفواتير القديمة هتفضل محفوظة.', customerDeleted:'تم حذف العميل', customerSuspendedMsg:'تم إيقاف العميل', customerActivatedMsg:'تم تفعيل العميل', orderHistory:'سجل الفواتير', accountSuspended:'حسابك موقوف — تواصل مع الإدارة', cancelOrderConfirm:'متأكد عايز تلغي الطلب؟ المخزون هيرجع للفرع.', stockRestored:'تم رجوع المخزون', myQrCode:'الـ QR بتاعي', showMyQr:'عرض QR التعريف', qrHint:'وري الكاشير الكود ده عشان يبدأ طلبك', startOrderForCustomer:'بدء طلب لعميل', selectCustomer:'اختر العميل', searchByNameOrPhone:'ابحث بالاسم أو التليفون', orderingFor:'طلب باسم', noCustomerFound:'مفيش عميل بالبيانات دي', scanCustomerQr:'مسح QR العميل', customerNotFound:'العميل ده مش موجود', useCustomerPoints:'استخدم نقاط العميل', requestSent:'تم إرسال طلب الاستخدام للعميل', waitingCustomerApproval:'في انتظار موافقة العميل...', customerApproved:'العميل وافق', customerRejected:'العميل رفض', requestTimeout:'انتهت مهلة الطلب', pointsRequestTitle:'طلب استخدام نقاط', pointsRequestMsg:'الكاشير عايز يستخدم نقاطك في الفاتورة', approve:'موافق', reject:'رفض', pointsEarned:'نقاط مكتسبة', pointsUsed:'نقاط مستخدمة', minPointsHint:'الحد الأدنى للاستخدام: ', prepareOrder:'تجهيز الطلب', confirmReady:'تم التجهيز — جاهز للاستلام', cancelItem:'إلغاء الصنف', cancelOrder:'إلغاء الطلب', loyaltyDiscount:'خصم نقاط الولاء', payNow:'ادفع دلوقتي', payAtPickup:'ادفع عند الاستلام', payMethodChoice:'طريقة الدفع', cashAtPickup:'كاش (عند الاستلام)', instapayNow:'Instapay (ادفع دلوقتي)', clientInstapayTitle:'دفع بـ Instapay', clientInstapayHint:'حوّل المبلغ على IPA المحل وارفق إيصال التحويل', copyIpa:'نسخ IPA', copyAmount:'نسخ المبلغ', copied:'تم النسخ ✓', openInstapayApp:'افتح تطبيق Instapay', stepsToFollow:'الخطوات:', step1Copy:'انسخ الـ IPA',  step2OpenApp:'افتح Instapay وحوّل المبلغ', step3Screenshot:'صوّر إيصال التحويل', step4Upload:'ارجع وارفع الإيصال هنا', uploadProofMandatory:'ارفق إيصال الدفع (إجباري)', chooseProofImage:'اختار صورة الإيصال', confirmOrder:'تأكيد الطلب', orderPaidAlready:'مدفوع Instapay', viewProof:'عرض الإيصال', proofMissing:'لازم ترفع إيصال الدفع', cantCancelPaid:'الطلب اتدفع — تواصل مع المحل للإلغاء', instapayAliasNotSet:'الإدارة لسه ما حطّتش بيانات Instapay', howPointsWork:'إزاي بتشتغل النقاط؟', pointRule1:'لما تشتري، بتكسب نقاط حسب نسبة الفرع (شوف الجدول فوق)', pointRule2:'١ نقطة = ١ ج.م خصم في الفاتورة', pointRule3:'لازم يبقى عندك ٥٠ نقطة على الأقل عشان تقدر تستخدمهم', pointRule4:'النقاط بتتقرّب لأعلى دايماً (مثلاً ٠.٣ = ١ نقطة)', pointRule5:'عند الاستخدام نفس الشيء (مثلاً ٢٣.٥ ج.م = ٢٤ نقطة)', pointsHistory:'سجل النقاط', noPointsHistory:'مفيش حركات نقاط لسه', earned:'كسبت', spent:'صرفت', linkRegCustomer:'ربط بعميل مسجّل', dashProfitTitle:'تفاصيل الربح', dashOrdersTitle:'فواتير الفترة', dashItemsTitle:'المنتجات المباعة', dashRevenue:'الإيراد', dashCosts:'تكلفة البضاعة', dashNetProfit:'صافي الربح', dashGrossProfit:'الربح الإجمالي', dashTopByProfit:'أعلى المنتجات ربحاً', dashNothingInPeriod:'مفيش بيانات في الفترة المختارة', dashSortedByRevenue:'مرتبة من الأعلى للأدنى', dashReturnsTitle:'المرتجعات والإلغاءات', dashPurchasesTitle:'فواتير الشراء', dashItemsPurchTitle:'المنتجات المشتراة', dashOpenSitesTitle:'الفروع المفتوحة', dashActiveStaffTitle:'الموظفين في الخدمة', dashFullyVoided:'ملغية بالكامل', dashPartialReturn:'مرتجع جزئي', dashFromSupplier:'من المورد', dashOpenedAt:'فتح الوردية', dashWho:'الموظف', dashWhere:'الفرع', dashTimeOpen:'مدة الوردية', dashComingSoon:'هتفعّل قريباً', dashUnitCost:'سعر القطعة', clientVisibleCats:'الفئات اللي العميل يقدر يطلبها', clientVisibleCatsHint:'العميل في التطبيق هيشوف بس المنتجات في الفئات دي. الكاشير في المحل يقدر يبيع كل المنتجات.', selectAll:'اختر الكل', selectNone:'الغي الكل', ptsRateExplain:'كل ١٠ ج.م يساوي ١ نقطة', pointsReady:'متاحة للاستخدام', pointsLocked:'مش متاحة لسه', pointsNeedMore:'محتاج ', pointsToUnlock:' نقطة كمان عشان تستخدمها', pointsCanUseNow:'تقدر تستخدم نقاطك دلوقتي!', congratsTitle:'مبروك!', congratsMsg:'وصلت لـ ٥٠ نقطة! دلوقتي تقدر تستخدم نقاطك في فاتورتك القادمة', congratsBtn:'ابدأ التسوق', scanHintCust:'تقدر تقفل دي وتمسح QR العميل مباشرة من زر 📷 في الكاشير', vipRatesTitle:'معدلات نقاط مخصصة (VIP)', vipRatesHint:'سيب الخانة فاضية عشان نسبة الفرع الافتراضية، أو اكتب نسبة مخصصة للعميل ده في الفرع ده', branchDefault:'الافتراضي', saveCustomRates:'حفظ المعدلات المخصصة', vipBadge:'معدلاتك الخاصة', vipHint:'عميلنا الذهبي 💎 — معدلات نقاط أعلى في الفروع دي', discountPct:'نسبة الخصم', inMoney:'بالفلوس', pointValue:'قيمة النقطة', settings:'الإعدادات', phoneRequired:'رقم التليفون', phoneRequiredErr:'لازم تدخل رقم التليفون', phoneWhyHint:'هنحتاج رقمك عشان نبعتلك إيصالات الشراء عبر واتساب', invalidPhone:'رقم تليفون غير صحيح', phoneInUse:'الرقم ده متسجّل قبل كده', addCustomer:'عميل جديد', adminCreateCustHint:'العميل هيقدر يدخل بالتليفون ده وكلمة السر اللي حطّيتها', editProfile:'تعديل بيانات العميل', manualPtsHint:'تعديل يدوي للنقاط (لو حصل خطأ)', sendPwdReset:'إرسال إعادة تعيين كلمة السر', sendPwdResetConfirm:'هنبعت إيميل إعادة تعيين كلمة السر على:', pwdResetSent:'تم إرسال الإيميل ✓', noEmailForReset:'العميل ده مفيش إيميل — مينفعش نبعت إعادة تعيين', willEarn:'هيكسب', newBalance:'الرصيد بعد البيع', willCrossThreshold:'🎉 العميل هيوصل للحد الأدنى ويقدر يستخدم نقاطه!', dataResetTitle:'مركز إعادة الضبط الشامل', dataResetSubtitle:'حذف انتقائي لأقسام مختلفة من البيانات — للأدمن فقط', openDataResetCenter:'فتح مركز إعادة الضبط', dataResetMovedHint:'لإعادة ضبط شاملة (نقاط، عملاء، صور…) → الإعدادات ⚙️', dangerZone:'منطقة خطر', dataResetCenter:'مركز إعادة الضبط', rstDangerTitle:'تحذير: عملية لا رجوع فيها', rstDangerMsg:'الحذف ده دائم ومينفعش تراجع فيه. حسابات Firebase Auth بتفضل (لازم تمسحها يدوياً من الـ Console). الأدمن الأساسي محمي من الحذف.', transactionsGroup:'📊 المعاملات', catalogGroup:'🏢 الكتالوج', peopleGroup:'👥 الأشخاص', systemGroup:'⚙️ النظام', rstSales:'الفواتير', rstSalesWarn:'الفواتير القديمة هتختفي نهائياً — تأكد من Backup', rstPointsLedger:'سجل حركة النقاط', rstPointsLedgerWarn:'احذف ده مع الفواتير عشان ما يبقاش فيه تناقض', rstClientOrders:'طلبات العملاء (Online)', rstLoads:'فواتير الشراء/الاستلام', rstTransfers:'التحويلات بين الفروع', rstCustody:'العُهد بين الموظفين', rstShifts:'الورديات', rstInventory:'المخزون (كل الأصناف من كل الفروع)', rstInventoryWarn:'هيتم حذف كل سجلات المخزون', rstCategories:'الفئات', rstCategoriesWarn:'لو حذفت الفئات لازم تحذف المنتجات كمان', rstProducts:'المنتجات', rstProductsWarn:'هيكسر روابط الفواتير القديمة بالمنتجات', rstProductPhotos:'صور المنتجات (احتفاظ بالمنتجات)', rstProductPhotosWarn:'هتفضي خانة الصورة من كل المنتجات', rstSuppliers:'المورّدين', rstBranches:'الفروع', rstBranchesWarn:'⚠️ خطير جداً! هيكسر معظم البيانات', rstCustomers:'العملاء (مع نقاطهم وكل بياناتهم)', rstCustomersWarn:'حسابات Firebase Auth للعملاء بتفضل', rstCustomerPoints:'نقاط العملاء فقط (احتفاظ بالعملاء)', rstCustomerPointsWarn:'هيتم تصفير كل النقاط ومسح سجل الحركة', rstUsers:'الموظفين (ما عدا الأدمن)', rstUsersWarn:'الأدمن الأساسي محمي. حسابات Firebase Auth بتفضل', rstStaffPhotos:'صور الموظفين', rstSettings:'إعدادات النظام (Instapay، إلخ)', rstSettingsWarn:'هيمسح إعدادات Instapay وأي إعدادات تانية', rstAllTitle:'صفّر كل البيانات', rstAllHint:'لما تحدد هنا، كل الخانات فوق هتتحدد تلقائياً', rstTypeConfirm:'اكتب "AZZERA" بالضبط للتأكيد:', rstConfirmHint:'حروف كبيرة، بدون مسافات', rstExecute:'بدء الحذف', rstNothingSelected:'مفيش حاجة محددة', rstFinalConfirm:'متأكد بشكل نهائي؟ ده هيمسح {n} نوع من البيانات.', rstDone:'تم الحذف بنجاح', rstDocsDeleted:'سجل تم حذفه', protectedAdminBlock:'🛡️ ممنوع — الأدمن الأساسي محمي', protectedAdminSanitized:'🛡️ تم تصحيح التعديل — الأدمن الأساسي محمي', rstAutoBackupHint:'💾 هيتم تنزيل Backup أوتوماتيكي قبل البداية', rstAutoBackupRunning:'📥 جاري تنزيل النسخة الاحتياطية...', rstAutoBackupDone:'✅ تم تنزيل الـ Backup بنجاح', rstAutoBackupFail:'❌ فشل الـ Backup — تم إلغاء العملية', rstCountdownLabel:'⏱️ هيبدأ الحذف بعد', rstCountdownSec:'ثانية', rstCancelBtn:'إلغاء', rstSafeMode:'🛡️ الوضع الآمن: الأدمن الأساسي ومحفوظات فرعه محمية', rstSelfRepairTitle:'إصلاح تلقائي', rstSelfRepairMsg:'تم اكتشاف خلل: الأدمن الأساسي بدون فرع. جاري إعادة الربط...', rstSelfRepairDone:'✅ تم الإصلاح: الأدمن مربوط بفرع {branch}', qrIsCustomerNotProduct:'ده QR عميل ({name}) — مش باركود منتج. للبيع: روح الكاشير', barcodeNotFound:'الباركود ده مش متسجّل', repInvByBranch:'المخزون: تفصيل لكل فرع', repInvSummary:'المخزون: ملخص لكل منتج', repCapitalSnapshot:'رأس المال الحالي لكل فرع', repCapitalFlow:'دورة رأس المال في الفترة', repCategories:'تقرير الفئات', repCrossBranch:'مقارنة المنتجات عبر الفروع', repTopCustomersSpend:'أكثر العملاء إنفاقاً', repTopCustomersFreq:'أكثر العملاء تكراراً', repBestSellers:'أفضل البائعين لكل فرع', valCost:'القيمة بالتكلفة', valPrice:'القيمة بسعر البيع', marginThe:'الهامش النظري', pctTotal:'% من الإجمالي', capStart:'رأس المال أول الفترة (محسوب)', capEnd:'رأس المال آخر الفترة', purchasesIn:'مشتريات داخلة', cogsOut:'تكلفة المباع (خارج)', transfersNet:'صافي التحويلات', deltaCap:'تغير رأس المال', deltaPct:'% التغير', prodCount:'عدد المنتجات', marginPct:'% الهامش', category:'الفئة', sold:'مباع', totalSpend:'إجمالي الإنفاق', avgSpend:'متوسط الإنفاق', avgDaysBetween:'متوسط الأيام بين الزيارات', lastBuy:'آخر شراء', secWarehouseCap:'📦 المخزن ورأس المال', secCustomersRep:'🛍️ تقارير العملاء', chartCategoriesValCost:'الفئات حسب قيمة المخزون', chartTopCustomers:'أعلى العملاء إنفاقاً', warehouseReports:'تقارير المخزن', customersReports:'تقارير العملاء', totalRow:'الإجمالي', dashStockCost:'قيمة المخزن (تكلفة)', dashStockPrice:'قيمة المخزن (بيع)', dashTopCategories:'أفضل الفئات', dashTopCustomers:'أفضل العملاء', mTopBySpend:'مرتب بالإنفاق', mUnits:'وحدة', filterByBranch:'فلتر الفرع', allBranches:'كل الفروع', hubTitle:'مركز التقارير', hubSubtitle:'تقارير ذكية وقابلة للتخصيص', hubSearch:'ابحث في التقارير...', hubReportType:'نوع التقرير', hubPeriod:'الفترة', hubDetailLevel:'مستوى التفاصيل', hubDetailSummary:'ملخص', hubDetailStandard:'قياسي', hubDetailFull:'كامل', hubCompare:'مقارنة بفترة سابقة', hubCompareResult:'مقارنة A مقابل B', hubGenerate:'توليد التقرير', noData:'لا توجد بيانات', rows:'صفوف', metric:'المقياس', rMonth:'الشهر', rYear:'السنة', repSalesByInvoice:'سجل الفواتير', repSalesDetail:'تفصيل المبيعات',
+        addProduct:'منتج جديد', scanAddProduct:'مسح باركود لمنتج جديد', prodExistsScan:'المنتج موجود — هفتحه لك للتعديل', createNewWithBarcode:'الباركود ده مش متسجّل. تعمل منتج جديد بنفس الكود؟', costFallbackHint:'لو سيبته فاضي = آخر سعر شراء', scanBtn:'مسح', prodDetails:'تفاصيل المنتج', stockByBranch:'المخزون في كل فرع', recentSales:'آخر المبيعات', lastSold:'آخر مرة اتباع', noSalesYet:'مفيش مبيعات لسه', countAddedByScan:'اتلقط بالمسح', enterPhysCount:'الكمية الفعلية', openForEdit:'فتح المنتج للتعديل', closeBtn:'إغلاق', instapayTitle:'إعداد Instapay', instapayQr:'صورة الـ QR', instapayAlias:'اسم المستخدم (alias)', uploadQr:'رفع QR', saveCfg:'حفظ', instapayShowTitle:'دفع بـ Instapay', instapayHint:'اطلب من العميل يمسح الـ QR ويدفع المبلغ', amountToPay:'المبلغ المطلوب', received:'تم الاستلام', skipPhoto:'تأكيد بدون صورة', takeProof:'تصوير إثبات الدفع', noQrSet:'لسه ما اتحطش QR — افتح الإعدادات', payProofLbl:'إثبات الدفع', empPhoto:'صورة الموظف', empBirthdate:'تاريخ الميلاد', empGender:'النوع', empMale:'ذكر', empFemale:'أنثى', empNationalId:'الرقم القومي', empAddress:'عنوان السكن', empPhone:'رقم التليفون', empHireDate:'تاريخ التعيين', empPersonalData:'البيانات الشخصية (اختياري)', empCall:'اتصال', empWhatsapp:'واتساب', empPrintCard:'طباعة البطاقة', empSendCard:'إرسال البطاقة', uploadPhoto:'رفع صورة', empContact:'التواصل', showChart:'📈 رسم بياني', chartRevenue:'الإيراد', chartProfit:'الربح', chartTopProducts:'أعلى المنتجات', chartBranches:'مقارنة الفروع', chartStaff:'مقارنة الموظفين', chartByCategory:'القيمة بالفئة', noChartData:'مفيش بيانات للرسم', cleanGhostTitle:'تنظيف سجلات الفروع المقفولة', cleanGhostHint:'يمسح سجلات مخزون لفروع اتشالت من النظام', cleanGhostBtn:'فحص ومسح السجلات الخرافية', ghostFound:'لقينا سجلات خرافية', ghostNone:'مفيش سجلات خرافية 👍', ghostDeleted:'تم مسح السجلات الخرافية', reorderLevel:'حد الطلب', reorderSaved:'تم حفظ حد الطلب', lowInBranches:'ناقص في', qtyByBranch:'الكمية في كل فرع', totalAllBranches:'الإجمالي بكل الفروع', valueByCost:'القيمة (تكلفة)', editProduct:'تعديل المنتج', barcode:'الباركود', name:'الاسم (فرنسي)', clientSignup:'تسجيل عميل جديد', clientLogin:'دخول العملاء', staffLogin:'دخول الموظفين', clientName:'الاسم', emailOrPhone:'إيميل أو تليفون', emailOpt:'الإيميل (اختياري)', phoneOpt:'التليفون (اختياري)', needEmailOrPhone:'لازم تدخل إيميل أو تليفون', nameTaken:'الاسم ده متسجّل قبل كده — ميّزه بإضافة لقب أو رقم', chooseBranch:'اختر الفرع', clientWelcome:'أهلاً بيك', myOrders:'طلباتي', myPoints:'نقاطي', pointsBalance:'رصيد النقاط', shopNow:'اطلب دلوقتي', browseProducts:'تصفّح المنتجات', clientLogout:'خروج', signupDone:'تم التسجيل! ادخل دلوقتي', notAvailable:'غير متاح', addToCartC:'أضف للسلة', myCart:'سلة الطلبات', sendOrder:'إرسال الطلب', orderSent:'تم إرسال طلبك للفرع', emptyCartC:'سلتك فاضية', usePoints:'استخدام نقاط الولاء', orderHoldMin:'مدة انتظار الطلب (دقائق)', branchPointsPct:'نسبة نقاط الولاء (٪)', newOrderTitle:'طلب جديد من عميل', orderReady:'طلبك جاهز! تعالى استلمه وادفع', orderPreparing:'بيتجهّز', orderStatusPending:'مستني', orderStatusPreparing:'بيتجهّز', orderStatusReady:'جاهز', orderStatusPaid:'مدفوع', orderStatusCancelled:'ملغي', orderStatusHold:'في الانتظار', readyOrdersTitle:'طلبات عملاء جاهزة', orderFromCustomer:'طلب من', payOrderBtn:'استلام ودفع', orderPaid:'تم تسجيل دفع الطلب', favorites:'المفضلات', addFav:'أضف للمفضلات', removeFav:'شيل من المفضلات', noFavorites:'مفيش منتجات مفضلة لسه', minPoints:'الحد الأدنى للنقاط', updateMyData:'تحديث بياناتي', myData:'بياناتي', customers_tab:'العملاء', noCustomers:'مفيش عملاء مسجلين لسه', customerActive:'نشط', customerSuspended:'موقوف', suspendCustomer:'إيقاف العميل', activateCustomer:'تفعيل العميل', deleteCustomer:'حذف العميل', deleteCustomerConfirm:'متأكد عايز تمسح العميل ده نهائياً؟ الفواتير القديمة هتفضل محفوظة.', customerDeleted:'تم حذف العميل', customerSuspendedMsg:'تم إيقاف العميل', customerActivatedMsg:'تم تفعيل العميل', orderHistory:'سجل الفواتير', accountSuspended:'حسابك موقوف — تواصل مع الإدارة', cancelOrderConfirm:'متأكد عايز تلغي الطلب؟ المخزون هيرجع للفرع.', stockRestored:'تم رجوع المخزون', myQrCode:'الـ QR بتاعي', showMyQr:'عرض QR التعريف', qrHint:'وري الكاشير الكود ده عشان يبدأ طلبك', startOrderForCustomer:'بدء طلب لعميل', selectCustomer:'اختر العميل', searchByNameOrPhone:'ابحث بالاسم أو التليفون', orderingFor:'طلب باسم', noCustomerFound:'مفيش عميل بالبيانات دي', scanCustomerQr:'مسح QR العميل', customerNotFound:'العميل ده مش موجود', useCustomerPoints:'استخدم نقاط العميل', requestSent:'تم إرسال طلب الاستخدام للعميل', waitingCustomerApproval:'في انتظار موافقة العميل...', customerApproved:'العميل وافق', customerRejected:'العميل رفض', requestTimeout:'انتهت مهلة الطلب', pointsRequestTitle:'طلب استخدام نقاط', pointsRequestMsg:'الكاشير عايز يستخدم نقاطك في الفاتورة', approve:'موافق', reject:'رفض', pointsEarned:'نقاط مكتسبة', pointsUsed:'نقاط مستخدمة', minPointsHint:'الحد الأدنى للاستخدام: ', prepareOrder:'تجهيز الطلب', confirmReady:'تم التجهيز — جاهز للاستلام', cancelItem:'إلغاء الصنف', cancelOrder:'إلغاء الطلب', loyaltyDiscount:'خصم نقاط الولاء', payNow:'ادفع دلوقتي', payAtPickup:'ادفع عند الاستلام', payMethodChoice:'طريقة الدفع', cashAtPickup:'كاش (عند الاستلام)', instapayNow:'Instapay (ادفع دلوقتي)', clientInstapayTitle:'دفع بـ Instapay', clientInstapayHint:'حوّل المبلغ على IPA المحل وارفق إيصال التحويل', copyIpa:'نسخ IPA', copyAmount:'نسخ المبلغ', copied:'تم النسخ ✓', openInstapayApp:'افتح تطبيق Instapay', stepsToFollow:'الخطوات:', step1Copy:'انسخ الـ IPA',  step2OpenApp:'افتح Instapay وحوّل المبلغ', step3Screenshot:'صوّر إيصال التحويل', step4Upload:'ارجع وارفع الإيصال هنا', uploadProofMandatory:'ارفق إيصال الدفع (إجباري)', chooseProofImage:'اختار صورة الإيصال', confirmOrder:'تأكيد الطلب', orderPaidAlready:'مدفوع Instapay', viewProof:'عرض الإيصال', proofMissing:'لازم ترفع إيصال الدفع', cantCancelPaid:'الطلب اتدفع — تواصل مع المحل للإلغاء', instapayAliasNotSet:'الإدارة لسه ما حطّتش بيانات Instapay', howPointsWork:'إزاي بتشتغل النقاط؟', pointRule1:'لما تشتري، بتكسب نقاط حسب نسبة الفرع (شوف الجدول فوق)', pointRule2:'١ نقطة = ١ ج.م خصم في الفاتورة', pointRule3:'لازم يبقى عندك ٥٠ نقطة على الأقل عشان تقدر تستخدمهم', pointRule4:'النقاط بتتقرّب لأعلى دايماً (مثلاً ٠.٣ = ١ نقطة)', pointRule5:'عند الاستخدام نفس الشيء (مثلاً ٢٣.٥ ج.م = ٢٤ نقطة)', pointsHistory:'سجل النقاط', noPointsHistory:'مفيش حركات نقاط لسه', earned:'كسبت', spent:'صرفت', linkRegCustomer:'ربط بعميل مسجّل', dashProfitTitle:'تفاصيل الربح', dashOrdersTitle:'فواتير الفترة', dashItemsTitle:'المنتجات المباعة', dashRevenue:'الإيراد', dashCosts:'تكلفة البضاعة', dashNetProfit:'صافي الربح', dashGrossProfit:'الربح الإجمالي', dashTopByProfit:'أعلى المنتجات ربحاً', dashNothingInPeriod:'مفيش بيانات في الفترة المختارة', dashSortedByRevenue:'مرتبة من الأعلى للأدنى', dashReturnsTitle:'المرتجعات والإلغاءات', dashPurchasesTitle:'فواتير الشراء', dashItemsPurchTitle:'المنتجات المشتراة', dashOpenSitesTitle:'الفروع المفتوحة', dashActiveStaffTitle:'الموظفين في الخدمة', dashFullyVoided:'ملغية بالكامل', dashPartialReturn:'مرتجع جزئي', dashFromSupplier:'من المورد', dashOpenedAt:'فتح الوردية', dashWho:'الموظف', dashWhere:'الفرع', dashTimeOpen:'مدة الوردية', dashComingSoon:'هتفعّل قريباً', dashUnitCost:'سعر القطعة', clientVisibleCats:'الفئات اللي العميل يقدر يطلبها', clientVisibleCatsHint:'العميل في التطبيق هيشوف بس المنتجات في الفئات دي. الكاشير في المحل يقدر يبيع كل المنتجات.', selectAll:'اختر الكل', selectNone:'الغي الكل', ptsRateExplain:'كل ١٠ ج.م يساوي ١ نقطة', pointsReady:'متاحة للاستخدام', pointsLocked:'مش متاحة لسه', pointsNeedMore:'محتاج ', pointsToUnlock:' نقطة كمان عشان تستخدمها', pointsCanUseNow:'تقدر تستخدم نقاطك دلوقتي!', congratsTitle:'مبروك!', congratsMsg:'وصلت لـ ٥٠ نقطة! دلوقتي تقدر تستخدم نقاطك في فاتورتك القادمة', congratsBtn:'ابدأ التسوق', scanHintCust:'تقدر تقفل دي وتمسح QR العميل مباشرة من زر 📷 في الكاشير', vipRatesTitle:'معدلات نقاط مخصصة (VIP)', vipRatesHint:'سيب الخانة فاضية عشان نسبة الفرع الافتراضية، أو اكتب نسبة مخصصة للعميل ده في الفرع ده', branchDefault:'الافتراضي', saveCustomRates:'حفظ المعدلات المخصصة', vipBadge:'معدلاتك الخاصة', vipHint:'عميلنا الذهبي 💎 — معدلات نقاط أعلى في الفروع دي', discountPct:'نسبة الخصم', inMoney:'بالفلوس', pointValue:'قيمة النقطة', settings:'الإعدادات', phoneRequired:'رقم التليفون', phoneRequiredErr:'لازم تدخل رقم التليفون', phoneWhyHint:'هنحتاج رقمك عشان نبعتلك إيصالات الشراء عبر واتساب', invalidPhone:'رقم تليفون غير صحيح', phoneInUse:'الرقم ده متسجّل قبل كده', addCustomer:'عميل جديد', adminCreateCustHint:'العميل هيقدر يدخل بالتليفون ده وكلمة السر اللي حطّيتها', editProfile:'تعديل بيانات العميل', manualPtsHint:'تعديل يدوي للنقاط (لو حصل خطأ)', sendPwdReset:'إرسال إعادة تعيين كلمة السر', sendPwdResetConfirm:'هنبعت إيميل إعادة تعيين كلمة السر على:', pwdResetSent:'تم إرسال الإيميل ✓', noEmailForReset:'العميل ده مفيش إيميل — مينفعش نبعت إعادة تعيين', willEarn:'هيكسب', newBalance:'الرصيد بعد البيع', willCrossThreshold:'🎉 العميل هيوصل للحد الأدنى ويقدر يستخدم نقاطه!', dataResetTitle:'مركز إعادة الضبط الشامل', dataResetSubtitle:'حذف انتقائي لأقسام مختلفة من البيانات — للأدمن فقط', openDataResetCenter:'فتح مركز إعادة الضبط', dataResetMovedHint:'لإعادة ضبط شاملة (نقاط، عملاء، صور…) → الإعدادات ⚙️', dangerZone:'منطقة خطر', dataResetCenter:'مركز إعادة الضبط', rstDangerTitle:'تحذير: عملية لا رجوع فيها', rstDangerMsg:'الحذف ده دائم ومينفعش تراجع فيه. حسابات Firebase Auth بتفضل (لازم تمسحها يدوياً من الـ Console). الأدمن الأساسي محمي من الحذف.', transactionsGroup:'📊 المعاملات', catalogGroup:'🏢 الكتالوج', peopleGroup:'👥 الأشخاص', systemGroup:'⚙️ النظام', rstSales:'الفواتير', rstSalesWarn:'الفواتير القديمة هتختفي نهائياً — تأكد من Backup', rstPointsLedger:'سجل حركة النقاط', rstPointsLedgerWarn:'احذف ده مع الفواتير عشان ما يبقاش فيه تناقض', rstClientOrders:'طلبات العملاء (Online)', rstLoads:'فواتير الشراء/الاستلام', rstTransfers:'التحويلات بين الفروع', rstCustody:'العُهد بين الموظفين', rstShifts:'الورديات', rstInventory:'المخزون (كل الأصناف من كل الفروع)', rstInventoryWarn:'هيتم حذف كل سجلات المخزون', rstCategories:'الفئات', rstCategoriesWarn:'لو حذفت الفئات لازم تحذف المنتجات كمان', rstProducts:'المنتجات', rstProductsWarn:'هيكسر روابط الفواتير القديمة بالمنتجات', rstProductPhotos:'صور المنتجات (احتفاظ بالمنتجات)', rstProductPhotosWarn:'هتفضي خانة الصورة من كل المنتجات', rstSuppliers:'المورّدين', rstBranches:'الفروع', rstBranchesWarn:'⚠️ خطير جداً! هيكسر معظم البيانات', rstCustomers:'العملاء (مع نقاطهم وكل بياناتهم)', rstCustomersWarn:'حسابات Firebase Auth للعملاء بتفضل', rstCustomerPoints:'نقاط العملاء فقط (احتفاظ بالعملاء)', rstCustomerPointsWarn:'هيتم تصفير كل النقاط ومسح سجل الحركة', rstUsers:'الموظفين (ما عدا الأدمن)', rstUsersWarn:'الأدمن الأساسي محمي. حسابات Firebase Auth بتفضل', rstStaffPhotos:'صور الموظفين', rstSettings:'إعدادات النظام (Instapay، إلخ)', rstSettingsWarn:'هيمسح إعدادات Instapay وأي إعدادات تانية', rstAllTitle:'صفّر كل البيانات', rstAllHint:'لما تحدد هنا، كل الخانات فوق هتتحدد تلقائياً', rstTypeConfirm:'اكتب "AZZERA" بالضبط للتأكيد:', rstConfirmHint:'حروف كبيرة، بدون مسافات', rstExecute:'بدء الحذف', rstNothingSelected:'مفيش حاجة محددة', rstFinalConfirm:'متأكد بشكل نهائي؟ ده هيمسح {n} نوع من البيانات.', rstDone:'تم الحذف بنجاح', rstDocsDeleted:'سجل تم حذفه', protectedAdminBlock:'🛡️ ممنوع — الأدمن الأساسي محمي', protectedAdminSanitized:'🛡️ تم تصحيح التعديل — الأدمن الأساسي محمي', rstAutoBackupHint:'💾 هيتم تنزيل Backup أوتوماتيكي قبل البداية', rstAutoBackupRunning:'📥 جاري تنزيل النسخة الاحتياطية...', rstAutoBackupDone:'✅ تم تنزيل الـ Backup بنجاح', rstAutoBackupFail:'❌ فشل الـ Backup — تم إلغاء العملية', rstCountdownLabel:'⏱️ هيبدأ الحذف بعد', rstCountdownSec:'ثانية', rstCancelBtn:'إلغاء', rstSafeMode:'🛡️ الوضع الآمن: الأدمن الأساسي ومحفوظات فرعه محمية', rstSelfRepairTitle:'إصلاح تلقائي', rstSelfRepairMsg:'تم اكتشاف خلل: الأدمن الأساسي بدون فرع. جاري إعادة الربط...', rstSelfRepairDone:'✅ تم الإصلاح: الأدمن مربوط بفرع {branch}', qrIsCustomerNotProduct:'ده QR عميل ({name}) — مش باركود منتج. للبيع: روح الكاشير', barcodeNotFound:'الباركود ده مش متسجّل', repInvByBranch:'المخزون: تفصيل لكل فرع', repInvSummary:'المخزون: ملخص لكل منتج', repCapitalSnapshot:'رأس المال الحالي لكل فرع', repCapitalFlow:'دورة رأس المال في الفترة', repCategories:'تقرير الفئات', repCrossBranch:'مقارنة المنتجات عبر الفروع', repTopCustomersSpend:'أكثر العملاء إنفاقاً', repTopCustomersFreq:'أكثر العملاء تكراراً', repBestSellers:'أفضل البائعين لكل فرع', valCost:'القيمة بالتكلفة', valPrice:'القيمة بسعر البيع', marginThe:'الهامش النظري', pctTotal:'% من الإجمالي', capStart:'رأس المال أول الفترة (محسوب)', capEnd:'رأس المال آخر الفترة', purchasesIn:'مشتريات داخلة', cogsOut:'تكلفة المباع (خارج)', transfersNet:'صافي التحويلات', deltaCap:'تغير رأس المال', deltaPct:'% التغير', prodCount:'عدد المنتجات', marginPct:'% الهامش', category:'الفئة', sold:'مباع', totalSpend:'إجمالي الإنفاق', avgSpend:'متوسط الإنفاق', avgDaysBetween:'متوسط الأيام بين الزيارات', lastBuy:'آخر شراء', secWarehouseCap:'📦 المخزن ورأس المال', secCustomersRep:'🛍️ تقارير العملاء', chartCategoriesValCost:'الفئات حسب قيمة المخزون', chartTopCustomers:'أعلى العملاء إنفاقاً', warehouseReports:'تقارير المخزن', customersReports:'تقارير العملاء', totalRow:'الإجمالي', dashStockCost:'قيمة المخزن (تكلفة)', dashStockPrice:'قيمة المخزن (بيع)', dashTopCategories:'أفضل الفئات', dashTopCustomers:'أفضل العملاء', mTopBySpend:'مرتب بالإنفاق', mUnits:'وحدة', filterByBranch:'فلتر الفرع', allBranches:'كل الفروع', hubTitle:'مركز التقارير', hubSubtitle:'تقارير ذكية وقابلة للتخصيص', hubSearch:'ابحث في التقارير...', hubReportType:'نوع التقرير', hubPeriod:'الفترة', hubDetailLevel:'مستوى التفاصيل', hubDetailSummary:'ملخص', hubDetailStandard:'قياسي', hubDetailFull:'كامل', hubCompare:'مقارنة بفترة سابقة', hubCompareResult:'مقارنة A مقابل B', hubGenerate:'توليد التقرير', noData:'لا توجد بيانات', rows:'صفوف', metric:'المقياس', rMonth:'الشهر', rYear:'السنة', repSalesByInvoice:'سجل الفواتير', repSalesDetail:'تفصيل المبيعات', hubOpenBtn:'افتح المركز', analyticsTitle:'المركز التحليلي', analyticsSubtitle:'لوحة شاملة لتحليل أعمالك', analyticsExport:'تصدير', anTabOverview:'نظرة عامة', anTabSales:'المبيعات', anTabInventory:'المخزن', anTabCustomers:'العملاء', anTabStaff:'الموظفون', anFullView:'عرض كامل', anRevenueTimeline:'الإيراد على مدار الفترة', anTopCategories:'أعلى الفئات', anTopProducts:'أعلى المنتجات', anLowStock:'تنبيهات المخزون المنخفض', anActiveCustomers:'عملاء نشطون', anRegisteredCustomers:'عملاء مسجّلون', anTotal:'الإجمالي', anPerCustomer:'لكل عميل', anAvgTicket:'متوسط الفاتورة', anDailyRevenue:'الإيراد اليومي', anByBranch:'حسب الفرع', anTopByRevenue:'الأكثر إيراداً', anTopByQuantity:'الأكثر مبيعاً (كمية)', anCategoriesByValue:'الفئات حسب القيمة', anStockByBranch:'المخزون لكل فرع', anStockUnits:'إجمالي الوحدات', anMarginPct:'% الهامش', anShiftsCount:'عدد الورديات', anStaffByRevenue:'الموظفون حسب الإيراد', anHours:'س', vsBefore:'مقارنة بالفترة السابقة', mInPeriod:'في الفترة المحددة', rstOrders:'الطلبات الداخلية', rstInventories:'سجلات الجرد الفعلي',
         descAr:'الوصف بالعربية', descEn:'الوصف بالإنجليزية', category:'الفئة', price:'السعر', cost:'التكلفة',
         photo:'صورة المنتج', addPhoto:'إضافة صورة', stock:'المخزون', threshold:'حد الإنذار',
         margin:'الربح', search:'بحث...', noCategories:'لا توجد فئات بعد', noProducts:'لا توجد منتجات بعد',
@@ -425,7 +426,7 @@
         deleteUser:'Delete user', confirmDelUser:'Delete this user? They will be blocked from login. (The email stays reserved in Firebase and cannot be reused)', userDeleted:'User deleted',
         depotTools:'Depot tools', softReset:'Reset stock (Soft)', hardReset:'Empty depot (Hard)', softResetDesc:'Sets all quantities to zero and keeps products — easier re-entry', hardResetDesc:'Permanently removes all products from this depot (products stay in the catalog)', confirmSoftReset:'Sure? All quantities in this branch will become zero (products stay)', confirmHardReset:'Warning! This permanently removes every item in this depot. Sure?', resetDone:'Done', resetting:'Working...',
         confirmDelCat:'Delete this category?', confirmDelProd:'Delete this product?',
-        addProduct:'New product', scanAddProduct:'Scan barcode for new product', prodExistsScan:'Product exists — opening it to edit', createNewWithBarcode:'This barcode is not registered. Create a new product with this code?', costFallbackHint:'Leave empty = last purchase cost', scanBtn:'Scan', prodDetails:'Product details', stockByBranch:'Stock by branch', recentSales:'Recent sales', lastSold:'Last sold', noSalesYet:'No sales yet', countAddedByScan:'Set by scan', enterPhysCount:'Physical quantity', openForEdit:'Open product to edit', closeBtn:'Close', instapayTitle:'Instapay setup', instapayQr:'QR image', instapayAlias:'Username (alias)', uploadQr:'Upload QR', saveCfg:'Save', instapayShowTitle:'Pay with Instapay', instapayHint:'Ask the customer to scan the QR and pay the amount', amountToPay:'Amount to pay', received:'Received', skipPhoto:'Confirm without photo', takeProof:'Capture payment proof', noQrSet:'QR not set yet — open settings', payProofLbl:'Payment proof', empPhoto:'Employee photo', empBirthdate:'Date of birth', empGender:'Gender', empMale:'Male', empFemale:'Female', empNationalId:'National ID', empAddress:'Home address', empPhone:'Phone number', empHireDate:'Hire date', empPersonalData:'Personal data (optional)', empCall:'Call', empWhatsapp:'WhatsApp', empPrintCard:'Print card', empSendCard:'Send card', uploadPhoto:'Upload photo', empContact:'Contact', showChart:'📈 Chart', chartRevenue:'Revenue', chartProfit:'Profit', chartTopProducts:'Top products', chartBranches:'Branches comparison', chartStaff:'Staff comparison', chartByCategory:'Value by category', noChartData:'No data to chart', cleanGhostTitle:'Clean closed-branch records', cleanGhostHint:'Deletes stock records for branches removed from the system', cleanGhostBtn:'Scan & delete ghost records', ghostFound:'Ghost records found', ghostNone:'No ghost records 👍', ghostDeleted:'Ghost records deleted', reorderLevel:'Reorder level', reorderSaved:'Reorder level saved', lowInBranches:'Low in', qtyByBranch:'Quantity by branch', totalAllBranches:'Total across branches', valueByCost:'Value (cost)', editProduct:'Edit product', barcode:'Barcode', name:'Name (French)', clientSignup:'New customer signup', clientLogin:'Customer login', staffLogin:'Staff login', clientName:'Name', emailOrPhone:'Email or phone', emailOpt:'Email (optional)', phoneOpt:'Phone (optional)', needEmailOrPhone:'You must enter an email or phone', nameTaken:'This name is already registered — please differentiate it', chooseBranch:'Choose branch', clientWelcome:'Welcome', myOrders:'My orders', myPoints:'My points', pointsBalance:'Points balance', shopNow:'Order now', browseProducts:'Browse products', clientLogout:'Logout', signupDone:'Registered! Log in now', notAvailable:'Not available', addToCartC:'Add to cart', myCart:'Cart', sendOrder:'Send order', orderSent:'Your order was sent to the branch', emptyCartC:'Your cart is empty', usePoints:'Use loyalty points', orderHoldMin:'Order hold time (minutes)', branchPointsPct:'Loyalty points rate (%)', newOrderTitle:'New customer order', orderReady:'Your order is ready! Come collect and pay', orderPreparing:'Preparing', orderStatusPending:'Pending', orderStatusPreparing:'Preparing', orderStatusReady:'Ready', orderStatusPaid:'Paid', orderStatusCancelled:'Cancelled', orderStatusHold:'On hold', readyOrdersTitle:'Customer orders ready', orderFromCustomer:'Order from', payOrderBtn:'Pick up & pay', orderPaid:'Order payment registered', favorites:'Favorites', addFav:'Add to favorites', removeFav:'Remove from favorites', noFavorites:'No favorites yet', minPoints:'Minimum points', updateMyData:'Update my data', myData:'My data', customers_tab:'Customers', noCustomers:'No registered customers yet', customerActive:'Active', customerSuspended:'Suspended', suspendCustomer:'Suspend customer', activateCustomer:'Activate customer', deleteCustomer:'Delete customer', deleteCustomerConfirm:'Sure you want to delete this customer permanently? Past invoices will be kept.', customerDeleted:'Customer deleted', customerSuspendedMsg:'Customer suspended', customerActivatedMsg:'Customer activated', orderHistory:'Invoice history', accountSuspended:'Your account is suspended — contact administration', cancelOrderConfirm:'Sure you want to cancel this order? Stock will be restored.', stockRestored:'Stock restored', myQrCode:'My QR code', showMyQr:'Show ID QR', qrHint:'Show this code to the cashier to start your order', startOrderForCustomer:'Start order for customer', selectCustomer:'Select customer', searchByNameOrPhone:'Search by name or phone', orderingFor:'Ordering for', noCustomerFound:'No customer matches', scanCustomerQr:'Scan customer QR', customerNotFound:'Customer not found', useCustomerPoints:'Use customer points', requestSent:'Use request sent to customer', waitingCustomerApproval:'Waiting for customer approval...', customerApproved:'Customer approved', customerRejected:'Customer rejected', requestTimeout:'Request timed out', pointsRequestTitle:'Points usage request', pointsRequestMsg:'The cashier wants to use your points in the bill', approve:'Approve', reject:'Reject', pointsEarned:'Points earned', pointsUsed:'Points used', minPointsHint:'Min to use: ', prepareOrder:'Prepare order', confirmReady:'Prepared — ready for pickup', cancelItem:'Cancel item', cancelOrder:'Cancel order', loyaltyDiscount:'Loyalty points discount', payNow:'Pay now', payAtPickup:'Pay at pickup', payMethodChoice:'Payment method', cashAtPickup:'Cash (at pickup)', instapayNow:'Instapay (pay now)', clientInstapayTitle:'Pay with Instapay', clientInstapayHint:'Send to the IPA below and attach the transfer receipt', copyIpa:'Copy IPA', copyAmount:'Copy amount', copied:'Copied ✓', openInstapayApp:'Open Instapay app', stepsToFollow:'Steps:', step1Copy:'Copy the IPA', step2OpenApp:'Open Instapay and transfer the amount', step3Screenshot:'Screenshot the transfer receipt', step4Upload:'Come back and upload the receipt here', uploadProofMandatory:'Attach payment proof (mandatory)', chooseProofImage:'Choose receipt image', confirmOrder:'Confirm order', orderPaidAlready:'Paid Instapay', viewProof:'View receipt', proofMissing:'You must upload payment proof', cantCancelPaid:'Order already paid — contact the shop to cancel', instapayAliasNotSet:'Admin has not set Instapay info yet', howPointsWork:'How do points work?', pointRule1:'When you buy, you earn points based on the branch rate (see table above)', pointRule2:'1 point = 1 EGP discount on the bill', pointRule3:'You need at least 50 points to be able to use them', pointRule4:'Points always round up (e.g. 0.3 → 1 point)', pointRule5:'Same when spending (e.g. 23.5 EGP item → 24 points)', pointsHistory:'Points history', noPointsHistory:'No point transactions yet', earned:'Earned', spent:'Spent', linkRegCustomer:'Link to registered customer', dashProfitTitle:'Profit details', dashOrdersTitle:'Invoices in period', dashItemsTitle:'Items sold', dashRevenue:'Revenue', dashCosts:'Cost of goods', dashNetProfit:'Net profit', dashGrossProfit:'Gross profit', dashTopByProfit:'Top products by profit', dashNothingInPeriod:'No data in selected period', dashSortedByRevenue:'Sorted high to low', dashReturnsTitle:'Returns & voids', dashPurchasesTitle:'Purchase invoices', dashItemsPurchTitle:'Items purchased', dashOpenSitesTitle:'Open branches', dashActiveStaffTitle:'Active staff', dashFullyVoided:'Fully voided', dashPartialReturn:'Partial return', dashFromSupplier:'From supplier', dashOpenedAt:'Shift opened', dashWho:'Staff', dashWhere:'Branch', dashTimeOpen:'Time open', dashComingSoon:'Coming soon', dashUnitCost:'Unit cost', clientVisibleCats:'Categories customers can order online', clientVisibleCatsHint:'Customers in the app will only see products in these categories. The cashier in store can still sell everything.', selectAll:'Select all', selectNone:'Select none', ptsRateExplain:'Every 10 EGP = 1 point', pointsReady:'Ready to use', pointsLocked:'Not unlocked yet', pointsNeedMore:'Need ', pointsToUnlock:' more points to use them', pointsCanUseNow:'You can use your points now!', congratsTitle:'Congratulations!', congratsMsg:'You reached 50 points! You can now use them on your next bill', congratsBtn:'Start shopping', scanHintCust:'You can close this and scan the customer QR directly from the 📷 button in the cashier', vipRatesTitle:'Custom points rates (VIP)', vipRatesHint:'Leave empty for the branch default, or enter a custom rate for this customer in this branch', branchDefault:'Default', saveCustomRates:'Save custom rates', vipBadge:'Your special rates', vipHint:'Our VIP customer 💎 — higher points rates at these branches', discountPct:'Discount rate', inMoney:'In money', pointValue:'Point value', settings:'Settings', phoneRequired:'Phone number', phoneRequiredErr:'Phone number is required', phoneWhyHint:'We need your phone to send purchase receipts via WhatsApp', invalidPhone:'Invalid phone number', phoneInUse:'This phone is already registered', addCustomer:'New customer', adminCreateCustHint:'The customer can log in with this phone and the password you set', editProfile:'Edit customer profile', manualPtsHint:'Manual points correction (if needed)', sendPwdReset:'Send password reset', sendPwdResetConfirm:'We will send a password reset email to:', pwdResetSent:'Email sent ✓', noEmailForReset:'This customer has no email — cannot send reset', willEarn:'Will earn', newBalance:'Balance after sale', willCrossThreshold:'🎉 Customer will reach the threshold and can use their points!', dataResetTitle:'Full data reset center', dataResetSubtitle:'Selective deletion of various data sections — admin only', openDataResetCenter:'Open reset center', dataResetMovedHint:'For full reset (points, customers, photos…) → Settings ⚙️', dangerZone:'Danger zone', dataResetCenter:'Data reset center', rstDangerTitle:'Warning: irreversible operation', rstDangerMsg:'This deletion is permanent and cannot be undone. Firebase Auth accounts remain (you must delete them manually from the Console). The primary admin is protected from deletion.', transactionsGroup:'📊 Transactions', catalogGroup:'🏢 Catalog', peopleGroup:'👥 People', systemGroup:'⚙️ System', rstSales:'Sales / Invoices', rstSalesWarn:'Old invoices will disappear permanently — back up first', rstPointsLedger:'Points ledger history', rstPointsLedgerWarn:'Delete together with sales to avoid inconsistencies', rstClientOrders:'Customer orders (Online)', rstLoads:'Purchase invoices / Receivings', rstTransfers:'Inter-branch transfers', rstCustody:'Staff custody transfers', rstShifts:'Shifts', rstInventory:'Inventory (all branches)', rstInventoryWarn:'All inventory records will be deleted', rstCategories:'Categories', rstCategoriesWarn:'Deleting categories means you must delete products too', rstProducts:'Products', rstProductsWarn:'Will break links from old sales to products', rstProductPhotos:'Product photos (keep products)', rstProductPhotosWarn:'Empties photo field on all products', rstSuppliers:'Suppliers', rstBranches:'Branches', rstBranchesWarn:'⚠️ Very dangerous! Will break most data', rstCustomers:'Customers (with their points and data)', rstCustomersWarn:'Customer Firebase Auth accounts remain', rstCustomerPoints:'Customer points only (keep customers)', rstCustomerPointsWarn:'All points will be zeroed and ledger cleared', rstUsers:'Staff (except admins)', rstUsersWarn:'Primary admin is protected. Firebase Auth accounts remain', rstStaffPhotos:'Staff photos', rstSettings:'System settings (Instapay, etc.)', rstSettingsWarn:'Will delete Instapay setup and any other settings', rstAllTitle:'Reset everything', rstAllHint:'Checking this auto-selects every checkbox above', rstTypeConfirm:'Type "AZZERA" exactly to confirm:', rstConfirmHint:'Uppercase, no spaces', rstExecute:'Start deletion', rstNothingSelected:'Nothing selected', rstFinalConfirm:'Are you absolutely sure? This will erase {n} data type(s).', rstDone:'Successfully deleted', rstDocsDeleted:'records deleted', protectedAdminBlock:'🛡️ Blocked — primary admin is protected', protectedAdminSanitized:'🛡️ Edit auto-sanitized — primary admin is protected', rstAutoBackupHint:'💾 An automatic backup will be downloaded before starting', rstAutoBackupRunning:'📥 Downloading backup...', rstAutoBackupDone:'✅ Backup downloaded successfully', rstAutoBackupFail:'❌ Backup failed — operation cancelled', rstCountdownLabel:'⏱️ Deletion starts in', rstCountdownSec:'s', rstCancelBtn:'Cancel', rstSafeMode:'🛡️ Safe mode: primary admin and their branch are protected', rstSelfRepairTitle:'Auto-repair', rstSelfRepairMsg:'Issue detected: primary admin has no branch. Re-linking...', rstSelfRepairDone:'✅ Repaired: admin linked to branch {branch}', qrIsCustomerNotProduct:'This is a customer QR ({name}) — not a product barcode. To sell, go to Cashier', barcodeNotFound:'Barcode not registered', repInvByBranch:'Inventory: per-branch detail', repInvSummary:'Inventory: per-product summary', repCapitalSnapshot:'Capital snapshot per branch', repCapitalFlow:'Capital cycle in period', repCategories:'Categories report', repCrossBranch:'Cross-branch product comparison', repTopCustomersSpend:'Top customers by spend', repTopCustomersFreq:'Top customers by frequency', repBestSellers:'Best sellers per branch', valCost:'Value at cost', valPrice:'Value at price', marginThe:'Theoretical margin', pctTotal:'% of total', capStart:'Capital start (estimated)', capEnd:'Capital end', purchasesIn:'Purchases in', cogsOut:'COGS (out)', transfersNet:'Net transfers', deltaCap:'Capital change', deltaPct:'% change', prodCount:'# products', marginPct:'Margin %', category:'Category', sold:'Sold', totalSpend:'Total spend', avgSpend:'Avg spend', avgDaysBetween:'Avg days between visits', lastBuy:'Last purchase', secWarehouseCap:'📦 Warehouse & Capital', secCustomersRep:'🛍️ Customer reports', chartCategoriesValCost:'Categories by stock value', chartTopCustomers:'Top customers by spend', warehouseReports:'Warehouse reports', customersReports:'Customer reports', totalRow:'TOTAL', dashStockCost:'Stock Value (Cost)', dashStockPrice:'Stock Value (Price)', dashTopCategories:'Top Categories', dashTopCustomers:'Top Customers', mTopBySpend:'Sorted by spend', mUnits:'units', filterByBranch:'Branch filter', allBranches:'All branches', hubTitle:'Reports Hub', hubSubtitle:'Smart, customizable reports', hubSearch:'Search reports...', hubReportType:'Report type', hubPeriod:'Period', hubDetailLevel:'Detail level', hubDetailSummary:'Summary', hubDetailStandard:'Standard', hubDetailFull:'Full', hubCompare:'Compare with previous period', hubCompareResult:'Compare A vs B', hubGenerate:'Generate report', noData:'No data', rows:'rows', metric:'Metric', rMonth:'Month', rYear:'Year', repSalesByInvoice:'Sales by invoice', repSalesDetail:'Sales detail',
+        addProduct:'New product', scanAddProduct:'Scan barcode for new product', prodExistsScan:'Product exists — opening it to edit', createNewWithBarcode:'This barcode is not registered. Create a new product with this code?', costFallbackHint:'Leave empty = last purchase cost', scanBtn:'Scan', prodDetails:'Product details', stockByBranch:'Stock by branch', recentSales:'Recent sales', lastSold:'Last sold', noSalesYet:'No sales yet', countAddedByScan:'Set by scan', enterPhysCount:'Physical quantity', openForEdit:'Open product to edit', closeBtn:'Close', instapayTitle:'Instapay setup', instapayQr:'QR image', instapayAlias:'Username (alias)', uploadQr:'Upload QR', saveCfg:'Save', instapayShowTitle:'Pay with Instapay', instapayHint:'Ask the customer to scan the QR and pay the amount', amountToPay:'Amount to pay', received:'Received', skipPhoto:'Confirm without photo', takeProof:'Capture payment proof', noQrSet:'QR not set yet — open settings', payProofLbl:'Payment proof', empPhoto:'Employee photo', empBirthdate:'Date of birth', empGender:'Gender', empMale:'Male', empFemale:'Female', empNationalId:'National ID', empAddress:'Home address', empPhone:'Phone number', empHireDate:'Hire date', empPersonalData:'Personal data (optional)', empCall:'Call', empWhatsapp:'WhatsApp', empPrintCard:'Print card', empSendCard:'Send card', uploadPhoto:'Upload photo', empContact:'Contact', showChart:'📈 Chart', chartRevenue:'Revenue', chartProfit:'Profit', chartTopProducts:'Top products', chartBranches:'Branches comparison', chartStaff:'Staff comparison', chartByCategory:'Value by category', noChartData:'No data to chart', cleanGhostTitle:'Clean closed-branch records', cleanGhostHint:'Deletes stock records for branches removed from the system', cleanGhostBtn:'Scan & delete ghost records', ghostFound:'Ghost records found', ghostNone:'No ghost records 👍', ghostDeleted:'Ghost records deleted', reorderLevel:'Reorder level', reorderSaved:'Reorder level saved', lowInBranches:'Low in', qtyByBranch:'Quantity by branch', totalAllBranches:'Total across branches', valueByCost:'Value (cost)', editProduct:'Edit product', barcode:'Barcode', name:'Name (French)', clientSignup:'New customer signup', clientLogin:'Customer login', staffLogin:'Staff login', clientName:'Name', emailOrPhone:'Email or phone', emailOpt:'Email (optional)', phoneOpt:'Phone (optional)', needEmailOrPhone:'You must enter an email or phone', nameTaken:'This name is already registered — please differentiate it', chooseBranch:'Choose branch', clientWelcome:'Welcome', myOrders:'My orders', myPoints:'My points', pointsBalance:'Points balance', shopNow:'Order now', browseProducts:'Browse products', clientLogout:'Logout', signupDone:'Registered! Log in now', notAvailable:'Not available', addToCartC:'Add to cart', myCart:'Cart', sendOrder:'Send order', orderSent:'Your order was sent to the branch', emptyCartC:'Your cart is empty', usePoints:'Use loyalty points', orderHoldMin:'Order hold time (minutes)', branchPointsPct:'Loyalty points rate (%)', newOrderTitle:'New customer order', orderReady:'Your order is ready! Come collect and pay', orderPreparing:'Preparing', orderStatusPending:'Pending', orderStatusPreparing:'Preparing', orderStatusReady:'Ready', orderStatusPaid:'Paid', orderStatusCancelled:'Cancelled', orderStatusHold:'On hold', readyOrdersTitle:'Customer orders ready', orderFromCustomer:'Order from', payOrderBtn:'Pick up & pay', orderPaid:'Order payment registered', favorites:'Favorites', addFav:'Add to favorites', removeFav:'Remove from favorites', noFavorites:'No favorites yet', minPoints:'Minimum points', updateMyData:'Update my data', myData:'My data', customers_tab:'Customers', noCustomers:'No registered customers yet', customerActive:'Active', customerSuspended:'Suspended', suspendCustomer:'Suspend customer', activateCustomer:'Activate customer', deleteCustomer:'Delete customer', deleteCustomerConfirm:'Sure you want to delete this customer permanently? Past invoices will be kept.', customerDeleted:'Customer deleted', customerSuspendedMsg:'Customer suspended', customerActivatedMsg:'Customer activated', orderHistory:'Invoice history', accountSuspended:'Your account is suspended — contact administration', cancelOrderConfirm:'Sure you want to cancel this order? Stock will be restored.', stockRestored:'Stock restored', myQrCode:'My QR code', showMyQr:'Show ID QR', qrHint:'Show this code to the cashier to start your order', startOrderForCustomer:'Start order for customer', selectCustomer:'Select customer', searchByNameOrPhone:'Search by name or phone', orderingFor:'Ordering for', noCustomerFound:'No customer matches', scanCustomerQr:'Scan customer QR', customerNotFound:'Customer not found', useCustomerPoints:'Use customer points', requestSent:'Use request sent to customer', waitingCustomerApproval:'Waiting for customer approval...', customerApproved:'Customer approved', customerRejected:'Customer rejected', requestTimeout:'Request timed out', pointsRequestTitle:'Points usage request', pointsRequestMsg:'The cashier wants to use your points in the bill', approve:'Approve', reject:'Reject', pointsEarned:'Points earned', pointsUsed:'Points used', minPointsHint:'Min to use: ', prepareOrder:'Prepare order', confirmReady:'Prepared — ready for pickup', cancelItem:'Cancel item', cancelOrder:'Cancel order', loyaltyDiscount:'Loyalty points discount', payNow:'Pay now', payAtPickup:'Pay at pickup', payMethodChoice:'Payment method', cashAtPickup:'Cash (at pickup)', instapayNow:'Instapay (pay now)', clientInstapayTitle:'Pay with Instapay', clientInstapayHint:'Send to the IPA below and attach the transfer receipt', copyIpa:'Copy IPA', copyAmount:'Copy amount', copied:'Copied ✓', openInstapayApp:'Open Instapay app', stepsToFollow:'Steps:', step1Copy:'Copy the IPA', step2OpenApp:'Open Instapay and transfer the amount', step3Screenshot:'Screenshot the transfer receipt', step4Upload:'Come back and upload the receipt here', uploadProofMandatory:'Attach payment proof (mandatory)', chooseProofImage:'Choose receipt image', confirmOrder:'Confirm order', orderPaidAlready:'Paid Instapay', viewProof:'View receipt', proofMissing:'You must upload payment proof', cantCancelPaid:'Order already paid — contact the shop to cancel', instapayAliasNotSet:'Admin has not set Instapay info yet', howPointsWork:'How do points work?', pointRule1:'When you buy, you earn points based on the branch rate (see table above)', pointRule2:'1 point = 1 EGP discount on the bill', pointRule3:'You need at least 50 points to be able to use them', pointRule4:'Points always round up (e.g. 0.3 → 1 point)', pointRule5:'Same when spending (e.g. 23.5 EGP item → 24 points)', pointsHistory:'Points history', noPointsHistory:'No point transactions yet', earned:'Earned', spent:'Spent', linkRegCustomer:'Link to registered customer', dashProfitTitle:'Profit details', dashOrdersTitle:'Invoices in period', dashItemsTitle:'Items sold', dashRevenue:'Revenue', dashCosts:'Cost of goods', dashNetProfit:'Net profit', dashGrossProfit:'Gross profit', dashTopByProfit:'Top products by profit', dashNothingInPeriod:'No data in selected period', dashSortedByRevenue:'Sorted high to low', dashReturnsTitle:'Returns & voids', dashPurchasesTitle:'Purchase invoices', dashItemsPurchTitle:'Items purchased', dashOpenSitesTitle:'Open branches', dashActiveStaffTitle:'Active staff', dashFullyVoided:'Fully voided', dashPartialReturn:'Partial return', dashFromSupplier:'From supplier', dashOpenedAt:'Shift opened', dashWho:'Staff', dashWhere:'Branch', dashTimeOpen:'Time open', dashComingSoon:'Coming soon', dashUnitCost:'Unit cost', clientVisibleCats:'Categories customers can order online', clientVisibleCatsHint:'Customers in the app will only see products in these categories. The cashier in store can still sell everything.', selectAll:'Select all', selectNone:'Select none', ptsRateExplain:'Every 10 EGP = 1 point', pointsReady:'Ready to use', pointsLocked:'Not unlocked yet', pointsNeedMore:'Need ', pointsToUnlock:' more points to use them', pointsCanUseNow:'You can use your points now!', congratsTitle:'Congratulations!', congratsMsg:'You reached 50 points! You can now use them on your next bill', congratsBtn:'Start shopping', scanHintCust:'You can close this and scan the customer QR directly from the 📷 button in the cashier', vipRatesTitle:'Custom points rates (VIP)', vipRatesHint:'Leave empty for the branch default, or enter a custom rate for this customer in this branch', branchDefault:'Default', saveCustomRates:'Save custom rates', vipBadge:'Your special rates', vipHint:'Our VIP customer 💎 — higher points rates at these branches', discountPct:'Discount rate', inMoney:'In money', pointValue:'Point value', settings:'Settings', phoneRequired:'Phone number', phoneRequiredErr:'Phone number is required', phoneWhyHint:'We need your phone to send purchase receipts via WhatsApp', invalidPhone:'Invalid phone number', phoneInUse:'This phone is already registered', addCustomer:'New customer', adminCreateCustHint:'The customer can log in with this phone and the password you set', editProfile:'Edit customer profile', manualPtsHint:'Manual points correction (if needed)', sendPwdReset:'Send password reset', sendPwdResetConfirm:'We will send a password reset email to:', pwdResetSent:'Email sent ✓', noEmailForReset:'This customer has no email — cannot send reset', willEarn:'Will earn', newBalance:'Balance after sale', willCrossThreshold:'🎉 Customer will reach the threshold and can use their points!', dataResetTitle:'Full data reset center', dataResetSubtitle:'Selective deletion of various data sections — admin only', openDataResetCenter:'Open reset center', dataResetMovedHint:'For full reset (points, customers, photos…) → Settings ⚙️', dangerZone:'Danger zone', dataResetCenter:'Data reset center', rstDangerTitle:'Warning: irreversible operation', rstDangerMsg:'This deletion is permanent and cannot be undone. Firebase Auth accounts remain (you must delete them manually from the Console). The primary admin is protected from deletion.', transactionsGroup:'📊 Transactions', catalogGroup:'🏢 Catalog', peopleGroup:'👥 People', systemGroup:'⚙️ System', rstSales:'Sales / Invoices', rstSalesWarn:'Old invoices will disappear permanently — back up first', rstPointsLedger:'Points ledger history', rstPointsLedgerWarn:'Delete together with sales to avoid inconsistencies', rstClientOrders:'Customer orders (Online)', rstLoads:'Purchase invoices / Receivings', rstTransfers:'Inter-branch transfers', rstCustody:'Staff custody transfers', rstShifts:'Shifts', rstInventory:'Inventory (all branches)', rstInventoryWarn:'All inventory records will be deleted', rstCategories:'Categories', rstCategoriesWarn:'Deleting categories means you must delete products too', rstProducts:'Products', rstProductsWarn:'Will break links from old sales to products', rstProductPhotos:'Product photos (keep products)', rstProductPhotosWarn:'Empties photo field on all products', rstSuppliers:'Suppliers', rstBranches:'Branches', rstBranchesWarn:'⚠️ Very dangerous! Will break most data', rstCustomers:'Customers (with their points and data)', rstCustomersWarn:'Customer Firebase Auth accounts remain', rstCustomerPoints:'Customer points only (keep customers)', rstCustomerPointsWarn:'All points will be zeroed and ledger cleared', rstUsers:'Staff (except admins)', rstUsersWarn:'Primary admin is protected. Firebase Auth accounts remain', rstStaffPhotos:'Staff photos', rstSettings:'System settings (Instapay, etc.)', rstSettingsWarn:'Will delete Instapay setup and any other settings', rstAllTitle:'Reset everything', rstAllHint:'Checking this auto-selects every checkbox above', rstTypeConfirm:'Type "AZZERA" exactly to confirm:', rstConfirmHint:'Uppercase, no spaces', rstExecute:'Start deletion', rstNothingSelected:'Nothing selected', rstFinalConfirm:'Are you absolutely sure? This will erase {n} data type(s).', rstDone:'Successfully deleted', rstDocsDeleted:'records deleted', protectedAdminBlock:'🛡️ Blocked — primary admin is protected', protectedAdminSanitized:'🛡️ Edit auto-sanitized — primary admin is protected', rstAutoBackupHint:'💾 An automatic backup will be downloaded before starting', rstAutoBackupRunning:'📥 Downloading backup...', rstAutoBackupDone:'✅ Backup downloaded successfully', rstAutoBackupFail:'❌ Backup failed — operation cancelled', rstCountdownLabel:'⏱️ Deletion starts in', rstCountdownSec:'s', rstCancelBtn:'Cancel', rstSafeMode:'🛡️ Safe mode: primary admin and their branch are protected', rstSelfRepairTitle:'Auto-repair', rstSelfRepairMsg:'Issue detected: primary admin has no branch. Re-linking...', rstSelfRepairDone:'✅ Repaired: admin linked to branch {branch}', qrIsCustomerNotProduct:'This is a customer QR ({name}) — not a product barcode. To sell, go to Cashier', barcodeNotFound:'Barcode not registered', repInvByBranch:'Inventory: per-branch detail', repInvSummary:'Inventory: per-product summary', repCapitalSnapshot:'Capital snapshot per branch', repCapitalFlow:'Capital cycle in period', repCategories:'Categories report', repCrossBranch:'Cross-branch product comparison', repTopCustomersSpend:'Top customers by spend', repTopCustomersFreq:'Top customers by frequency', repBestSellers:'Best sellers per branch', valCost:'Value at cost', valPrice:'Value at price', marginThe:'Theoretical margin', pctTotal:'% of total', capStart:'Capital start (estimated)', capEnd:'Capital end', purchasesIn:'Purchases in', cogsOut:'COGS (out)', transfersNet:'Net transfers', deltaCap:'Capital change', deltaPct:'% change', prodCount:'# products', marginPct:'Margin %', category:'Category', sold:'Sold', totalSpend:'Total spend', avgSpend:'Avg spend', avgDaysBetween:'Avg days between visits', lastBuy:'Last purchase', secWarehouseCap:'📦 Warehouse & Capital', secCustomersRep:'🛍️ Customer reports', chartCategoriesValCost:'Categories by stock value', chartTopCustomers:'Top customers by spend', warehouseReports:'Warehouse reports', customersReports:'Customer reports', totalRow:'TOTAL', dashStockCost:'Stock Value (Cost)', dashStockPrice:'Stock Value (Price)', dashTopCategories:'Top Categories', dashTopCustomers:'Top Customers', mTopBySpend:'Sorted by spend', mUnits:'units', filterByBranch:'Branch filter', allBranches:'All branches', hubTitle:'Reports Hub', hubSubtitle:'Smart, customizable reports', hubSearch:'Search reports...', hubReportType:'Report type', hubPeriod:'Period', hubDetailLevel:'Detail level', hubDetailSummary:'Summary', hubDetailStandard:'Standard', hubDetailFull:'Full', hubCompare:'Compare with previous period', hubCompareResult:'Compare A vs B', hubGenerate:'Generate report', noData:'No data', rows:'rows', metric:'Metric', rMonth:'Month', rYear:'Year', repSalesByInvoice:'Sales by invoice', repSalesDetail:'Sales detail', hubOpenBtn:'Open Hub', analyticsTitle:'Analytics Center', analyticsSubtitle:'Comprehensive dashboard for business analysis', analyticsExport:'Export', anTabOverview:'Overview', anTabSales:'Sales', anTabInventory:'Inventory', anTabCustomers:'Customers', anTabStaff:'Staff', anFullView:'Full view', anRevenueTimeline:'Revenue over period', anTopCategories:'Top categories', anTopProducts:'Top products', anLowStock:'Low stock alerts', anActiveCustomers:'Active customers', anRegisteredCustomers:'Registered customers', anTotal:'Total', anPerCustomer:'Per customer', anAvgTicket:'Avg ticket', anDailyRevenue:'Daily revenue', anByBranch:'By branch', anTopByRevenue:'Top by revenue', anTopByQuantity:'Top by quantity', anCategoriesByValue:'Categories by value', anStockByBranch:'Stock by branch', anStockUnits:'Total units', anMarginPct:'Margin %', anShiftsCount:'Shifts count', anStaffByRevenue:'Staff by revenue', anHours:'h', vsBefore:'vs previous period', mInPeriod:'In period', rstOrders:'Internal orders', rstInventories:'Physical count records',
         descAr:'Description (Arabic)', descEn:'Description (English)', category:'Category', price:'Price', cost:'Cost',
         photo:'Product photo', addPhoto:'Add photo', stock:'Stock', threshold:'Low-stock alert',
         margin:'Margin', search:'Search...', noCategories:'No categories yet', noProducts:'No products yet',
@@ -595,6 +596,7 @@
       if(img.classList.contains('logo')) return false; // logo scontrino
       if(img.classList.contains('brand-name')) return false;
       if(img.classList.contains('cl-photo')) return false; // foto inline nel carrello (contesto interattivo)
+      if(img.classList.contains('pc-photo')) return false; // 🛒 foto tile cassa: click=addToCart, zoom solo via 🔍 dedicato
       // Dentro un upload box (cliccare = aprire file picker)
       if(img.closest('#photo-box') || img.closest('#u-photo-box') || img.closest('.photo-upload')) return false;
       // Avatar piccoli (lista clienti, staff inline, ecc.) — soglia 48px (post-bug 30/05/2026)
@@ -797,9 +799,20 @@
       applyBranchLock();
       $('user-btn').onclick=openSettings;
       $('menu-btn')&&($('menu-btn').onclick=openMenu);
+      // 🆕 v2.5.8 — icona Reports Hub nell'header (admin/manager)
+      const repsBtn = $('reports-btn');
+      if(repsBtn){
+        if(profile.role==='admin'||profile.role==='manager'){
+          repsBtn.style.display='inline-flex';
+          repsBtn.onclick=()=>openFullReports();
+        } else {
+          repsBtn.style.display='none';
+        }
+      }
       // nav depends on role
       const tabs=[];
-      if(profile.role==='admin'||profile.role==='manager') tabs.push({k:'dashboard',ico:'📈',l:t('dashboard_tab')});
+      // 🆕 v2.6.0 — Tab unico "Analytics" (sostituisce dashboard + reports separati)
+      if(profile.role==='admin'||profile.role==='manager') tabs.push({k:'analytics',ico:'📊',l:t('analyticsTitle')});
       tabs.push({k:'cassa',ico:'🛒',l:t('cashier_tab')});
       tabs.push({k:'shift',ico:'🕐',l:t('shift_tab')});
       tabs.push({k:'receipts',ico:'🧾',l:t('receipts_tab')});
@@ -812,9 +825,10 @@
       }
       if(profile.role==='admin') tabs.push({k:'branches',ico:'🏢',l:t('branches_tab')});
       if(profile.role==='admin') tabs.push({k:'customers',ico:'👥',l: (lang==='ar'?'العملاء':'Customers')});
-      // landing page: الكاشير يفتح على الوردية، المدير/الأدمن على لوحة التحكم
+      // 🗑️ v2.6.0: tab 'reports' rimosso, accessibile via drill-down dall'Analytics
+      // landing page: الكاشير يفتح على الوردية، المدير/الأدمن على المركز التحليلي
       if(profile.role==='cashier') activeTab='shift';
-      else activeTab='dashboard';
+      else activeTab='analytics';
       navTabs=tabs; // عشان قائمة الأقسام تستخدمها
       $('nav-inner').style.gridTemplateColumns=`repeat(${tabs.length},1fr)`;
       $('nav-inner').innerHTML=tabs.map(x=>`<button class="nav-btn ${x.k===activeTab?'active':''}" data-tab="${x.k}"><span class="ico">${x.ico}</span><span class="lbl2">${x.l}</span></button>`).join('');
@@ -831,10 +845,11 @@
     function render(){
       // refresh nav labels & branch names for language
       const bs=$('branch-select'); if(bs){const cur=bs.value;bs.innerHTML=branches.map(b=>`<option value="${b.id}">${lang==='ar'?b.nameAr:b.nameEn}</option>`).join('');bs.value=cur;}
-      document.querySelectorAll('.nav-btn').forEach(b=>{const k=b.dataset.tab;b.querySelector('.lbl2').textContent=k==='dashboard'?t('dashboard_tab'):k==='cassa'?t('cashier_tab'):k==='shift'?t('shift_tab'):k==='receipts'?t('receipts_tab'):k==='products'?t('products'):k==='categories'?t('categories'):k==='warehouse'?t('warehouse'):k==='suppliers'?t('suppliers_tab'):k==='users'?t('users'):k==='staff'?t('staff_tab'):k==='reports'?t('reports'):k==='branches'?t('branches_tab'):k==='customers'?(lang==='ar'?'العملاء':'Customers'):t('cashier_tab');});
+      document.querySelectorAll('.nav-btn').forEach(b=>{const k=b.dataset.tab;b.querySelector('.lbl2').textContent=k==='analytics'?t('analyticsTitle'):k==='dashboard'?t('dashboard_tab'):k==='cassa'?t('cashier_tab'):k==='shift'?t('shift_tab'):k==='receipts'?t('receipts_tab'):k==='products'?t('products'):k==='categories'?t('categories'):k==='warehouse'?t('warehouse'):k==='suppliers'?t('suppliers_tab'):k==='users'?t('users'):k==='staff'?t('staff_tab'):k==='reports'?t('reports'):k==='branches'?t('branches_tab'):k==='customers'?(lang==='ar'?'العملاء':'Customers'):t('cashier_tab');});
       if(activeTab==='cassa') renderCassa();
       else { const cb=$('cart-bar-root'); if(cb) cb.innerHTML=''; 
-        if(activeTab==='dashboard') renderDashboard();
+        if(activeTab==='analytics') renderAnalytics();
+        else if(activeTab==='dashboard') renderAnalytics(); // 🔁 v2.6.0: redirect legacy → analytics
         else if(activeTab==='products') renderProducts();
         else if(activeTab==='categories') renderCategories();
         else if(activeTab==='warehouse') renderWarehouse();
@@ -843,7 +858,7 @@
         else if(activeTab==='receipts') renderReceipts();
         else if(activeTab==='users') renderUsers();
         else if(activeTab==='staff') renderStaff();
-        else if(activeTab==='reports') renderReports();
+        else if(activeTab==='reports') renderAnalytics(); // 🔁 v2.6.0: redirect legacy → analytics
         else if(activeTab==='branches') renderBranches();
         else if(activeTab==='customers') renderCustomers();
         else renderCassa();
@@ -2162,6 +2177,561 @@
       const tt=dashRange.to?new Date(dashRange.to+'T23:59:59').getTime():now;
       return [f,tt];
     }
+    // ============ 🆕 v2.6.0 — ANALYTICS HUB (rivoluzione UX) ============
+    // Sostituisce Dashboard + Reports separati.
+    // Unica pagina con sub-tabs (Overview/Sales/Inventory/Customers/Staff),
+    // filtri sticky condivisi, drill-down su ogni widget tramite openFullReports().
+    const analyticsState = {
+      subTab: 'overview',
+      range: { mode:'30', from:'', to:'' },
+      branchFilter: 'all',
+      compare: false,
+      _data: null,        // last loaded buildReportData
+      _data2: null,       // comparison dataset
+      _sales: null,       // raw sales
+      _loads: null,       // raw loads
+      _inv: null,         // raw inventory
+      _custs: null,       // raw customers
+      _shifts: null,      // raw shifts
+      _ts: null,          // last timestamps
+    };
+
+    // SVG sparkline inline (no library)
+    function sparklineSVG(values, color, w, h){
+      w = w||80; h = h||22;
+      if(!values || !values.length) return '';
+      const max = Math.max(...values, 0), min = Math.min(...values, 0);
+      const range = max-min || 1;
+      const pts = values.map((v,i)=>{
+        const x = values.length>1 ? (i/(values.length-1))*w : w/2;
+        const y = h - ((v-min)/range)*h;
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      }).join(' ');
+      return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="display:block;"><polyline points="${pts}" fill="none" stroke="${color||'#1F3A2E'}" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
+    }
+
+    // Helper: trend daily revenues per range
+    function dailyBuckets(salesArr, fromTs, toTs){
+      const dayMs = 86400000;
+      const days = Math.max(1, Math.ceil((toTs-fromTs)/dayMs));
+      const buckets = new Array(days).fill(0);
+      salesArr.forEach(s=>{
+        if(s.voided) return;
+        const idx = Math.floor((s.createdAt-fromTs)/dayMs);
+        if(idx>=0 && idx<days) buckets[idx] += Math.max(0, (s.total||0)-(s.refundTotal||0));
+      });
+      return buckets;
+    }
+
+    // Periodo di analyticsState → [fromTs, toTs]
+    function analyticsRangeTs(){
+      const r = analyticsState.range;
+      const now = Date.now();
+      let fromTs, toTs;
+      if(r.mode==='today'){ fromTs=dayStart(now); toTs=now; }
+      else if(r.mode==='7'){ fromTs=dayStart(now-6*86400000); toTs=now; }
+      else if(r.mode==='30'){ fromTs=dayStart(now-29*86400000); toTs=now; }
+      else if(r.mode==='month'){ const d=new Date(); fromTs=new Date(d.getFullYear(),d.getMonth(),1).getTime(); toTs=now; }
+      else if(r.mode==='year'){ const d=new Date(); fromTs=new Date(d.getFullYear(),0,1).getTime(); toTs=now; }
+      else { fromTs=dayStart(new Date(r.from+'T00:00:00').getTime()); toTs=new Date(r.to+'T23:59:59').getTime(); }
+      return [fromTs, toTs];
+    }
+
+    // Carica dati Analytics
+    async function loadAnalyticsData(){
+      const [fromTs, toTs] = analyticsRangeTs();
+      let visIds = profile.role==='admin' ? branches.map(b=>b.id) : (profile.branchIds||[]);
+      if(analyticsState.branchFilter!=='all' && visIds.includes(analyticsState.branchFilter)) visIds = [analyticsState.branchFilter];
+      // Sales (filtrati per filiale + periodo)
+      let sales=[], loadsArr=[], invAll=[], customersArr=[], shiftsArr=[];
+      try{
+        if(profile.role==='admin'){ (await getDocs(collection(db,'sales'))).forEach(d=>sales.push({id:d.id,...d.data()})); }
+        else { for(const b of visIds){ (await getDocs(query(collection(db,'sales'),where('branchId','==',b)))).forEach(d=>sales.push({id:d.id,...d.data()})); } }
+        (await getDocs(collection(db,'loads'))).forEach(d=>loadsArr.push(d.data()));
+        (await getDocs(collection(db,'inventory'))).forEach(d=>invAll.push(d.data()));
+        (await getDocs(collection(db,'shifts'))).forEach(d=>shiftsArr.push(d.data()));
+        if(profile.role==='admin'){ try{ (await getDocs(collection(db,'customers'))).forEach(d=>customersArr.push({id:d.id,...d.data()})); }catch(e){} }
+      }catch(e){ console.error('[analytics] load failed:', e); throw e; }
+      const inP = ts => ts>=fromTs && ts<=toTs;
+      const visOk = bid => visIds.includes(bid);
+      sales = sales.filter(s=>visOk(s.branchId) && inP(s.createdAt));
+      loadsArr = loadsArr.filter(l=>visOk(l.branchId) && inP(l.createdAt));
+      invAll = invAll.filter(i=>visOk(i.branchId));
+      shiftsArr = shiftsArr.filter(s=>visOk(s.branchId) && inP(s.openAt||s.openedAt||s.createdAt||0));
+      analyticsState._sales = sales;
+      analyticsState._loads = loadsArr;
+      analyticsState._inv = invAll;
+      analyticsState._custs = customersArr;
+      analyticsState._shifts = shiftsArr;
+      analyticsState._ts = [fromTs, toTs];
+      analyticsState._visIds = visIds;
+      // buildReportData per drill-down (lazy: solo quando serve)
+      analyticsState._data = await buildReportData(fromTs, toTs);
+      if(analyticsState.compare){
+        const span = toTs - fromTs;
+        analyticsState._data2 = await buildReportData(fromTs-span-1, fromTs-1);
+      } else { analyticsState._data2 = null; }
+    }
+
+    // Render principale
+    async function renderAnalytics(){
+      $('content').innerHTML = `<div class="spinner"></div>`;
+      try{
+        await loadAnalyticsData();
+      }catch(e){ $('content').innerHTML=`<div class="empty">${t('errorGen')}</div>`; return; }
+      const [fromTs, toTs] = analyticsState._ts;
+      const cur = t('currency');
+      // -------- HEADER (titolo + export) --------
+      let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+        <div>
+          <div style="font-size:20px;font-weight:800;color:var(--charcoal);">📊 ${t('analyticsTitle')}</div>
+          <div style="font-size:11.5px;color:rgba(26,26,26,0.55);">${t('analyticsSubtitle')}</div>
+        </div>
+        <button id="an-export" class="btn-secondary" style="padding:8px 14px;font-size:12.5px;font-weight:700;">📥 ${t('analyticsExport')}</button>
+      </div>`;
+      // -------- STICKY FILTERS --------
+      const rangeBtn = (m,lbl)=>`<button class="an-r" data-m="${m}" style="padding:7px 13px;border-radius:18px;font-weight:700;font-family:inherit;font-size:12px;cursor:pointer;white-space:nowrap;border:1px solid ${analyticsState.range.mode===m?'var(--gold)':'var(--ivory-dark)'};background:${analyticsState.range.mode===m?'var(--gold)':'#fff'};color:var(--charcoal);">${lbl}</button>`;
+      const allBr = profile.role==='admin' ? branches : branches.filter(b=>(profile.branchIds||[]).includes(b.id));
+      const branchOpts = `<option value="all">${t('allBranches')}</option>` + allBr.map(b=>`<option value="${b.id}" ${analyticsState.branchFilter===b.id?'selected':''}>${lang==='ar'?b.nameAr:b.nameEn}</option>`).join('');
+      const customDates = analyticsState.range.mode==='custom' ? `<div class="row2" style="margin-top:8px;"><div class="field" style="margin:0;"><label class="lbl">${t('repFrom')}</label><input class="input" id="an-from" type="date" value="${analyticsState.range.from||new Date(fromTs).toISOString().slice(0,10)}"></div><div class="field" style="margin:0;"><label class="lbl">${t('repTo')}</label><input class="input" id="an-to" type="date" value="${analyticsState.range.to||new Date(toTs).toISOString().slice(0,10)}"></div></div>` : '';
+      html += `<div style="background:var(--ivory-dark);border-radius:14px;padding:12px;margin-bottom:12px;position:sticky;top:0;z-index:5;">
+        <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;">${rangeBtn('today',t('rToday'))}${rangeBtn('7',t('r7'))}${rangeBtn('30',t('r30'))}${rangeBtn('month',t('rMonth'))}${rangeBtn('year',t('rYear'))}${rangeBtn('custom',t('rCustom'))}</div>
+        ${customDates}
+        <div style="display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap;">
+          ${allBr.length>1?`<select class="input" id="an-branch" style="flex:1;min-width:140px;padding:8px 10px;font-size:12.5px;">${branchOpts}</select>`:''}
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--charcoal);background:#fff;padding:8px 12px;border-radius:18px;border:1px solid var(--ivory-dark);">
+            <input type="checkbox" id="an-compare" ${analyticsState.compare?'checked':''} style="width:14px;height:14px;cursor:pointer;">⚖️ ${t('hubCompare')}
+          </label>
+        </div>
+      </div>`;
+      // -------- SUB-TABS --------
+      const tabs = [
+        {k:'overview', ico:'🏠', l:t('anTabOverview')},
+        {k:'sales', ico:'💰', l:t('anTabSales')},
+        {k:'inventory', ico:'📦', l:t('anTabInventory')},
+      ];
+      if(profile.role==='admin') tabs.push({k:'customers', ico:'🛍️', l:t('anTabCustomers')});
+      tabs.push({k:'staff', ico:'👥', l:t('anTabStaff')});
+      html += `<div style="display:flex;gap:4px;margin-bottom:14px;background:#fff;border:1px solid var(--ivory-dark);border-radius:12px;padding:4px;overflow-x:auto;">`;
+      tabs.forEach(tab=>{
+        const isActive = analyticsState.subTab===tab.k;
+        html += `<button class="an-tab" data-k="${tab.k}" style="flex:1;min-width:90px;padding:9px 6px;border-radius:9px;border:none;background:${isActive?'var(--forest)':'transparent'};color:${isActive?'#fff':'var(--charcoal)'};font-weight:700;font-family:inherit;font-size:11.5px;cursor:pointer;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:2px;">
+          <span style="font-size:15px;">${tab.ico}</span><span>${tab.l}</span>
+        </button>`;
+      });
+      html += `</div>`;
+      // -------- CONTENT (varia per sub-tab) --------
+      html += `<div id="an-content"></div>`;
+      $('content').innerHTML = html;
+      // Wire filters
+      document.querySelectorAll('.an-r').forEach(b=>b.onclick=()=>{ analyticsState.range.mode=b.dataset.m; renderAnalytics(); });
+      const fromIn=$('an-from'), toIn=$('an-to');
+      if(fromIn) fromIn.onchange=(e)=>{ analyticsState.range.from=e.target.value; };
+      if(toIn) toIn.onchange=(e)=>{ analyticsState.range.to=e.target.value; renderAnalytics(); };
+      const brSel=$('an-branch'); if(brSel) brSel.onchange=(e)=>{ analyticsState.branchFilter=e.target.value; renderAnalytics(); };
+      $('an-compare').onchange=(e)=>{ analyticsState.compare=e.target.checked; renderAnalytics(); };
+      document.querySelectorAll('.an-tab').forEach(b=>b.onclick=()=>{ analyticsState.subTab=b.dataset.k; renderAnalytics(); });
+      $('an-export').onclick=()=>exportAnalyticsTab();
+      // Render del sub-tab
+      renderAnalyticsSubTab();
+    }
+
+    // Renderizza il sub-tab attivo dentro #an-content
+    function renderAnalyticsSubTab(){
+      const sub = analyticsState.subTab;
+      if(sub==='overview') return renderOverviewTab();
+      if(sub==='sales') return renderSalesTab();
+      if(sub==='inventory') return renderInventoryTab();
+      if(sub==='customers') return renderCustomersTab();
+      if(sub==='staff') return renderStaffTab();
+    }
+
+    // === Helpers shared per i sub-tabs ===
+    const _AN_COLORS = { green:'#1F3A2E', gold:'#C9A84C', g2:'#3D7355', amber:'#D88E2A', red:'#C04848' };
+    function _kpiCard(label, val, sub, trendArr, trendColor, drillKey){
+      const tr = trendArr && trendArr.length>1 ? sparklineSVG(trendArr, trendColor||_AN_COLORS.green) : '';
+      const subHtml = sub ? `<div style="font-size:10.5px;color:rgba(26,26,26,0.55);margin-top:2px;">${sub}</div>` : '';
+      const drill = drillKey ? `data-drill="${drillKey}"` : '';
+      const cursor = drillKey ? 'cursor:pointer;' : '';
+      return `<button class="an-kpi" ${drill} style="${cursor}background:#fff;border:1px solid var(--ivory-dark);border-radius:12px;padding:12px;text-align:start;font-family:inherit;width:100%;display:block;">
+        <div style="font-size:10.5px;letter-spacing:0.5px;color:rgba(26,26,26,0.55);font-weight:700;text-transform:uppercase;">${label}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px;">
+          <div class="num" style="font-size:20px;font-weight:800;color:var(--forest);">${val}</div>
+          ${tr}
+        </div>
+        ${subHtml}
+      </button>`;
+    }
+    function _wireKpiDrill(){
+      document.querySelectorAll('.an-kpi[data-drill]').forEach(b=>b.onclick=()=>{
+        const k = b.dataset.drill;
+        // Mappa drill → openFullReports section
+        const map = { revenue:'sales', profit:'products', stock:'warehouse', customers:'customers', staff:'shifts', sales:'sales', inventory:'warehouse', categories:'warehouse', items:'products' };
+        openFullReports(map[k]||null);
+      });
+    }
+    function _periodLabel(){
+      const [f,t2]=analyticsState._ts;
+      return `${new Date(f).toISOString().slice(0,10)} → ${new Date(t2).toISOString().slice(0,10)}`;
+    }
+    function _compareDeltaBadge(curVal, prevVal){
+      if(!analyticsState.compare || !analyticsState._data2 || prevVal===undefined) return '';
+      const d = curVal - prevVal;
+      const pct = prevVal!==0 ? Math.round(d/Math.abs(prevVal)*1000)/10 : (curVal>0?100:0);
+      const col = d>0?_AN_COLORS.green : d<0?_AN_COLORS.red : 'rgba(26,26,26,0.5)';
+      const arr = d>0?'▲':d<0?'▼':'━';
+      return `<div style="font-size:10.5px;font-weight:700;color:${col};margin-top:3px;">${arr} ${pct>=0?'+':''}${pct}% ${t('vsBefore')}</div>`;
+    }
+    function _prevTotalFor(reportKey, colIdx){
+      // estrae il valore dalla riga TOTALE del report nel dataset precedente
+      if(!analyticsState._data2) return undefined;
+      const rep = analyticsState._data2[reportKey];
+      if(!rep) return undefined;
+      const totalLabel = 'Σ '+t('totalRow');
+      const row = rep.rows.find(r=>String(r[0]||'')===totalLabel);
+      if(!row) return undefined;
+      return parseFloat(String(row[colIdx]).replace(/[^0-9.\-]/g,''))||0;
+    }
+    function _curTotalFor(reportKey, colIdx){
+      if(!analyticsState._data) return 0;
+      const rep = analyticsState._data[reportKey];
+      if(!rep) return 0;
+      const totalLabel = 'Σ '+t('totalRow');
+      const row = rep.rows.find(r=>String(r[0]||'')===totalLabel);
+      if(!row) return 0;
+      return parseFloat(String(row[colIdx]).replace(/[^0-9.\-]/g,''))||0;
+    }
+
+    // ===== OVERVIEW TAB =====
+    function renderOverviewTab(){
+      const cur = t('currency');
+      const [fromTs, toTs] = analyticsState._ts;
+      const sales = analyticsState._sales || [];
+      const inv = analyticsState._inv || [];
+      const data = analyticsState._data;
+      // KPI calcoli
+      const effTotal = s=>Math.max(0,(s.total||0)-(s.refundTotal||0));
+      const rmFn=s=>{ const m={}; if(s.voided)(s.items||[]).forEach(it=>m[it.productId]=(m[it.productId]||0)+it.qty); (s.returns||[]).forEach(r=>(r.lines||[]).forEach(l=>m[l.productId]=(m[l.productId]||0)+l.qty)); return m; };
+      let revenue=0, cogs=0, orders=0, itemsSold=0;
+      sales.forEach(s=>{ if(s.voided) return; revenue+=effTotal(s); orders++; const rm=rmFn(s); (s.items||[]).forEach(it=>{ const net=Math.max(0,it.qty-(rm[it.productId]||0)); itemsSold+=net; const p=products.find(x=>x.id===it.productId); if(p) cogs+=net*(p.cost||0); }); });
+      const profit = revenue - cogs;
+      // Stock value
+      let stockVC=0, stockVP=0;
+      inv.forEach(i=>{ const p=products.find(x=>x.id===i.productId); if(!p) return; const q=i.qty||0; const c=i.lastCost||p.cost||0; const pr=p.price||0; stockVC+=q*c; stockVP+=q*pr; });
+      // Customers attivi nel periodo
+      const customersActive = new Set();
+      sales.forEach(s=>{ if(!s.voided && s.customerId) customersActive.add(s.customerId); });
+      // Trends daily
+      const dailyRev = dailyBuckets(sales, fromTs, toTs);
+      const dailyOrders = (()=>{ const dayMs=86400000; const days=Math.max(1,Math.ceil((toTs-fromTs)/dayMs)); const b=new Array(days).fill(0); sales.forEach(s=>{ if(s.voided) return; const i=Math.floor((s.createdAt-fromTs)/dayMs); if(i>=0&&i<days) b[i]++; }); return b; })();
+      // Previous-period values per compare
+      const prevRev = _prevTotalFor('branches', 1);
+      const prevOrders = _prevTotalFor('branches', 2);
+      const prevProfit = (()=>{ const r=_prevTotalFor('salesByInvoice',6)-_prevTotalFor('salesByInvoice',7); return isNaN(r)?undefined:r; })();
+      let html = `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;">
+        ${_kpiCard(t('mSalesRevenue'), fmt(revenue)+' '+cur, _compareDeltaBadge(revenue, prevRev), dailyRev, _AN_COLORS.green, 'revenue')}
+        ${_kpiCard(t('mProfit'), fmt(profit)+' '+cur, _compareDeltaBadge(profit, prevProfit), dailyRev.map((v,i)=>v - (i<dailyRev.length?0:0)), _AN_COLORS.gold, 'profit')}
+        ${_kpiCard(t('dashStockCost'), fmt(stockVC)+' '+cur, t('valPrice')+': '+fmt(stockVP)+' '+cur, null, null, 'inventory')}
+        ${_kpiCard(t('anActiveCustomers'), customersActive.size, t('mInPeriod'), null, null, 'customers')}
+      </div>`;
+      // Mid row: chart timeline + categorie
+      html += `<div style="display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:14px;">
+        <div class="card" style="margin:0;padding:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <div style="font-weight:700;font-size:13.5px;">📈 ${t('anRevenueTimeline')}</div>
+            <button class="an-drill" data-k="sales" style="background:transparent;border:none;color:var(--forest);font-weight:700;font-size:11.5px;cursor:pointer;">${t('anFullView')} →</button>
+          </div>
+          <canvas id="an-chart-timeline" height="160"></canvas>
+        </div>
+        <div class="card" style="margin:0;padding:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <div style="font-weight:700;font-size:13.5px;">🏷️ ${t('anTopCategories')}</div>
+            <button class="an-drill" data-k="warehouse" style="background:transparent;border:none;color:var(--forest);font-weight:700;font-size:11.5px;cursor:pointer;">${t('anFullView')} →</button>
+          </div>
+          <canvas id="an-chart-cats" height="160"></canvas>
+        </div>
+      </div>`;
+      // Bottom: Top products tile
+      const soldMap={};
+      sales.forEach(s=>{ if(s.voided) return; const rm=rmFn(s); (s.items||[]).forEach(it=>{ const net=Math.max(0,it.qty-(rm[it.productId]||0)); if(net<=0) return; if(!soldMap[it.productId]) soldMap[it.productId]={qty:0,rev:0}; soldMap[it.productId].qty+=net; soldMap[it.productId].rev+=net*(it.price||0); }); });
+      const topProds = Object.entries(soldMap).map(([pid,v])=>{ const p=products.find(x=>x.id===pid); return {pid, name:p?p.name:'—', qty:v.qty, rev:v.rev}; }).sort((a,b)=>b.rev-a.rev).slice(0,5);
+      if(topProds.length){
+        const mx=Math.max(1,...topProds.map(p=>p.rev));
+        html += `<div class="card" style="margin:0 0 12px 0;padding:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <div style="font-weight:700;font-size:13.5px;">⭐ ${t('anTopProducts')}</div>
+            <button class="an-drill" data-k="products" style="background:transparent;border:none;color:var(--forest);font-weight:700;font-size:11.5px;cursor:pointer;">${t('anFullView')} →</button>
+          </div>
+          ${topProds.map(p=>`<div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:3px;gap:8px;"><span style="font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.name}</span><span style="color:rgba(26,26,26,0.55);font-size:11px;">${p.qty} ${t('sold')}</span><span class="num" style="font-weight:700;color:var(--forest);">${fmt(p.rev)} ${cur}</span></div><div style="background:var(--ivory-dark);border-radius:6px;height:6px;overflow:hidden;"><div style="background:var(--forest);height:100%;width:${Math.round(p.rev/mx*100)}%;"></div></div></div>`).join('')}
+        </div>`;
+      }
+      // Low stock alert
+      const lowStock = [];
+      inv.forEach(i=>{ const p=products.find(x=>x.id===i.productId); if(!p) return; const lvl=p.reorderLevel||0; if(lvl>0 && (i.qty||0)<=lvl) lowStock.push({pname:p.name, bid:i.branchId, qty:i.qty||0, lvl}); });
+      if(lowStock.length){
+        html += `<div class="card" style="margin:0 0 12px 0;padding:14px;border-left:3px solid var(--amber,#D88E2A);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <div style="font-weight:700;font-size:13.5px;">⚠️ ${t('anLowStock')} (${lowStock.length})</div>
+            <button class="an-drill" data-k="warehouse" style="background:transparent;border:none;color:var(--forest);font-weight:700;font-size:11.5px;cursor:pointer;">${t('anFullView')} →</button>
+          </div>
+          ${lowStock.slice(0,5).map(l=>`<div style="font-size:12.5px;padding:4px 0;display:flex;justify-content:space-between;"><span>${l.pname}</span><span class="num" style="color:#C04848;font-weight:700;">${l.qty}/${l.lvl}</span></div>`).join('')}
+        </div>`;
+      }
+      $('an-content').innerHTML = html;
+      _wireKpiDrill();
+      document.querySelectorAll('.an-drill').forEach(b=>b.onclick=()=>openFullReports(b.dataset.k));
+      // Charts
+      try{
+        const labels = dailyRev.map((_,i)=>{ const d=new Date(fromTs+i*86400000); return `${d.getDate()}/${d.getMonth()+1}`; });
+        new Chart($('an-chart-timeline').getContext('2d'), { type:'line', data:{ labels, datasets:[{ label:t('chartRevenue'), data:dailyRev, borderColor:_AN_COLORS.green, backgroundColor:'rgba(31,58,46,0.1)', fill:true, tension:0.3 }] }, options:{ plugins:{legend:{display:false}}, responsive:true, scales:{x:{ticks:{font:{size:10}}}, y:{ticks:{font:{size:10}}}} } });
+        // Categorie chart
+        const catRev={}; sales.forEach(s=>{ if(s.voided) return; const rm=rmFn(s); (s.items||[]).forEach(it=>{ const net=Math.max(0,it.qty-(rm[it.productId]||0)); if(net<=0) return; const p=products.find(x=>x.id===it.productId); const cid=p?p.categoryId:'_'; catRev[cid]=(catRev[cid]||0)+net*(it.price||0); }); });
+        const topCats = Object.entries(catRev).map(([cid,rev])=>{ const c=categories.find(x=>x.id===cid); return {name:c?(lang==='ar'?c.nameAr:c.nameEn):'—', rev}; }).sort((a,b)=>b.rev-a.rev).slice(0,7);
+        new Chart($('an-chart-cats').getContext('2d'), { type:'bar', data:{ labels:topCats.map(c=>c.name), datasets:[{ label:t('chartRevenue'), data:topCats.map(c=>c.rev), backgroundColor:_AN_COLORS.gold }] }, options:{ indexAxis:'y', plugins:{legend:{display:false}}, responsive:true, scales:{x:{ticks:{font:{size:10}}}, y:{ticks:{font:{size:10}}}} } });
+      }catch(e){ console.warn('[analytics] chart error', e); }
+    }
+
+    // ===== SALES TAB =====
+    function renderSalesTab(){
+      const cur = t('currency');
+      const [fromTs, toTs] = analyticsState._ts;
+      const sales = analyticsState._sales || [];
+      const dailyRev = dailyBuckets(sales, fromTs, toTs);
+      const dailyOrders = (()=>{ const dayMs=86400000; const days=Math.max(1,Math.ceil((toTs-fromTs)/dayMs)); const b=new Array(days).fill(0); sales.forEach(s=>{ if(s.voided) return; const i=Math.floor((s.createdAt-fromTs)/dayMs); if(i>=0&&i<days) b[i]++; }); return b; })();
+      const effTotal = s=>Math.max(0,(s.total||0)-(s.refundTotal||0));
+      const rmFn=s=>{ const m={}; if(s.voided)(s.items||[]).forEach(it=>m[it.productId]=(m[it.productId]||0)+it.qty); (s.returns||[]).forEach(r=>(r.lines||[]).forEach(l=>m[l.productId]=(m[l.productId]||0)+l.qty)); return m; };
+      let revenue=0, orders=0, itemsSold=0, avgTicket=0;
+      sales.forEach(s=>{ if(s.voided) return; revenue+=effTotal(s); orders++; const rm=rmFn(s); (s.items||[]).forEach(it=>{ itemsSold+=Math.max(0,it.qty-(rm[it.productId]||0)); }); });
+      avgTicket = orders>0 ? revenue/orders : 0;
+      const prevRev = _prevTotalFor('branches', 1);
+      const prevOrders = _prevTotalFor('branches', 2);
+      let html = `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;">
+        ${_kpiCard(t('mSalesRevenue'), fmt(revenue)+' '+cur, _compareDeltaBadge(revenue, prevRev), dailyRev, _AN_COLORS.green, 'sales')}
+        ${_kpiCard(t('mSalesOrders'), orders, _compareDeltaBadge(orders, prevOrders), dailyOrders, _AN_COLORS.g2, 'sales')}
+        ${_kpiCard(t('anAvgTicket'), fmt(avgTicket)+' '+cur, '', null, null, 'sales')}
+        ${_kpiCard(t('mItemsSold'), itemsSold, t('mInPeriod'), null, null, 'items')}
+      </div>`;
+      // Timeline chart
+      html += `<div class="card" style="margin:0 0 12px 0;padding:14px;">
+        <div style="font-weight:700;font-size:13.5px;margin-bottom:8px;">📈 ${t('anDailyRevenue')}</div>
+        <canvas id="an-sales-timeline" height="160"></canvas>
+      </div>`;
+      // Sales by branch chart
+      html += `<div class="card" style="margin:0 0 12px 0;padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div style="font-weight:700;font-size:13.5px;">🏢 ${t('anByBranch')}</div>
+          <button class="an-drill" data-k="shifts" style="background:transparent;border:none;color:var(--forest);font-weight:700;font-size:11.5px;cursor:pointer;">${t('anFullView')} →</button>
+        </div>
+        <canvas id="an-sales-branches" height="160"></canvas>
+      </div>`;
+      // Top products
+      const soldMap={};
+      sales.forEach(s=>{ if(s.voided) return; const rm=rmFn(s); (s.items||[]).forEach(it=>{ const net=Math.max(0,it.qty-(rm[it.productId]||0)); if(net<=0) return; if(!soldMap[it.productId]) soldMap[it.productId]={qty:0,rev:0}; soldMap[it.productId].qty+=net; soldMap[it.productId].rev+=net*(it.price||0); }); });
+      const topByRev = Object.entries(soldMap).map(([pid,v])=>{ const p=products.find(x=>x.id===pid); return {name:p?p.name:'—',qty:v.qty,rev:v.rev}; }).sort((a,b)=>b.rev-a.rev).slice(0,10);
+      const topByQty = Object.entries(soldMap).map(([pid,v])=>{ const p=products.find(x=>x.id===pid); return {name:p?p.name:'—',qty:v.qty,rev:v.rev}; }).sort((a,b)=>b.qty-a.qty).slice(0,10);
+      const renderTopList = (list, valFn, valSuffix, color)=>{
+        const mx=Math.max(1,...list.map(p=>valFn(p)));
+        return list.map(p=>`<div style="margin-bottom:7px;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;gap:6px;"><span style="font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.name}</span><span class="num" style="font-weight:700;color:${color};">${valFn(p)===p.rev?fmt(valFn(p)):valFn(p)} ${valSuffix}</span></div><div style="background:var(--ivory-dark);border-radius:5px;height:5px;overflow:hidden;"><div style="background:${color};height:100%;width:${Math.round(valFn(p)/mx*100)}%;"></div></div></div>`).join('');
+      };
+      html += `<div style="display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:12px;">
+        <div class="card" style="margin:0;padding:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <div style="font-weight:700;font-size:13.5px;">⭐ ${t('anTopByRevenue')}</div>
+            <button class="an-drill" data-k="products" style="background:transparent;border:none;color:var(--forest);font-weight:700;font-size:11.5px;cursor:pointer;">${t('anFullView')} →</button>
+          </div>
+          ${renderTopList(topByRev, p=>p.rev, cur, _AN_COLORS.green)}
+        </div>
+        <div class="card" style="margin:0;padding:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <div style="font-weight:700;font-size:13.5px;">📦 ${t('anTopByQuantity')}</div>
+          </div>
+          ${renderTopList(topByQty, p=>p.qty, t('mUnits'), _AN_COLORS.gold)}
+        </div>
+      </div>`;
+      $('an-content').innerHTML = html;
+      _wireKpiDrill();
+      document.querySelectorAll('.an-drill').forEach(b=>b.onclick=()=>openFullReports(b.dataset.k));
+      // Charts
+      try{
+        const labels = dailyRev.map((_,i)=>{ const d=new Date(fromTs+i*86400000); return `${d.getDate()}/${d.getMonth()+1}`; });
+        new Chart($('an-sales-timeline').getContext('2d'), { type:'line', data:{ labels, datasets:[{ label:t('chartRevenue'), data:dailyRev, borderColor:_AN_COLORS.green, backgroundColor:'rgba(31,58,46,0.1)', fill:true, tension:0.3 }] }, options:{ plugins:{legend:{display:false}}, responsive:true, scales:{x:{ticks:{font:{size:10}}}, y:{ticks:{font:{size:10}}}} } });
+        // Branches comparison
+        const brRev={};
+        sales.forEach(s=>{ if(s.voided) return; brRev[s.branchId]=(brRev[s.branchId]||0)+effTotal(s); });
+        const brList = analyticsState._visIds.map(bid=>{ const b=branches.find(x=>x.id===bid); return {name:b?(lang==='ar'?b.nameAr:b.nameEn):bid, rev:brRev[bid]||0}; });
+        new Chart($('an-sales-branches').getContext('2d'), { type:'bar', data:{ labels:brList.map(b=>b.name), datasets:[{ label:t('chartRevenue'), data:brList.map(b=>b.rev), backgroundColor:[_AN_COLORS.green,_AN_COLORS.gold,_AN_COLORS.g2,_AN_COLORS.amber,_AN_COLORS.red] }] }, options:{ plugins:{legend:{display:false}}, responsive:true, scales:{x:{ticks:{font:{size:10}}}, y:{ticks:{font:{size:10}}}} } });
+      }catch(e){ console.warn('[analytics] chart error', e); }
+    }
+
+    // ===== INVENTORY TAB =====
+    function renderInventoryTab(){
+      const cur = t('currency');
+      const inv = analyticsState._inv || [];
+      let stockVC=0, stockVP=0, stockUnits=0;
+      inv.forEach(i=>{ const p=products.find(x=>x.id===i.productId); if(!p) return; const q=i.qty||0; const c=i.lastCost||p.cost||0; const pr=p.price||0; stockVC+=q*c; stockVP+=q*pr; stockUnits+=q; });
+      const margin = stockVP - stockVC;
+      const marginPct = stockVC>0 ? Math.round(margin/stockVC*1000)/10 : 0;
+      const prevStockVC = _prevTotalFor('capitalByBranch', 1);
+      let html = `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;">
+        ${_kpiCard(t('dashStockCost'), fmt(stockVC)+' '+cur, _compareDeltaBadge(stockVC, prevStockVC), null, _AN_COLORS.gold, 'inventory')}
+        ${_kpiCard(t('dashStockPrice'), fmt(stockVP)+' '+cur, t('marginThe')+': '+fmt(margin)+' '+cur, null, _AN_COLORS.green, 'inventory')}
+        ${_kpiCard(t('anStockUnits'), stockUnits, t('mUnits'), null, null, 'inventory')}
+        ${_kpiCard(t('anMarginPct'), marginPct+'%', t('marginThe'), null, null, null)}
+      </div>`;
+      // Categorie value chart
+      html += `<div class="card" style="margin:0 0 12px 0;padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div style="font-weight:700;font-size:13.5px;">🏷️ ${t('anCategoriesByValue')}</div>
+          <button class="an-drill" data-k="warehouse" style="background:transparent;border:none;color:var(--forest);font-weight:700;font-size:11.5px;cursor:pointer;">${t('anFullView')} →</button>
+        </div>
+        <canvas id="an-inv-cats" height="180"></canvas>
+      </div>`;
+      // Stock per filiale
+      const brStock={};
+      inv.forEach(i=>{ const p=products.find(x=>x.id===i.productId); if(!p) return; const v=(i.qty||0)*(i.lastCost||p.cost||0); brStock[i.branchId]=(brStock[i.branchId]||0)+v; });
+      if(Object.keys(brStock).length>1){
+        html += `<div class="card" style="margin:0 0 12px 0;padding:14px;">
+          <div style="font-weight:700;font-size:13.5px;margin-bottom:8px;">🏢 ${t('anStockByBranch')}</div>
+          <canvas id="an-inv-branches" height="160"></canvas>
+        </div>`;
+      }
+      // Capital flow table (semplificata)
+      const cf = analyticsState._data ? analyticsState._data.capitalFlow : null;
+      if(cf && cf.rows.length){
+        const totalLabel = 'Σ '+t('totalRow');
+        const dataRows = cf.rows.filter(r=>String(r[0]||'')!==totalLabel);
+        html += `<div class="card" style="margin:0 0 12px 0;padding:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <div style="font-weight:700;font-size:13.5px;">🔄 ${t('repCapitalFlow')}</div>
+            <button class="an-drill" data-k="warehouse" style="background:transparent;border:none;color:var(--forest);font-weight:700;font-size:11.5px;cursor:pointer;">${t('anFullView')} →</button>
+          </div>
+          ${dataRows.map(r=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--ivory-dark);font-size:12px;"><span style="font-weight:600;">${r[0]}</span><span class="num" style="font-weight:700;color:${String(r[6]).startsWith('-')?'#C04848':'var(--forest)'};">Δ ${r[6]} ${cur}</span></div>`).join('')}
+        </div>`;
+      }
+      // Low stock
+      const lowStock = [];
+      inv.forEach(i=>{ const p=products.find(x=>x.id===i.productId); if(!p) return; const lvl=p.reorderLevel||0; if(lvl>0 && (i.qty||0)<=lvl){ const b=branches.find(x=>x.id===i.branchId); lowStock.push({pname:p.name, bname:b?(lang==='ar'?b.nameAr:b.nameEn):'—', qty:i.qty||0, lvl}); } });
+      if(lowStock.length){
+        html += `<div class="card" style="margin:0 0 12px 0;padding:14px;border-left:3px solid #D88E2A;">
+          <div style="font-weight:700;font-size:13.5px;margin-bottom:8px;">⚠️ ${t('anLowStock')} (${lowStock.length})</div>
+          ${lowStock.slice(0,10).map(l=>`<div style="font-size:12px;padding:5px 0;display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid var(--ivory-dark);"><span style="flex:1;overflow:hidden;text-overflow:ellipsis;">${l.pname} · <span style="color:rgba(26,26,26,0.55);">${l.bname}</span></span><span class="num" style="color:#C04848;font-weight:700;">${l.qty}/${l.lvl}</span></div>`).join('')}
+        </div>`;
+      }
+      $('an-content').innerHTML = html;
+      _wireKpiDrill();
+      document.querySelectorAll('.an-drill').forEach(b=>b.onclick=()=>openFullReports(b.dataset.k));
+      // Charts
+      try{
+        const catData = analyticsState._data && analyticsState._data.categories;
+        if(catData){
+          const totalLabel = 'Σ '+t('totalRow');
+          const catRows = catData.rows.filter(r=>String(r[0]||'')!==totalLabel).map(r=>({name:r[0], val:parseFloat(String(r[7]).replace(/[^0-9.\-]/g,''))||0})).filter(c=>c.val>0).sort((a,b)=>b.val-a.val).slice(0,10);
+          if(catRows.length){
+            new Chart($('an-inv-cats').getContext('2d'), { type:'bar', data:{ labels:catRows.map(c=>c.name), datasets:[{ label:t('valCost'), data:catRows.map(c=>c.val), backgroundColor:_AN_COLORS.gold }] }, options:{ indexAxis:'y', plugins:{legend:{display:false}}, responsive:true, scales:{x:{ticks:{font:{size:10}}}, y:{ticks:{font:{size:10}}}} } });
+          }
+        }
+        if(Object.keys(brStock).length>1){
+          const list = Object.entries(brStock).map(([bid,v])=>{ const b=branches.find(x=>x.id===bid); return {name:b?(lang==='ar'?b.nameAr:b.nameEn):bid, val:v}; });
+          new Chart($('an-inv-branches').getContext('2d'), { type:'bar', data:{ labels:list.map(b=>b.name), datasets:[{ label:t('valCost'), data:list.map(b=>b.val), backgroundColor:[_AN_COLORS.green,_AN_COLORS.gold,_AN_COLORS.g2,_AN_COLORS.amber] }] }, options:{ plugins:{legend:{display:false}}, responsive:true, scales:{x:{ticks:{font:{size:10}}}, y:{ticks:{font:{size:10}}}} } });
+        }
+      }catch(e){ console.warn('[analytics] inv chart error', e); }
+    }
+
+    // ===== CUSTOMERS TAB =====
+    function renderCustomersTab(){
+      const cur = t('currency');
+      const sales = analyticsState._sales || [];
+      const customers = analyticsState._custs || [];
+      const effTotal = s=>Math.max(0,(s.total||0)-(s.refundTotal||0));
+      const custStats = {};
+      sales.forEach(s=>{ if(s.voided||!s.customerId) return; if(!custStats[s.customerId]) custStats[s.customerId]={count:0,spend:0}; custStats[s.customerId].count++; custStats[s.customerId].spend+=effTotal(s); });
+      const activeCust = Object.keys(custStats).length;
+      const totalSpend = Object.values(custStats).reduce((a,b)=>a+b.spend,0);
+      const avgSpend = activeCust>0 ? totalSpend/activeCust : 0;
+      const totalRegistered = customers.length;
+      const prevTotalSpend = _prevTotalFor('topCustomersBySpend', 3);
+      let html = `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;">
+        ${_kpiCard(t('anActiveCustomers'), activeCust, t('mInPeriod'), null, _AN_COLORS.green, 'customers')}
+        ${_kpiCard(t('anRegisteredCustomers'), totalRegistered, t('anTotal'), null, _AN_COLORS.g2, 'customers')}
+        ${_kpiCard(t('totalSpend'), fmt(totalSpend)+' '+cur, _compareDeltaBadge(totalSpend, prevTotalSpend), null, _AN_COLORS.gold, 'customers')}
+        ${_kpiCard(t('avgSpend'), fmt(avgSpend)+' '+cur, t('anPerCustomer'), null, null, null)}
+      </div>`;
+      // Top spenders
+      const topSpend = Object.entries(custStats).map(([cid,st])=>{ const c=customers.find(x=>x.id===cid); return {name:c?(c.name||'—'):'—', phone:c?(c.phone||c.email||''):'', count:st.count, spend:st.spend}; }).sort((a,b)=>b.spend-a.spend).slice(0,10);
+      const topFreq = Object.entries(custStats).filter(([,st])=>st.count>=2).map(([cid,st])=>{ const c=customers.find(x=>x.id===cid); return {name:c?(c.name||'—'):'—', phone:c?(c.phone||c.email||''):'', count:st.count, spend:st.spend}; }).sort((a,b)=>b.count-a.count).slice(0,10);
+      if(topSpend.length){
+        const mx=Math.max(1,...topSpend.map(c=>c.spend));
+        html += `<div class="card" style="margin:0 0 12px 0;padding:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <div style="font-weight:700;font-size:13.5px;">💰 ${t('repTopCustomersSpend')}</div>
+            <button class="an-drill" data-k="customers" style="background:transparent;border:none;color:var(--forest);font-weight:700;font-size:11.5px;cursor:pointer;">${t('anFullView')} →</button>
+          </div>
+          ${topSpend.map(c=>`<div style="margin-bottom:7px;"><div style="display:flex;justify-content:space-between;gap:8px;font-size:12.5px;margin-bottom:3px;"><span style="font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.name}${c.phone?` <span class="num" style="color:rgba(26,26,26,0.45);font-weight:400;font-size:10.5px;" dir="ltr">${c.phone}</span>`:''}</span><span class="num" style="font-weight:700;color:var(--forest);">${fmt(c.spend)} ${cur}</span></div><div style="background:var(--ivory-dark);border-radius:5px;height:5px;overflow:hidden;"><div style="background:var(--forest);height:100%;width:${Math.round(c.spend/mx*100)}%;"></div></div></div>`).join('')}
+        </div>`;
+      }
+      if(topFreq.length){
+        const mxF=Math.max(1,...topFreq.map(c=>c.count));
+        html += `<div class="card" style="margin:0 0 12px 0;padding:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <div style="font-weight:700;font-size:13.5px;">🔁 ${t('repTopCustomersFreq')}</div>
+            <button class="an-drill" data-k="customers" style="background:transparent;border:none;color:var(--forest);font-weight:700;font-size:11.5px;cursor:pointer;">${t('anFullView')} →</button>
+          </div>
+          ${topFreq.map(c=>`<div style="margin-bottom:7px;"><div style="display:flex;justify-content:space-between;gap:8px;font-size:12.5px;margin-bottom:3px;"><span style="font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.name}</span><span class="num" style="font-weight:700;color:var(--gold);">${c.count} ${t('invoicesShort')}</span></div><div style="background:var(--ivory-dark);border-radius:5px;height:5px;overflow:hidden;"><div style="background:var(--gold);height:100%;width:${Math.round(c.count/mxF*100)}%;"></div></div></div>`).join('')}
+        </div>`;
+      }
+      if(!topSpend.length && !topFreq.length){
+        html += `<div class="empty">${t('noData')}</div>`;
+      }
+      $('an-content').innerHTML = html;
+      _wireKpiDrill();
+      document.querySelectorAll('.an-drill').forEach(b=>b.onclick=()=>openFullReports(b.dataset.k));
+    }
+
+    // ===== STAFF TAB =====
+    function renderStaffTab(){
+      const cur = t('currency');
+      const sales = analyticsState._sales || [];
+      const shiftsArr = analyticsState._shifts || [];
+      // Active staff
+      const activeStaff = new Set();
+      sales.forEach(s=>{ if(!s.voided && s.userId) activeStaff.add(s.userId); });
+      const totalShifts = shiftsArr.length;
+      // Sales per staff
+      const effTotal = s=>Math.max(0,(s.total||0)-(s.refundTotal||0));
+      const stStats = {};
+      sales.forEach(s=>{ if(s.voided) return; if(!stStats[s.userId]) stStats[s.userId]={count:0,rev:0}; stStats[s.userId].count++; stStats[s.userId].rev+=effTotal(s); });
+      // Hours from shifts
+      const stHours = {};
+      shiftsArr.forEach(s=>{ const open=s.openAt||s.openedAt||s.createdAt||0; const close=s.closedAt||Date.now(); const pause=(s.totalPause||0); const h=Math.max(0,(close-open-pause)/3600000); stHours[s.userId]=(stHours[s.userId]||0)+h; });
+      const stList = Object.entries(stStats).map(([uid,s])=>{ const u=users.find(x=>x.uid===uid); return {name:u?(u.name||u.email):'—', count:s.count, rev:s.rev, hours:(stHours[uid]||0)}; }).sort((a,b)=>b.rev-a.rev);
+      let html = `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;">
+        ${_kpiCard(t('mActiveStaff'), activeStaff.size, t('mInPeriod'), null, _AN_COLORS.green, 'staff')}
+        ${_kpiCard(t('anShiftsCount'), totalShifts, t('mInPeriod'), null, _AN_COLORS.g2, 'staff')}
+      </div>`;
+      if(stList.length){
+        const mx=Math.max(1,...stList.map(s=>s.rev));
+        html += `<div class="card" style="margin:0 0 12px 0;padding:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <div style="font-weight:700;font-size:13.5px;">💰 ${t('anStaffByRevenue')}</div>
+            <button class="an-drill" data-k="shifts" style="background:transparent;border:none;color:var(--forest);font-weight:700;font-size:11.5px;cursor:pointer;">${t('anFullView')} →</button>
+          </div>
+          ${stList.map(s=>`<div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;gap:8px;font-size:12.5px;margin-bottom:3px;"><span style="font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.name}</span><span class="num" style="color:rgba(26,26,26,0.55);font-size:11px;">${s.count} ${t('invoicesShort')} · ${Math.round(s.hours*10)/10}${t('anHours')}</span><span class="num" style="font-weight:700;color:var(--forest);">${fmt(s.rev)} ${cur}</span></div><div style="background:var(--ivory-dark);border-radius:5px;height:5px;overflow:hidden;"><div style="background:var(--forest);height:100%;width:${Math.round(s.rev/mx*100)}%;"></div></div></div>`).join('')}
+        </div>`;
+      } else {
+        html += `<div class="empty">${t('noData')}</div>`;
+      }
+      $('an-content').innerHTML = html;
+      _wireKpiDrill();
+      document.querySelectorAll('.an-drill').forEach(b=>b.onclick=()=>openFullReports(b.dataset.k));
+    }
+
+    // ===== EXPORT TAB CORRENTE =====
+    function exportAnalyticsTab(){
+      // Apre il Reports Hub focalizzato sul sub-tab corrente
+      const map = { overview:null, sales:'sales', inventory:'warehouse', customers:'customers', staff:'shifts' };
+      openFullReports(map[analyticsState.subTab]||null);
+    }
+
     async function renderDashboard(){
       $('content').innerHTML=`<div class="spinner"></div>`;
       const [fromTs,toTs]=dashRangeTs();
@@ -2385,8 +2955,8 @@
 
       let html=`<div style="font-size:11px;letter-spacing:1px;color:var(--forest);font-weight:700;margin-bottom:12px;">${t('reports').toUpperCase()}</div>`;
       html+=`<div class="card" style="background:var(--forest);color:var(--ivory);"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
-        <div><div style="font-weight:700;font-size:14px;">📑 ${t('fullReports')}</div><div style="font-size:11px;opacity:0.8;margin-top:2px;">${t('reportsHubHint')}</div></div>
-        <button id="open-hub" style="background:var(--gold);color:var(--forest-dark);border:none;border-radius:10px;padding:9px 14px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;">${t('exportData').split(' ')[0]} ⤓</button>
+        <div><div style="font-weight:700;font-size:14px;">📊 ${t('hubTitle')}</div><div style="font-size:11px;opacity:0.85;margin-top:2px;">${t('hubSubtitle')}</div></div>
+        <button id="open-hub" style="background:var(--gold);color:var(--forest-dark);border:none;border-radius:10px;padding:10px 16px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;font-size:13px;">${t('hubOpenBtn')} →</button>
       </div></div>`;
       // KPI oggi vs mese
       html+=`<div style="display:flex;gap:10px;margin-bottom:14px;">
@@ -3880,11 +4450,13 @@
           { id:'sales',         label:'rstSales',         coll:'sales',            warn:'rstSalesWarn' },
           { id:'pointsLedger',  label:'rstPointsLedger',  coll:'pointsLedger',     warn:'rstPointsLedgerWarn' },
           { id:'clientOrders',  label:'rstClientOrders',  coll:'clientOrders',     warn:null },
+          { id:'orders',        label:'rstOrders',        coll:'orders',           warn:null },
           { id:'loads',         label:'rstLoads',         coll:'loads',            warn:null },
           { id:'transfers',     label:'rstTransfers',     coll:'transfers',        warn:null },
           { id:'custodyTransfers', label:'rstCustody',    coll:'custodyTransfers', warn:null },
           { id:'shifts',        label:'rstShifts',        coll:'shifts',           warn:null },
           { id:'inventory',     label:'rstInventory',     coll:'inventory',        warn:'rstInventoryWarn' },
+          { id:'inventories',   label:'rstInventories',   coll:'inventories',      warn:null },
         ]
       },
       {
