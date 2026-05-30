@@ -360,7 +360,7 @@
         pause:'استراحة', resume:'استئناف', onPause:'في استراحة', pausedTime:'وقت الاستراحات', shiftSales:'مبيعات الوردية',
         expectedCash:'الكاش المتوقع', cashDiff:'فرق الدرج', shiftReport:'تقرير الوردية', shiftHistory:'سجل الورديات',
         custodyTitle:'العُهدة (تسليم النقدية)', handOver:'تسليم العهدة', handTo:'تسليم لـ', handAmount:'المبلغ المسلَّم', custReceived:'مستلَم', custHanded:'مسلَّم', toDeliver:'المطلوب تسليمه', noOpenColleague:'مفيش زميل ورديته مفتوحة في نفس الفرع', handDone:'تم تسليم العهدة', noOpenShiftsBranch:'مفيش ورديات مفتوحة في الفرع', custFrom:'من', custTo:'إلى',
-        custPending:'في انتظار التأكيد', custSent:'اتبعت — مستني تأكيد الزميل', custConfirmReceipt:'تأكيد استلام النقدية', custConfirmMsg:'بيسلّمك المبلغ ده. اتأكد إنك استلمته وأكّد.', custCheckbox:'أنا أكّد إني استلمت المبلغ المذكور', custConfirmBtn:'تأكيد الاستلام', custConfirmed:'تم تأكيد الاستلام', custReject:'رفض الاستلام', custRejectMsg:'متأكد إنك عايز ترفض استلام المبلغ؟ المبلغ هيرجع لزميلك', custRejectedToast:'تم رفض الاستلام', custRejected:'مرفوض', custWasRejected:'رفض الزميل الاستلام',
+        custPending:'في انتظار التأكيد', custSent:'اتبعت — مستني تأكيد الزميل', custConfirmReceipt:'تأكيد استلام النقدية', custConfirmMsg:'بيسلّمك المبلغ ده. اتأكد إنك استلمته وأكّد.', custCheckbox:'أنا أكّد إني استلمت المبلغ المذكور', custConfirmBtn:'تأكيد الاستلام', custConfirmed:'تم تأكيد الاستلام', custReject:'رفض الاستلام', custRejectMsg:'متأكد إنك عايز ترفض استلام المبلغ؟ المبلغ هيرجع لزميلك', custRejectedToast:'تم رفض الاستلام', custRejected:'مرفوض', custWasRejected:'رفض الزميل الاستلام', custCashLive:'الكاش الحالي في الدرج', custInsufficientCash:'مفيش رصيد كافي في الدرج', custMyPending:'طلباتي المستنية', custReqTitle:'طلبات تحويل النقدية', custModify:'تعديل الطلب', custModified:'تم تحديث الطلب ✓', custCancelConfirm:'متأكد عايز تلغي الطلب؟', custCancelledByYou:'تم إلغاء الطلب', custCancelledByThem:'الزميل ألغى طلب التحويل', custExpiredOnClose:'انتهى الطلب (الوردية قُفلت)', custRejectedNotif:'رفض الزميل استلام المبلغ', custExpiredOnCloseNotif:'انتهى طلبك (قفلت الوردية)',
         confirmCloseShift:'متأكد إنك عايز تقفل الوردية؟', shiftOpened:'تم فتح الوردية', shiftClosed:'تم قفل الوردية',
         openCashHint:'اكتب الكاش اللي في الدرج وانت بتفتح الوردية', countedCashHint:'عُدّ الكاش في الدرج واكتب الرقم',
         noShiftsYet:'لا توجد ورديات بعد', hShort:'س', mShort:'د', byUser:'الكاشير', cashOver:'زيادة', cashShort:'عجز',
@@ -463,7 +463,7 @@
         pause:'Break', resume:'Resume', onPause:'On break', pausedTime:'Break time', shiftSales:'Shift sales',
         expectedCash:'Expected cash', cashDiff:'Drawer difference', shiftReport:'Shift report', shiftHistory:'Shift history',
         custodyTitle:'Custody (cash handover)', handOver:'Hand over cash', handTo:'Hand over to', handAmount:'Amount handed', custReceived:'Received', custHanded:'Handed', toDeliver:'To deliver', noOpenColleague:'No colleague with an open shift in this branch', handDone:'Cash handed over', noOpenShiftsBranch:'No open shifts in this branch', custFrom:'From', custTo:'To',
-        custPending:'Awaiting confirmation', custSent:'Sent — awaiting colleague confirmation', custConfirmReceipt:'Confirm cash received', custConfirmMsg:'is handing you this amount. Make sure you received it and confirm.', custCheckbox:'I confirm I received the stated amount', custConfirmBtn:'Confirm receipt', custConfirmed:'Receipt confirmed', custReject:'Reject', custRejectMsg:'Reject receiving this amount? It will go back to your colleague', custRejectedToast:'Receipt rejected', custRejected:'Rejected', custWasRejected:'Colleague rejected the receipt',
+        custPending:'Awaiting confirmation', custSent:'Sent — awaiting colleague confirmation', custConfirmReceipt:'Confirm cash received', custConfirmMsg:'is handing you this amount. Make sure you received it and confirm.', custCheckbox:'I confirm I received the stated amount', custConfirmBtn:'Confirm receipt', custConfirmed:'Receipt confirmed', custReject:'Reject', custRejectMsg:'Reject receiving this amount? It will go back to your colleague', custRejectedToast:'Receipt rejected', custRejected:'Rejected', custWasRejected:'Colleague rejected the receipt', custCashLive:'Current cash in drawer', custInsufficientCash:'Not enough cash in drawer', custMyPending:'My pending requests', custReqTitle:'Cash transfer requests', custModify:'Edit request', custModified:'Request updated ✓', custCancelConfirm:'Are you sure you want to cancel the request?', custCancelledByYou:'Request cancelled', custCancelledByThem:'Colleague cancelled the transfer request', custExpiredOnClose:'Request expired (shift closed)', custRejectedNotif:'Colleague refused to receive the amount', custExpiredOnCloseNotif:'Your request expired (shift was closed)',
         confirmCloseShift:'Confirm closing the shift?', shiftOpened:'Shift opened', shiftClosed:'Shift closed',
         openCashHint:'Enter the cash in the drawer when opening', countedCashHint:'Count the cash in the drawer and enter it',
         noShiftsYet:'No shifts yet', hShort:'h', mShort:'m', byUser:'Cashier', cashOver:'Over', cashShort:'Short',
@@ -4014,15 +4014,32 @@
         qs.forEach(d=>custodyTx.push({id:d.id,...d.data()})); }catch(e){ console.error('loadCustodyTx',e); }
     }
     // يفتح شيت تسليم العهدة من الوردية fromSh لزميل ورديته مفتوحة في نفس الفرع (يتسجّل pending)
-    function openHandSheet(fromSh){
+    // 🆕 v2.7.1 — Supporta anche EDIT di una richiesta pending esistente (existing != null)
+    async function openHandSheet(fromSh, existing){
+      const isEdit = !!existing;
       const targets=shifts.filter(s=>s.status==='open' && s.branchId===fromSh.branchId && s.id!==fromSh.id);
       if(targets.length===0){ toast(t('noOpenColleague'),true); return; }
+      // 🆕 v2.7.1 — Calcola cash live in cassa per validare importo (Regola 5)
+      let cashLive = 0;
+      try{
+        const split = await shiftSalesSplit(fromSh);
+        const custIn = custInSum(fromSh);
+        const custOut = custOutSum(fromSh); // include solo confirmed (i pending non scalano ancora)
+        cashLive = (fromSh.openCash||0) + split.cash + custIn - custOut;
+        // Se in edit, l'importo dell'existing non è ancora "uscito" quindi è già incluso in cashLive
+      } catch(e){ console.warn('[custody] cashLive calc failed:', e); }
+      const preselectTo = isEdit ? existing.toShiftId : (targets[0]?targets[0].id:'');
+      const preselectAmt = isEdit ? (existing.amount||0) : '';
       $('sheet-root').innerHTML=`<div class="overlay" id="ov" onclick="closeSheet()"><div class="sheet" onclick="event.stopPropagation()">
-        <div class="sheet-head"><div><div class="sheet-sub">${t('custodyTitle')}</div><div class="sheet-title">🤝 ${t('handOver')}</div></div><button class="close-x" id="cx">×</button></div>
-        <div style="font-size:13px;margin-bottom:12px;">${t('custFrom')}: <b>${fromSh.userName||''}</b></div>
-        <div class="field"><label class="lbl">${t('handTo')}</label><select class="input" id="hand-to">${targets.map(s=>`<option value="${s.id}">${s.userName||''}</option>`).join('')}</select></div>
-        <div class="field"><label class="lbl">${t('handAmount')} (${t('currency')})</label><input class="input num" id="hand-amt" type="number" min="0" step="0.01" dir="ltr" placeholder="0"></div>
-        <button class="btn-forest btn-wide" id="hand-confirm">✓ ${t('handOver')}</button>
+        <div class="sheet-head"><div><div class="sheet-sub">${t('custodyTitle')}</div><div class="sheet-title">${isEdit?'✏️ '+t('custModify'):'🤝 '+t('handOver')}</div></div><button class="close-x" id="cx">×</button></div>
+        <div style="font-size:13px;margin-bottom:6px;">${t('custFrom')}: <b>${fromSh.userName||''}</b></div>
+        <div style="background:rgba(31,58,46,0.06);border-radius:10px;padding:10px 12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:12px;color:rgba(26,26,26,0.65);">💰 ${t('custCashLive')}</span>
+          <span class="num" style="font-weight:700;font-size:15px;color:var(--forest);">${fmt(cashLive)} ${t('currency')}</span>
+        </div>
+        <div class="field"><label class="lbl">${t('handTo')}</label><select class="input" id="hand-to">${targets.map(s=>`<option value="${s.id}" ${preselectTo===s.id?'selected':''}>${s.userName||''}</option>`).join('')}</select></div>
+        <div class="field"><label class="lbl">${t('handAmount')} (${t('currency')})</label><input class="input num" id="hand-amt" type="number" min="0" step="0.01" dir="ltr" placeholder="0" value="${preselectAmt}"></div>
+        <button class="btn-forest btn-wide" id="hand-confirm">✓ ${isEdit?t('save'):t('handOver')}</button>
       </div></div>`;
       $('ov').onclick=closeSheet;$('cx').onclick=closeSheet;
       $('hand-confirm').onclick=async()=>{
@@ -4030,17 +4047,37 @@
         const toId=$('hand-to').value;
         const toSh=targets.find(s=>s.id===toId);
         if(amt<=0||!toSh){ toast(t('errorGen'),true); return; }
+        // 🆕 v2.7.1 — Regola 5: blocca se amount > cashLive
+        if(amt > cashLive){ toast(t('custInsufficientCash')+' ('+fmt(cashLive)+' '+t('currency')+')',true); return; }
         const b=$('hand-confirm'); b.disabled=true; b.textContent='...';
         try{
-          const createdAt=Date.now();
-          await addDoc(collection(db,'custodyTransfers'),{
-            branchId:fromSh.branchId, fromShiftId:fromSh.id, fromUserId:fromSh.userId, fromUserName:fromSh.userName||'',
-            toShiftId:toSh.id, toUserId:toSh.userId, toUserName:toSh.userName||'',
-            amount:amt, status:'pending', createdAt, tzo:tzOffsetMin(createdAt)
-          });
-          closeSheet(); toast(t('custSent')); await loadCustodyTx(); renderShift();
-        }catch(e){ console.error(e); toast(t('errorGen'),true); b.disabled=false; b.textContent='✓ '+t('handOver'); }
+          if(isEdit){
+            // Modifica richiesta esistente: aggiorna amount + dest, mantieni status=pending
+            await updateDoc(doc(db,'custodyTransfers',existing.id),{
+              amount:amt, toShiftId:toSh.id, toUserId:toSh.userId, toUserName:toSh.userName||'',
+              modifiedAt:Date.now()
+            });
+            closeSheet(); toast(t('custModified')); await loadCustodyTx(); renderShift();
+          } else {
+            const createdAt=Date.now();
+            await addDoc(collection(db,'custodyTransfers'),{
+              branchId:fromSh.branchId, fromShiftId:fromSh.id, fromUserId:fromSh.userId, fromUserName:fromSh.userName||'',
+              toShiftId:toSh.id, toUserId:toSh.userId, toUserName:toSh.userName||'',
+              amount:amt, status:'pending', createdAt, tzo:tzOffsetMin(createdAt)
+            });
+            closeSheet(); toast(t('custSent')); await loadCustodyTx(); renderShift();
+          }
+        }catch(e){ console.error(e); toast(t('errorGen'),true); b.disabled=false; b.textContent='✓ '+(isEdit?t('save'):t('handOver')); }
       };
+    }
+    // 🆕 v2.7.1 — Cancellazione richiesta da parte del sender (Ahmed)
+    async function cancelCustodyRequest(txId){
+      if(!confirm(t('custCancelConfirm'))) return;
+      try{
+        await updateDoc(doc(db,'custodyTransfers',txId),{status:'cancelled',cancelledAt:Date.now()});
+        toast(t('custCancelledByYou'));
+        await loadCustodyTx(); renderShift();
+      } catch(e){ console.error(e); toast(t('errorGen'),true); }
     }
 
     // فحص دوري للعُهد المستنية تأكيد المستخدم الحالي (شبه فوري)
@@ -4367,10 +4404,45 @@
     async function checkPendingCustody(){
       if(!user||_custodyChecking) return; _custodyChecking=true;
       try{
+        // 1) Notifiche al RECEIVER (Sara): richieste pending in entrata
         const qs=await getDocs(query(collection(db,'custodyTransfers'),where('toUserId','==',user.uid),where('status','==','pending')));
         let pend=null; qs.forEach(d=>{ if(!pend) pend={id:d.id,...d.data()}; });
-        if(pend && !document.getElementById('cust-confirm-ov')) showCustodyConfirm(pend);
+        if(pend && !document.getElementById('cust-confirm-ov') && !document.getElementById('cust-sender-notif-ov')) showCustodyConfirm(pend);
+        // 🆕 v2.7.1 — 2) Notifiche al SENDER (Ahmed): sue richieste rifiutate/cancellate/scadute
+        // Trova richieste fromUserId === me, in stato finale negativo, e non ancora notificate
+        if(!document.getElementById('cust-confirm-ov') && !document.getElementById('cust-sender-notif-ov')){
+          const qs2=await getDocs(query(collection(db,'custodyTransfers'),where('fromUserId','==',user.uid)));
+          let notif=null;
+          qs2.forEach(d=>{
+            const x={id:d.id,...d.data()};
+            if(notif) return;
+            if(x.notifiedSender===true) return;
+            if(x.status==='rejected' || x.status==='expired_on_close'){ notif=x; }
+          });
+          if(notif) showCustodySenderNotification(notif);
+        }
       }catch(e){ console.error('checkPendingCustody',e); } finally{ _custodyChecking=false; }
+    }
+    // 🆕 v2.7.1 — Popup di notifica al sender quando la sua richiesta è rifiutata/scaduta
+    function showCustodySenderNotification(tx){
+      const root=$('sheet-root');
+      const reason = tx.status==='rejected' ? t('custRejectedNotif')
+                   : tx.status==='expired_on_close' ? t('custExpiredOnCloseNotif')
+                   : '';
+      const icon = tx.status==='rejected' ? '✕' : '⏱';
+      const color = tx.status==='rejected' ? 'var(--red)' : 'var(--amber)';
+      root.innerHTML=`<div class="overlay" id="cust-sender-notif-ov"><div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-head"><div><div class="sheet-sub">${t('custodyTitle')}</div><div class="sheet-title">${icon} ${reason}</div></div></div>
+        <div style="text-align:center;margin:8px 0 14px;">
+          <div style="font-size:13px;margin-bottom:8px;color:rgba(26,26,26,0.65);">${t('custTo')} <b>${tx.toUserName||''}</b></div>
+          <div class="num" style="font-size:30px;font-weight:700;color:${color};">${fmt(tx.amount)} ${t('currency')}</div>
+        </div>
+        <button class="btn-forest btn-wide" id="cust-notif-ok">${t('confirmBtn')||t('save')||'OK'}</button>
+      </div></div>`;
+      $('cust-notif-ok').onclick=async()=>{
+        try{ await updateDoc(doc(db,'custodyTransfers',tx.id),{notifiedSender:true,notifiedAt:Date.now()}); } catch(e){ console.warn('mark notifiedSender',e); }
+        root.innerHTML=''; await loadCustodyTx(); if(activeTab==='shift') renderShift();
+      };
     }
     function showCustodyConfirm(tx){
       const root=$('sheet-root');
@@ -4497,7 +4569,17 @@
             </div>
             ${custodyTx.filter(x=>x.status==='confirmed'&&x.toShiftId===s.id).map(x=>`<div style="font-size:11px;color:rgba(26,26,26,0.5);margin-top:2px;">📥 ${t('custFrom')} ${x.fromUserName}: <span class="num">${fmt(x.amount)}</span> ✓</div>`).join('')}
             ${custodyTx.filter(x=>x.status==='confirmed'&&x.fromShiftId===s.id).map(x=>`<div style="font-size:11px;color:rgba(26,26,26,0.5);margin-top:2px;">📤 ${t('custTo')} ${x.toUserName}: <span class="num">${fmt(x.amount)}</span> ✓</div>`).join('')}
-            ${pend.map(x=>`<div style="font-size:11px;color:var(--amber);margin-top:2px;">⏳ ${t('custTo')} ${x.toUserName}: <span class="num">${fmt(x.amount)}</span> — ${t('custPending')}</div>`).join('')}
+            ${pend.map(x=>{
+              // 🆕 v2.7.1 — Se sono io il sender (mio turno), mostro bottoni modifica/cancella
+              const isMine = myShift && x.fromShiftId===myShift.id;
+              return `<div style="font-size:11px;color:var(--amber);margin-top:4px;padding:6px 8px;background:rgba(255,184,77,0.08);border-radius:6px;display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;">
+                <span>⏳ ${t('custTo')} ${x.toUserName}: <span class="num">${fmt(x.amount)}</span> — ${t('custPending')}</span>
+                ${isMine?`<span style="display:flex;gap:4px;">
+                  <button class="cust-edit-btn" data-tx="${x.id}" style="background:none;border:1px solid var(--gold);color:var(--forest);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;font-family:inherit;font-weight:600;">✏️ ${t('custModify')}</button>
+                  <button class="cust-cancel-btn" data-tx="${x.id}" style="background:none;border:1px solid rgba(192,72,72,0.5);color:var(--red);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;font-family:inherit;font-weight:600;">✕</button>
+                </span>`:''}
+              </div>`;
+            }).join('')}
             ${custodyTx.filter(x=>x.status==='rejected'&&x.fromShiftId===s.id).map(x=>`<div style="font-size:11px;color:var(--red);margin-top:2px;">✕ ${t('custTo')} ${x.toUserName}: <span class="num">${fmt(x.amount)}</span> — ${t('custRejected')}</div>`).join('')}
           </div>`;
         }).join('');
@@ -4564,6 +4646,15 @@
           const cc=parseFloat($('sh-close-cash').value)||0;
           const b=$('sh-close-btn'); b.disabled=true; b.textContent='...';
           try{
+            // 🆕 v2.7.1 — Regola 4: alla chiusura del turno, tutte le richieste pending del sender scadono
+            // Logica fisica: se Ahmed se ne va, non c'è più passaggio mano-a-mano
+            const myPendings = custodyTx.filter(x=>x.status==='pending' && x.fromShiftId===myShift.id);
+            for(const tx of myPendings){
+              try{
+                await updateDoc(doc(db,'custodyTransfers',tx.id),{status:'expired_on_close',expiredAt:Date.now()});
+              } catch(e){ console.warn('[custody] expire on close failed:', e); }
+            }
+            if(myPendings.length){ await loadCustodyTx(); }
             const ps=myShift.pauses?[...myShift.pauses]:[];
             if(isOnPause(myShift)) ps[ps.length-1].end=Date.now(); // chiudi pausa aperta
             const closeAt=Date.now();
@@ -4585,6 +4676,12 @@
         };
       }
       document.querySelectorAll('.hand-btn[data-sh]').forEach(btn=>btn.onclick=()=>{ const s=shifts.find(x=>x.id===btn.dataset.sh); if(s) openHandSheet(s); });
+      // 🆕 v2.7.1 — Bottoni modifica/cancella richieste custody pending
+      document.querySelectorAll('.cust-edit-btn[data-tx]').forEach(btn=>btn.onclick=()=>{
+        const tx=custodyTx.find(x=>x.id===btn.dataset.tx); if(!tx||!myShift) return;
+        openHandSheet(myShift, tx);
+      });
+      document.querySelectorAll('.cust-cancel-btn[data-tx]').forEach(btn=>btn.onclick=()=>cancelCustodyRequest(btn.dataset.tx));
       document.querySelectorAll('.lnk-btn[data-sh]').forEach(btn=>btn.onclick=()=>{ const s=shifts.find(x=>x.id===btn.dataset.sh); if(s) showShiftReport(s); });
 
       // timer live (aggiorna ore lavorate ogni 30s se turno aperto)
