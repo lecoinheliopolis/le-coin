@@ -5859,39 +5859,42 @@
     // يبني إعداد الرسم البياني المناسب لكل قسم (يستخدم Chart.js)
     function chartConfigFor(section, data){
       const GREEN='#1F3A2E', GOLD='#C9A84C', G2='#3D7355', toNum=v=>parseFloat(String(v).replace(/[^0-9.\-]/g,''))||0;
+      // 🆕 v2.6.8 — Esclude la riga "Σ TOTALE" da tutti i chart: i totali nei grafici schiacciano visivamente i dati.
+      const totalLabel = 'Σ '+t('totalRow');
+      const noTotal = (rows) => (rows||[]).filter(r => String(r[0]||'') !== totalLabel);
       if(section==='products'){
         // أعلى 8 منتجات بالإيراد (من تقرير المنتجات: [اسم, مباع, إيراد,...])
-        const rows=[...(data.products.rows||[])].map(r=>({name:r[0],rev:toNum(r[2])})).filter(x=>x.rev>0).sort((a,b)=>b.rev-a.rev).slice(0,8);
+        const rows=noTotal(data.products.rows).map(r=>({name:r[0],rev:toNum(r[2])})).filter(x=>x.rev>0).sort((a,b)=>b.rev-a.rev).slice(0,8);
         if(!rows.length) return null;
         return { type:'bar', data:{ labels:rows.map(r=>r.name), datasets:[{ label:t('chartRevenue'), data:rows.map(r=>r.rev), backgroundColor:GREEN }] }, options:{ indexAxis:'y', plugins:{legend:{display:false},title:{display:true,text:t('chartTopProducts')}}, responsive:true } };
       }
       if(section==='shifts'){
         // مقارنة الفروع بالإيراد (من ملخص الفروع: [فرع, إيراد, فواتير, قيمة مخزون])
-        const rows=(data.branches.rows||[]).map(r=>({name:r[0],rev:toNum(r[1])}));
+        const rows=noTotal(data.branches.rows).map(r=>({name:r[0],rev:toNum(r[1])}));
         if(!rows.length || rows.every(r=>r.rev===0)) return null;
         return { type:'bar', data:{ labels:rows.map(r=>r.name), datasets:[{ label:t('chartRevenue'), data:rows.map(r=>r.rev), backgroundColor:[GREEN,GOLD,G2,'#D88E2A','#C04848'] }] }, options:{ plugins:{legend:{display:false},title:{display:true,text:t('chartBranches')}}, responsive:true } };
       }
       if(section==='sales'){
         // المبيعات: إجمالي كل فاتورة (آخر 12)
-        const rows=(data.salesByInvoice.rows||[]).slice(-12);
+        const rows=noTotal(data.salesByInvoice.rows).slice(-12);
         if(!rows.length) return null;
         return { type:'bar', data:{ labels:rows.map(r=>r[1]), datasets:[{ label:t('chartRevenue'), data:rows.map(r=>toNum(r[6])), backgroundColor:G2 }] }, options:{ plugins:{legend:{display:false},title:{display:true,text:t('chartRevenue')}}, responsive:true } };
       }
       if(section==='suppliers'){
         // المشتريات حسب المورد (من ملخص الموردين: [مورد, عدد, كمية, تكلفة])
-        const rows=(data.suppliers.rows||[]).map(r=>({name:r[0],val:toNum(r[3])})).filter(x=>x.val>0);
+        const rows=noTotal(data.suppliers.rows).map(r=>({name:r[0],val:toNum(r[3])})).filter(x=>x.val>0);
         if(!rows.length) return null;
         return { type:'bar', data:{ labels:rows.map(r=>r.name), datasets:[{ label:t('purchasesTotal'), data:rows.map(r=>r.val), backgroundColor:GOLD }] }, options:{ indexAxis:'y', plugins:{legend:{display:false},title:{display:true,text:t('secPurchases')}}, responsive:true } };
       }
       // 🆕 v2.5.3 — Chart magazzino: Top 10 categorie per valore-costo stock
       if(section==='warehouse'){
-        const rows=(data.categories.rows||[]).map(r=>({name:r[0],val:toNum(r[7])})).filter(x=>x.val>0).sort((a,b)=>b.val-a.val).slice(0,10);
+        const rows=noTotal(data.categories.rows).map(r=>({name:r[0],val:toNum(r[7])})).filter(x=>x.val>0).sort((a,b)=>b.val-a.val).slice(0,10);
         if(!rows.length) return null;
         return { type:'bar', data:{ labels:rows.map(r=>r.name), datasets:[{ label:t('valCost'), data:rows.map(r=>r.val), backgroundColor:GOLD }] }, options:{ indexAxis:'y', plugins:{legend:{display:false},title:{display:true,text:t('chartCategoriesValCost')}}, responsive:true } };
       }
       // 🆕 v2.5.3 — Chart clienti: Top 10 per spesa
       if(section==='customers'){
-        const rows=(data.topCustomersBySpend.rows||[]).slice(0,10).map(r=>({name:r[0],val:toNum(r[3])})).filter(x=>x.val>0);
+        const rows=noTotal(data.topCustomersBySpend.rows).slice(0,10).map(r=>({name:r[0],val:toNum(r[3])})).filter(x=>x.val>0);
         if(!rows.length) return null;
         return { type:'bar', data:{ labels:rows.map(r=>r.name), datasets:[{ label:t('totalSpend'), data:rows.map(r=>r.val), backgroundColor:GREEN }] }, options:{ indexAxis:'y', plugins:{legend:{display:false},title:{display:true,text:t('chartTopCustomers')}}, responsive:true } };
       }
