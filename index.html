@@ -2903,15 +2903,45 @@
     }
 
     // Helper: trend daily revenues per range
+    // 🆕 v2.7.2 — Granularità adattiva: 30min / 1h / 1 giorno a seconda della durata
+    // Quando il range è ≤ 24h, raggruppa per ora (o mezz'ora se durata < 6h)
+    // Ritorna {buckets, labels, mode}
     function dailyBuckets(salesArr, fromTs, toTs){
-      const dayMs = 86400000;
-      const days = Math.max(1, Math.ceil((toTs-fromTs)/dayMs));
-      const buckets = new Array(days).fill(0);
+      const HOUR_MS = 3600000;
+      const DAY_MS = 86400000;
+      const rangeMs = Math.max(1, toTs - fromTs);
+      let bucketMs, mode;
+      if(rangeMs <= DAY_MS + HOUR_MS){
+        const hoursSpan = rangeMs / HOUR_MS;
+        if(hoursSpan <= 6){ bucketMs = HOUR_MS/2; mode = 'halfHour'; }
+        else { bucketMs = HOUR_MS; mode = 'hour'; }
+      } else {
+        bucketMs = DAY_MS; mode = 'day';
+      }
+      const nBuckets = Math.max(1, Math.ceil(rangeMs / bucketMs));
+      const buckets = new Array(nBuckets).fill(0);
       salesArr.forEach(s=>{
         if(s.voided) return;
-        const idx = Math.floor((s.createdAt-fromTs)/dayMs);
-        if(idx>=0 && idx<days) buckets[idx] += Math.max(0, (s.total||0)-(s.refundTotal||0));
+        const idx = Math.floor((s.createdAt - fromTs) / bucketMs);
+        if(idx>=0 && idx<nBuckets) buckets[idx] += Math.max(0, (s.total||0)-(s.refundTotal||0));
       });
+      // Costruisci labels
+      const labels = [];
+      for(let i=0; i<nBuckets; i++){
+        const d = new Date(fromTs + i*bucketMs);
+        if(mode === 'day'){
+          labels.push(`${d.getDate()}/${d.getMonth()+1}`);
+        } else if(mode === 'hour'){
+          labels.push(`${String(d.getHours()).padStart(2,'0')}:00`);
+        } else { // halfHour
+          const h = String(d.getHours()).padStart(2,'0');
+          const m = d.getMinutes() === 0 ? '00' : '30';
+          labels.push(`${h}:${m}`);
+        }
+      }
+      // Per backward compat: array con properties (.labels, .mode)
+      buckets.labels = labels;
+      buckets.mode = mode;
       return buckets;
     }
 
@@ -3199,7 +3229,9 @@
       sales.forEach(s=>{ if(!s.voided && s.customerId) customersActive.add(s.customerId); });
       // Trends daily
       const dailyRev = dailyBuckets(sales, fromTs, toTs);
-      const dailyOrders = (()=>{ const dayMs=86400000; const days=Math.max(1,Math.ceil((toTs-fromTs)/dayMs)); const b=new Array(days).fill(0); sales.forEach(s=>{ if(s.voided) return; const i=Math.floor((s.createdAt-fromTs)/dayMs); if(i>=0&&i<days) b[i]++; }); return b; })();
+      // 🆕 v2.7.2 — dailyOrders coerente con dailyRev (count, stessa granularità)
+      const _bucketMs = dailyRev.mode==='halfHour' ? 1800000 : dailyRev.mode==='hour' ? 3600000 : 86400000;
+      const dailyOrders = (()=>{ const n=dailyRev.length; const b=new Array(n).fill(0); sales.forEach(s=>{ if(s.voided) return; const i=Math.floor((s.createdAt-fromTs)/_bucketMs); if(i>=0&&i<n) b[i]++; }); return b; })();
       // Previous-period values per compare
       const prevRev = _prevTotalFor('branches', 1);
       const prevOrders = _prevTotalFor('branches', 2);
@@ -3262,7 +3294,8 @@
         const timelineWrap = $('an-chart-timeline-wrap');
         if(timelineWrap){
           if(_isMeaningfulData(dailyRev, 1)){
-            const labels = dailyRev.map((_,i)=>{ const d=new Date(fromTs+i*86400000); return `${d.getDate()}/${d.getMonth()+1}`; });
+            // 🆕 v2.7.2 — Usa labels adattive (ore/mezz'ore/giorni) generate da dailyBuckets
+            const labels = dailyRev.labels || dailyRev.map((_,i)=>{ const d=new Date(fromTs+i*86400000); return `${d.getDate()}/${d.getMonth()+1}`; });
             timelineWrap.innerHTML = '<canvas id="an-chart-timeline"></canvas>';
             new Chart($('an-chart-timeline').getContext('2d'), {
               type:'line',
@@ -3298,7 +3331,9 @@
       const [fromTs, toTs] = analyticsState._ts;
       const sales = analyticsState._sales || [];
       const dailyRev = dailyBuckets(sales, fromTs, toTs);
-      const dailyOrders = (()=>{ const dayMs=86400000; const days=Math.max(1,Math.ceil((toTs-fromTs)/dayMs)); const b=new Array(days).fill(0); sales.forEach(s=>{ if(s.voided) return; const i=Math.floor((s.createdAt-fromTs)/dayMs); if(i>=0&&i<days) b[i]++; }); return b; })();
+      // 🆕 v2.7.2 — dailyOrders coerente con dailyRev (count, stessa granularità)
+      const _bucketMs = dailyRev.mode==='halfHour' ? 1800000 : dailyRev.mode==='hour' ? 3600000 : 86400000;
+      const dailyOrders = (()=>{ const n=dailyRev.length; const b=new Array(n).fill(0); sales.forEach(s=>{ if(s.voided) return; const i=Math.floor((s.createdAt-fromTs)/_bucketMs); if(i>=0&&i<n) b[i]++; }); return b; })();
       const effTotal = s=>Math.max(0,(s.total||0)-(s.refundTotal||0));
       const rmFn=s=>{ const m={}; if(s.voided)(s.items||[]).forEach(it=>m[it.productId]=(m[it.productId]||0)+it.qty); (s.returns||[]).forEach(r=>(r.lines||[]).forEach(l=>m[l.productId]=(m[l.productId]||0)+l.qty)); return m; };
       let revenue=0, orders=0, itemsSold=0, avgTicket=0;
@@ -3357,7 +3392,8 @@
         const tlWrap = $('an-sales-timeline-wrap');
         if(tlWrap){
           if(_isMeaningfulData(dailyRev, 1)){
-            const labels = dailyRev.map((_,i)=>{ const d=new Date(fromTs+i*86400000); return `${d.getDate()}/${d.getMonth()+1}`; });
+            // 🆕 v2.7.2 — Labels adattive
+            const labels = dailyRev.labels || dailyRev.map((_,i)=>{ const d=new Date(fromTs+i*86400000); return `${d.getDate()}/${d.getMonth()+1}`; });
             tlWrap.innerHTML = '<canvas id="an-sales-timeline"></canvas>';
             new Chart($('an-sales-timeline').getContext('2d'), {
               type:'line',
