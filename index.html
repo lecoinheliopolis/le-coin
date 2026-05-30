@@ -2987,8 +2987,8 @@
       const branchOpts = `<option value="all">${t('allBranches')}</option>` + allBr.map(b=>`<option value="${b.id}" ${analyticsState.branchFilter===b.id?'selected':''}>${lang==='ar'?b.nameAr:b.nameEn}</option>`).join('');
       const customDates = analyticsState.range.mode==='custom' ? `<div class="row2" style="margin-top:8px;"><div class="field" style="margin:0;"><label class="lbl">${t('repFrom')}</label><input class="input" id="an-from" type="date" value="${analyticsState.range.from||new Date(fromTs).toISOString().slice(0,10)}"></div><div class="field" style="margin:0;"><label class="lbl">${t('repTo')}</label><input class="input" id="an-to" type="date" value="${analyticsState.range.to||new Date(toTs).toISOString().slice(0,10)}"></div></div>` : '';
       html += `<div style="background:var(--ivory-dark);border-radius:14px;padding:12px;margin-bottom:12px;position:sticky;top:0;z-index:5;">
-        <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;">${rangeBtn('today',t('rToday'))}${rangeBtn('7',t('r7'))}${rangeBtn('30',t('r30'))}${rangeBtn('month',t('rMonth'))}${rangeBtn('year',t('rYear'))}${rangeBtn('custom',t('rCustom'))}</div>
-        ${customDates}
+        <div id="an-range-btns" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;">${rangeBtn('today',t('rToday'))}${rangeBtn('7',t('r7'))}${rangeBtn('30',t('r30'))}${rangeBtn('month',t('rMonth'))}${rangeBtn('year',t('rYear'))}${rangeBtn('custom',t('rCustom'))}</div>
+        <div id="an-custom-range">${customDates}</div>
         <div style="display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap;">
           ${allBr.length>1?`<select class="input" id="an-branch" style="flex:1;min-width:140px;padding:8px 10px;font-size:12.5px;">${branchOpts}</select>`:''}
           <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--charcoal);background:#fff;padding:8px 12px;border-radius:18px;border:1px solid var(--ivory-dark);">
@@ -3016,9 +3016,28 @@
       html += `<div id="an-content"></div>`;
       $('content').innerHTML = html;
       // Wire filters
-      document.querySelectorAll('.an-r').forEach(b=>b.onclick=()=>{ analyticsState.range.mode=b.dataset.m; renderAnalytics(); });
+      // 🆕 v2.7.2 — Click "custom" mostra solo date inputs senza rigenerare (evita freeze + spreco query)
+      const anRangeHandler = function(){
+        const newMode = this.dataset.m;
+        analyticsState.range.mode = newMode;
+        if(newMode === 'custom'){
+          // Update mirato: aggiorno stile chip + apertura area date, senza renderAnalytics() pesante
+          const fromDef = analyticsState.range.from || new Date(fromTs).toISOString().slice(0,10);
+          const toDef = analyticsState.range.to || new Date(toTs).toISOString().slice(0,10);
+          $('an-range-btns').innerHTML = `${rangeBtn('today',t('rToday'))}${rangeBtn('7',t('r7'))}${rangeBtn('30',t('r30'))}${rangeBtn('month',t('rMonth'))}${rangeBtn('year',t('rYear'))}${rangeBtn('custom',t('rCustom'))}`;
+          $('an-custom-range').innerHTML = `<div class="row2" style="margin-top:8px;"><div class="field" style="margin:0;"><label class="lbl">${t('repFrom')}</label><input class="input" id="an-from" type="date" value="${fromDef}"></div><div class="field" style="margin:0;"><label class="lbl">${t('repTo')}</label><input class="input" id="an-to" type="date" value="${toDef}"></div></div>`;
+          // Re-wire chip + date inputs
+          document.querySelectorAll('.an-r').forEach(b2=>b2.onclick=anRangeHandler);
+          const fI=$('an-from'), tI=$('an-to');
+          if(fI) fI.onchange=(e)=>{ analyticsState.range.from=e.target.value; renderAnalytics(); };
+          if(tI) tI.onchange=(e)=>{ analyticsState.range.to=e.target.value; renderAnalytics(); };
+        } else {
+          renderAnalytics();
+        }
+      };
+      document.querySelectorAll('.an-r').forEach(b=>b.onclick=anRangeHandler);
       const fromIn=$('an-from'), toIn=$('an-to');
-      if(fromIn) fromIn.onchange=(e)=>{ analyticsState.range.from=e.target.value; };
+      if(fromIn) fromIn.onchange=(e)=>{ analyticsState.range.from=e.target.value; renderAnalytics(); };
       if(toIn) toIn.onchange=(e)=>{ analyticsState.range.to=e.target.value; renderAnalytics(); };
       const brSel=$('an-branch'); if(brSel) brSel.onchange=(e)=>{ analyticsState.branchFilter=e.target.value; renderAnalytics(); };
       $('an-compare').onchange=(e)=>{ analyticsState.compare=e.target.checked; renderAnalytics(); };
@@ -3661,8 +3680,8 @@
         <div style="background:var(--ivory-dark);border-radius:14px;padding:14px;margin-bottom:14px;">
           <div style="font-weight:700;font-size:15px;">${t('summaryWindow')}</div>
           <div style="font-size:12px;color:rgba(26,26,26,0.55);margin:2px 0 10px;">${t('showing')}: ${fmtDate(fromTs)} → ${fmtDate(toTs)}</div>
-          <div style="display:flex;gap:6px;">${rangeBtn('today',t('rToday'))}${rangeBtn('7',t('r7'))}${rangeBtn('30',t('r30'))}${rangeBtn('custom',t('rCustom'))}</div>
-          ${dashRange.mode==='custom'?`<div class="row2" style="margin-top:10px;"><div class="field" style="margin:0;"><label class="lbl">${t('repFrom')}</label><input class="input" id="dash-from" type="date" value="${dashRange.from||fmtDate(fromTs)}"></div><div class="field" style="margin:0;"><label class="lbl">${t('repTo')}</label><input class="input" id="dash-to" type="date" value="${dashRange.to||fmtDate(toTs)}"></div></div>`:''}
+          <div id="dash-range-btns" style="display:flex;gap:6px;">${rangeBtn('today',t('rToday'))}${rangeBtn('7',t('r7'))}${rangeBtn('30',t('r30'))}${rangeBtn('custom',t('rCustom'))}</div>
+          <div id="dash-custom-range">${dashRange.mode==='custom'?`<div class="row2" style="margin-top:10px;"><div class="field" style="margin:0;"><label class="lbl">${t('repFrom')}</label><input class="input" id="dash-from" type="date" value="${dashRange.from||fmtDate(fromTs)}"></div><div class="field" style="margin:0;"><label class="lbl">${t('repTo')}</label><input class="input" id="dash-to" type="date" value="${dashRange.to||fmtDate(toTs)}"></div></div>`:''}</div>
           ${showBranchFilter?`<div style="margin-top:10px;"><div style="font-size:11.5px;color:rgba(26,26,26,0.6);margin-bottom:6px;font-weight:600;">🏢 ${t('filterByBranch')}</div><div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;">${branchChip('all',t('allBranches'))}${allBranches.map(b=>branchChip(b.id, lang==='ar'?b.nameAr:b.nameEn)).join('')}</div></div>`:''}
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
@@ -3723,7 +3742,24 @@
       document.querySelectorAll('.low-row').forEach(btn=>btn.onclick=()=>{ const p=products.find(x=>x.id===btn.dataset.pid); if(p) showProductDetail(p); });
       $('dash-refresh').onclick=renderDashboard;
       $('dash-scan')&&($('dash-scan').onclick=()=>smartScan('dashboard'));
-      document.querySelectorAll('.dash-r').forEach(b=>b.onclick=()=>{ dashRange.mode=b.dataset.m; renderDashboard(); });
+      // 🆕 v2.7.2 — Click "custom" in Dashboard non rigenera, mostra solo date inputs
+      const dashRangeHandler = function(){
+        const newMode = this.dataset.m;
+        dashRange.mode = newMode;
+        if(newMode === 'custom'){
+          const fromDef = dashRange.from || fmtDate(fromTs);
+          const toDef = dashRange.to || fmtDate(toTs);
+          $('dash-range-btns').innerHTML = `${rangeBtn('today',t('rToday'))}${rangeBtn('7',t('r7'))}${rangeBtn('30',t('r30'))}${rangeBtn('custom',t('rCustom'))}`;
+          $('dash-custom-range').innerHTML = `<div class="row2" style="margin-top:10px;"><div class="field" style="margin:0;"><label class="lbl">${t('repFrom')}</label><input class="input" id="dash-from" type="date" value="${fromDef}"></div><div class="field" style="margin:0;"><label class="lbl">${t('repTo')}</label><input class="input" id="dash-to" type="date" value="${toDef}"></div></div>`;
+          document.querySelectorAll('.dash-r').forEach(b2=>b2.onclick=dashRangeHandler);
+          const f=$('dash-from'),tt=$('dash-to');
+          const upd=()=>{ dashRange.from=f.value; dashRange.to=tt.value; renderDashboard(); };
+          if(f)f.onchange=upd; if(tt)tt.onchange=upd;
+        } else {
+          renderDashboard();
+        }
+      };
+      document.querySelectorAll('.dash-r').forEach(b=>b.onclick=dashRangeHandler);
       // 🆕 v2.5.4 — chips filiale
       document.querySelectorAll('.dash-b').forEach(b=>b.onclick=()=>{ dashRange.branchId=b.dataset.bid; renderDashboard(); });
       if(dashRange.mode==='custom'){ const f=$('dash-from'),tt=$('dash-to'); const upd=()=>{ dashRange.from=f.value; dashRange.to=tt.value; renderDashboard(); }; if(f)f.onchange=upd; if(tt)tt.onchange=upd; }
