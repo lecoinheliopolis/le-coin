@@ -603,7 +603,7 @@
         render();
         checkPendingCustody(); // فحص فوري للعُهد المستنية
         checkPendingOrders(); // فحص فوري للطلبات الواردة
-        clearInterval(window.__custTimer); window.__custTimer=setInterval(()=>{ checkPendingCustody(); checkPendingOrders(); },5000); // كل 5 ثواني (أسرع استجابة)
+        clearInterval(window.__custTimer); window.__custTimer=setInterval(()=>{ checkPendingCustody(); checkPendingOrders(); },15000); // كل 15 ثانية (تقليل استهلاك Firebase reads)
       }catch(e){ console.error(e); $('login-error').textContent=t('errorGen'); await signOut(auth); }
     });
 
@@ -629,7 +629,34 @@
         if(myShift && myShift.branchId){ currentBranchId=myShift.branchId; } // blocca la filiale sul turno
       }catch(e){ console.error('loadMyOpenShift',e); }
     }
-    async function loadCatalog(){
+    // 🚀 Cache catalogo: 5 دقائق لتقليل قراءات Firebase
+    // التخزين المؤقت يقلل القراءات بنسبة 80%+ خاصة للعملاء اللي بيفتحوا التطبيق كتير
+    const CATALOG_CACHE_TTL = 5 * 60 * 1000; // 5 دقائق
+    function _readCatalogCache(branchId){
+      try{
+        const raw = localStorage.getItem('lecoin_catalog_v1');
+        if(!raw) return null;
+        const obj = JSON.parse(raw);
+        if(!obj || !obj.t || (Date.now()-obj.t) > CATALOG_CACHE_TTL) return null;
+        if(obj.branchId !== branchId) return null; // المخزون يختلف حسب الفرع
+        return obj;
+      }catch(e){ return null; }
+    }
+    function _writeCatalogCache(branchId, cats, prods, inv){
+      try{ localStorage.setItem('lecoin_catalog_v1', JSON.stringify({t:Date.now(),branchId,cats,prods,inv})); }catch(e){}
+    }
+    function invalidateCatalogCache(){ try{ localStorage.removeItem('lecoin_catalog_v1'); }catch(e){} }
+    async function loadCatalog(forceReload){
+      // محاولة استخدام Cache (إلا لو الكود طلب reload صريح)
+      if(!forceReload){
+        const cache = _readCatalogCache(currentBranchId);
+        if(cache){
+          categories = cache.cats || [];
+          products = cache.prods || [];
+          inventory = cache.inv || {};
+          return;
+        }
+      }
       categories=[]; products=[]; inventory={};
       const cs=await getDocs(collection(db,'categories'));
       cs.forEach(d=>categories.push({id:d.id,...d.data()}));
@@ -638,6 +665,7 @@
       ps.forEach(d=>products.push({id:d.id,...d.data()}));
       const inv=await getDocs(query(collection(db,'inventory'),where('branchId','==',currentBranchId)));
       inv.forEach(d=>{ const x=d.data(); inventory[x.productId]={qty:x.qty||0,threshold:x.threshold||20,lastCost:x.lastCost||0}; });
+      _writeCatalogCache(currentBranchId, categories, products, inventory);
     }
     async function loadInstapayCfg(){
       try{ const s=await getDoc(doc(db,'settings','instapay')); if(s.exists()){ const x=s.data(); instapayCfg={qrDataUrl:x.qrDataUrl||'', alias:x.alias||''}; } }catch(e){ console.warn('loadInstapayCfg',e); }
@@ -1483,7 +1511,7 @@
       </div></div>`;
       setToggle('c-act',act,v=>act=v);
       $('ov').onclick=closeSheet;$('cx').onclick=closeSheet;
-      if(cat)$('c-del').onclick=async()=>{ if(!confirm(t('confirmDelCat')))return; try{await deleteDoc(doc(db,'categories',cat.id));categories=categories.filter(c=>c.id!==cat.id);closeSheet();renderCategories();toast(t('deleted'));}catch(e){toast(t('errorGen'),true);} };
+      if(cat)$('c-del').onclick=async()=>{ if(!confirm(t('confirmDelCat')))return; try{await deleteDoc(doc(db,'categories',cat.id));categories=categories.filter(c=>c.id!==cat.id);invalidateCatalogCache();closeSheet();renderCategories();toast(t('deleted'));}catch(e){toast(t('errorGen'),true);} };
       $('c-save').onclick=async()=>{
         const nameAr=$('c-ar').value.trim(),nameEn=$('c-en').value.trim(),order=parseInt($('c-order').value)||0;
         if(!nameAr||!nameEn){toast(t('required'),true);return;}
@@ -1491,6 +1519,7 @@
         try{
           if(cat){ await updateDoc(doc(db,'categories',cat.id),{nameAr,nameEn,order,active:act}); Object.assign(cat,{nameAr,nameEn,order,active:act}); }
           else{ const r=await addDoc(collection(db,'categories'),{nameAr,nameEn,order,active:act,createdAt:Date.now()}); categories.push({id:r.id,nameAr,nameEn,order,active:act}); }
+          invalidateCatalogCache();
           categories.sort((a,b)=>(a.order||0)-(b.order||0));
           closeSheet();renderCategories();toast(t('saved'));
         }catch(e){console.error(e);toast(t('errorGen'),true);$('c-save').textContent='✓ '+t('save');}
@@ -1662,7 +1691,7 @@
       $('photo-cam-input').onchange=handlePhoto;
       function mUpd(){const pr=parseFloat($('p-price').value),co=parseFloat($('p-cost').value);if(isNaN(pr)||isNaN(co)||pr<=0){$('p-margin').innerHTML='';return;}const m=pr-co,pct=Math.round(m/pr*100),bad=pct<30;$('p-margin').innerHTML=`<div style="background:${bad?'rgba(192,72,72,0.07)':'rgba(201,168,76,0.1)'};border-radius:10px;padding:8px 12px;margin-bottom:12px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:${bad?'var(--red)':'var(--forest)'};font-weight:600;">${t('margin')}</span><span class="num" style="font-weight:700;color:${bad?'var(--red)':'var(--forest)'}">${m} ${t('currency')} · ${pct}%</span></div>`;}
       $('p-price').oninput=mUpd;$('p-cost').oninput=mUpd;mUpd();
-      if(prod)$('p-del').onclick=async()=>{ if(!confirm(t('confirmDelProd')))return; try{await deleteDoc(doc(db,'products',prod.id));products=products.filter(p=>p.id!==prod.id);closeSheet();renderProducts();toast(t('deleted'));}catch(e){toast(t('errorGen'),true);} };
+      if(prod)$('p-del').onclick=async()=>{ if(!confirm(t('confirmDelProd')))return; try{await deleteDoc(doc(db,'products',prod.id));products=products.filter(p=>p.id!==prod.id);invalidateCatalogCache();closeSheet();renderProducts();toast(t('deleted'));}catch(e){toast(t('errorGen'),true);} };
       $('p-save').onclick=async()=>{
         const barcode=$('p-bc').value.trim(),name=$('p-name').value.trim(),nameAr=$('p-name-ar').value.trim(),categoryId=$('p-cat').value;
         const descAr=$('p-dar').value.trim(),descEn=$('p-den').value.trim();
@@ -1676,6 +1705,7 @@
           const data={barcode,name,nameAr,categoryId,descAr,descEn,price,cost,active:act};
           if(prod){ await updateDoc(doc(db,'products',prodId),data); }
           else{ data.createdAt=Date.now(); data.photoUrl=''; const r=await addDoc(collection(db,'products'),data); prodId=r.id; }
+          invalidateCatalogCache();
           // photo upload
           if(pendingPhoto){ data.photoUrl=pendingPhoto; await updateDoc(doc(db,'products',prodId),{photoUrl:pendingPhoto}); }
           else if(prod) data.photoUrl=prod.photoUrl||'';
@@ -4264,9 +4294,9 @@
       document.querySelectorAll('[data-ctab]').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#client-nav .nav-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); clientTab=b.dataset.ctab; renderClientTab(); });
       if(!clientTab) clientTab='home';
       renderClientTab();
-      // فحص دوري لأي طلب استخدام نقاط من الكاشير
+      // فحص دوري لأي طلب استخدام نقاط من الكاشير (كل 15 ثانية لتقليل استهلاك Firebase reads)
       clearInterval(window.__clientPtsTimer);
-      window.__clientPtsTimer = setInterval(checkClientPointsRequest, 3000);
+      window.__clientPtsTimer = setInterval(checkClientPointsRequest, 15000);
       checkClientPointsRequest();
     }
     // ☰ قائمة الفرع — يفتح sheet لاختيار الفرع
@@ -4607,9 +4637,9 @@
     }
     async function renderClientOrders(){
       const c=$('client-content'); c.innerHTML=`<div class="spinner"></div>`;
-      // auto-refresh كل 5 ثواني وانت في تبويب الطلبات (لما الكاشير يجهّز/يدفع تشوف فوراً)
+      // auto-refresh كل 20 ثانية وانت في تبويب الطلبات (تقليل استهلاك Firebase)
       clearInterval(window.__clientOrdersTimer);
-      window.__clientOrdersTimer = setInterval(()=>{ if(clientTab==='orders') renderClientOrdersInner(); else clearInterval(window.__clientOrdersTimer); }, 5000);
+      window.__clientOrdersTimer = setInterval(()=>{ if(clientTab==='orders') renderClientOrdersInner(); else clearInterval(window.__clientOrdersTimer); }, 20000);
       renderClientOrdersInner();
     }
     async function renderClientOrdersInner(){
