@@ -4547,7 +4547,8 @@
 
       // ===== العُهد: الورديات المفتوحة في الفرع (أدمن/مدير) =====
       if(profile.role==='admin'||profile.role==='manager'){
-        const openShifts=shifts.filter(s=>s.status==='open' && s.branchId===currentBranchId);
+        // 🆕 Fix: escludo il mio turno dalla lista (vedo solo gli ALTRI colleghi attivi)
+        const openShifts=shifts.filter(s=>s.status==='open' && s.branchId===currentBranchId && s.userId!==user.uid);
         html+=`<div class="card"><div class="card-title">🤝 ${t('custodyTitle')}</div>`;
         if(openShifts.length===0) html+=`<div class="empty">${t('noOpenShiftsBranch')}</div>`;
         else html+=openShifts.map(s=>{
