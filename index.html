@@ -681,6 +681,8 @@
     // assegna il logo (base64) alle immagini
     (function setLogos(){ const a=$('login-logo'),b=$('header-logo'); if(a)a.src=LOGO; if(b)b.src=LOGO; })();
     const fmt = n => Math.abs(n||0).toLocaleString('en-US',{maximumFractionDigits:0});
+    // 🆕 v2.7.3 — esc globale per HTML escaping (le funzioni locali con `const esc` lo ombreggiano senza conflitti)
+    const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
     // مثل fmt لكن مع كسور (للحساب الدقيق زي "كل X ج.م = ١ نقطة")
     const fmt2 = n => Math.abs(n||0).toLocaleString('en-US',{maximumFractionDigits:2});
     // Orario sempre su fuso del Cairo (Egitto), 24h, cifre occidentali — calcolato da noi, NON dipende dal browser
