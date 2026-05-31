@@ -699,6 +699,8 @@
       if(img.classList.contains('brand-name')) return false;
       if(img.classList.contains('cl-photo')) return false; // foto inline nel carrello (contesto interattivo)
       if(img.classList.contains('pc-photo')) return false; // 🛒 foto tile cassa: click=addToCart, zoom solo via 🔍 dedicato
+      // 🆕 v2.7.3 — Foto dentro card lavagna: il click apre la modal del prodotto, non il lightbox
+      if(img.closest('.chalk-product-card')) return false;
       // Dentro un upload box (cliccare = aprire file picker)
       if(img.closest('#photo-box') || img.closest('#u-photo-box') || img.closest('.photo-upload')) return false;
       // Avatar piccoli (lista clienti, staff inline, ecc.) — soglia 48px (post-bug 30/05/2026)
@@ -1168,24 +1170,34 @@
       } catch(e){ console.warn('[chalkboard] announcements failed:', e); }
       let annSectionHtml = '';
       if(annItems.length){
+        const isSingleAnn = annItems.length === 1;
         const itemsHtml = annItems.map((a, i) => {
           const ic = a.icon || '📢';
           const pin = a.pinned ? '<span style="font-size:12px;opacity:0.7;">📌</span>' : '';
-          const tilt = (((a.id||'x').charCodeAt(0) % 5) - 2) * 0.4;
+          const tilt = isSingleAnn ? 0 : (((a.id||'x').charCodeAt(0) % 5) - 2) * 0.4;
           // 🆕 v2.7.3 — Testo nella lingua corrente con fallback al campo legacy
           const annTitle = lang==='ar' ? (a.titleAr||a.title||'') : (a.titleEn||a.title||'');
           const annMsg = lang==='ar' ? (a.messageAr||a.message||'') : (a.messageEn||a.message||'');
-          // 🆕 v2.7.3 — Ogni annuncio è una "nota" stile post-it, distribuita in griglia
+          if(isSingleAnn){
+            // 🆕 v2.7.3 — Annuncio singolo: grande, centrato, titolo + testo affiancati
+            return `<div style="background:rgba(0,0,0,0.13);border:1px solid rgba(201,168,76,0.22);border-radius:16px;padding:20px 28px;max-width:780px;margin:0 auto;display:flex;align-items:center;gap:22px;flex-wrap:wrap;justify-content:center;">
+              <div style="font-size:52px;line-height:1;flex-shrink:0;filter:drop-shadow(0 0 6px rgba(245,240,220,0.25));">${ic}</div>
+              <div style="${titleDouble};font-size:34px;line-height:1.15;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">${esc(annTitle)} ${pin}</div>
+              ${annMsg ? `<div style="${bodyChalk};font-size:24px;line-height:1.25;opacity:0.92;flex:1;min-width:200px;">${esc(annMsg)}</div>` : ''}
+            </div>`;
+          }
+          // Annunci multipli: card "note" in griglia
           return `<div style="background:rgba(0,0,0,0.13);border:1px solid rgba(201,168,76,0.22);border-radius:14px;padding:14px 16px;transform:rotate(${tilt}deg);text-align:center;">
             <div style="font-size:30px;line-height:1;margin-bottom:8px;filter:drop-shadow(0 0 4px rgba(245,240,220,0.2));">${ic}</div>
             <div style="${titleDouble};font-size:21px;line-height:1.2;margin-bottom:5px;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;">${esc(annTitle)} ${pin}</div>
             ${annMsg ? `<div style="${bodyChalk};font-size:17px;line-height:1.3;opacity:0.9;">${esc(annMsg)}</div>` : ''}
           </div>`;
         }).join('');
-        // 🆕 v2.7.3 — Griglia responsive: le note si distribuiscono e centrano automaticamente
-        annSectionHtml = `<div style="margin-bottom:18px;padding-bottom:16px;border-bottom:1px dashed rgba(245,240,220,0.22);">
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;justify-content:center;">${itemsHtml}</div>
-        </div>`;
+        // 🆕 v2.7.3 — Per 1 annuncio: layout flex; per più: griglia responsive
+        const container = isSingleAnn
+          ? itemsHtml
+          : `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;justify-content:center;">${itemsHtml}</div>`;
+        annSectionHtml = `<div style="margin-bottom:18px;padding-bottom:16px;border-bottom:1px dashed rgba(245,240,220,0.22);">${container}</div>`;
       }
       // === 🆕 SEZIONE NUOVI ARRIVI + OFFERTE — calcolo count PRIMA per scala adattiva ===
       // 🆕 v2.7.3 — Quando una categoria è vuota, l'altra usa la "scala full-width" (card più grandi)
@@ -1231,30 +1243,34 @@
       // === RENDER NUOVI ARRIVI ===
       let newArrivalsHtml = '';
       if(arrivals.length){
-        const isHero = arrivals.length===1 && arrivalsFullWidth; // 🆕 v2.7.3 — prodotto unico centrato
+        // 🆕 v2.7.3 — Hero sempre per 1 solo prodotto (verticale grande centrato per bilanciare)
+        const isHero = arrivals.length===1;
         const sc = getCardScale(arrivals.length, arrivalsFullWidth);
         const cardsHtml = arrivals.map((p,i)=>{
-          const phSize = isHero ? 240 : sc.ph;
+          const phSize = isHero ? (arrivalsFullWidth ? 280 : 220) : sc.ph;
+          const heroNameSize = arrivalsFullWidth ? 38 : 30;
+          const heroPriceSize = arrivalsFullWidth ? 50 : 40;
           const photo = p.photoUrl
             ? `<img src="${p.photoUrl}" style="width:${phSize}px;height:${phSize}px;border-radius:12px;object-fit:contain;background:rgba(0,0,0,0.2);flex-shrink:0;border:1px solid rgba(201,168,76,0.25);">`
             : `<div style="width:${phSize}px;height:${phSize}px;border-radius:12px;background:rgba(0,0,0,0.2);flex-shrink:0;border:1px solid rgba(201,168,76,0.25);display:flex;align-items:center;justify-content:center;font-size:${Math.round(phSize*0.4)}px;">✨</div>`;
-          const newSticker = `<div style="position:absolute;top:-7px;${lang==='ar'?'right':'left'}:-7px;background:linear-gradient(135deg,#E53935,#C62828);color:#fff;font-weight:800;font-size:12px;padding:4px 10px;border-radius:6px;box-shadow:0 3px 8px rgba(0,0,0,0.4);font-family:system-ui,sans-serif;letter-spacing:0.5px;transform:rotate(-8deg);border:1.5px solid rgba(255,255,255,0.3);">${newLabel}</div>`;
+          const newSticker = `<div style="position:absolute;top:-7px;${lang==='ar'?'right':'left'}:-7px;background:linear-gradient(135deg,#E53935,#C62828);color:#fff;font-weight:800;font-size:13px;padding:4px 11px;border-radius:6px;box-shadow:0 3px 8px rgba(0,0,0,0.4);font-family:system-ui,sans-serif;letter-spacing:0.5px;transform:rotate(-8deg);border:1.5px solid rgba(255,255,255,0.3);z-index:2;">${newLabel}</div>`;
           if(isHero){
-            // Layout verticale centrato: foto sopra, nome+prezzo sotto, nome su più righe
-            return `<div class="chalk-product-card" data-product-id="${p.id}" data-product-name="${esc(pName(p))}" data-product-price="${p.price||0}" data-product-photo="${p.photoUrl||''}" style="position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;background:rgba(0,0,0,0.13);border:1px solid rgba(201,168,76,0.22);border-radius:16px;padding:24px;max-width:340px;margin:0 auto;">
+            return `<div class="chalk-product-card" data-product-id="${p.id}" data-product-name="${esc(pName(p))}" data-product-price="${p.price||0}" data-product-photo="${p.photoUrl||''}" style="position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px;background:rgba(0,0,0,0.13);border:1px solid rgba(201,168,76,0.22);border-radius:16px;padding:28px 24px;max-width:${arrivalsFullWidth?500:380}px;margin:0 auto;">
               ${newSticker}
               ${photo}
-              <div>
-                <div style="${bodyChalk};font-size:32px;line-height:1.2;margin-bottom:8px;">${esc(pName(p))}</div>
-                <div style="font-family:${chalkFont};${chalkDust}${chalkRough}font-size:42px;color:${GOLD};line-height:1;">${fmt(p.price||0)} <span style="font-size:24px;opacity:0.85;">${currency}</span></div>
+              <div style="width:100%;">
+                <div style="${bodyChalk};font-size:${heroNameSize}px;line-height:1.2;margin-bottom:10px;word-break:break-word;">${esc(pName(p))}</div>
+                <div style="font-family:${chalkFont};${chalkDust}${chalkRough}font-size:${heroPriceSize}px;color:${GOLD};line-height:1;">${fmt(p.price||0)} <span style="font-size:${Math.round(heroPriceSize*0.55)}px;opacity:0.85;">${currency}</span></div>
               </div>
             </div>`;
           }
-          return `<div class="chalk-product-card" data-product-id="${p.id}" data-product-name="${esc(pName(p))}" data-product-price="${p.price||0}" data-product-photo="${p.photoUrl||''}" style="position:relative;display:inline-flex;width:fit-content;max-width:100%;box-sizing:border-box;align-items:center;gap:${sc.gap}px;background:rgba(0,0,0,0.13);border:1px solid rgba(201,168,76,0.22);border-radius:14px;padding:${sc.pad}px;margin-bottom:14px;">
+          // Card normale: max-width sulla card forza wrap del nome
+          const cardMaxW = sc.ph + sc.gap + 200 + (sc.pad*2);
+          return `<div class="chalk-product-card" data-product-id="${p.id}" data-product-name="${esc(pName(p))}" data-product-price="${p.price||0}" data-product-photo="${p.photoUrl||''}" style="position:relative;display:inline-flex;width:fit-content;max-width:${cardMaxW}px;box-sizing:border-box;align-items:center;gap:${sc.gap}px;background:rgba(0,0,0,0.13);border:1px solid rgba(201,168,76,0.22);border-radius:14px;padding:${sc.pad}px;margin-bottom:14px;">
             ${newSticker}
             ${photo}
-            <div style="min-width:0;max-width:260px;">
-              <div style="${bodyChalk};font-size:${sc.nm}px;line-height:1.2;margin-bottom:5px;">${esc(pName(p))}</div>
+            <div style="min-width:0;flex:1;">
+              <div style="${bodyChalk};font-size:${sc.nm}px;line-height:1.2;margin-bottom:5px;word-break:break-word;">${esc(pName(p))}</div>
               <div style="font-family:${chalkFont};${chalkDust}${chalkRough}font-size:${sc.pr}px;color:${GOLD};line-height:1;white-space:nowrap;">${fmt(p.price||0)} <span style="font-size:${Math.round(sc.pr*0.6)}px;opacity:0.85;">${currency}</span></div>
             </div>
           </div>`;
@@ -1265,40 +1281,43 @@
       // === RENDER OFFERTE ===
       let offersHtml = '';
       if(branchOffers.length){
-        const isHero = branchOffers.length===1 && offersFullWidth; // 🆕 v2.7.3 — offerta unica centrata
+        const isHero = branchOffers.length===1;
         const sc = getCardScale(branchOffers.length, offersFullWidth);
         const offerCards = branchOffers.map((o,i)=>{
           const p = products.find(x=>x.id===o.productId);
           const oldP = fmt(p.price||0);
           const newP = fmt(o.priceNew||0);
           const pctOff = (p.price>0) ? Math.round((1 - (o.priceNew/p.price))*100) : 0;
-          const phSize = isHero ? 240 : sc.ph;
+          const phSize = isHero ? (offersFullWidth ? 280 : 220) : sc.ph;
+          const heroNameSize = offersFullWidth ? 38 : 30;
+          const heroPriceSize = offersFullWidth ? 50 : 40;
           const photo = p.photoUrl
             ? `<img src="${p.photoUrl}" style="width:${phSize}px;height:${phSize}px;border-radius:12px;object-fit:contain;background:rgba(0,0,0,0.2);flex-shrink:0;border:1px solid rgba(201,168,76,0.25);">`
             : `<div style="width:${phSize}px;height:${phSize}px;border-radius:12px;background:rgba(0,0,0,0.2);flex-shrink:0;border:1px solid rgba(201,168,76,0.25);display:flex;align-items:center;justify-content:center;font-size:${Math.round(phSize*0.4)}px;">🔥</div>`;
           let daysLeft = '', unitsLeft = '';
           if(o.expiresAt) daysLeft = Math.max(0, Math.ceil((o.expiresAt - Date.now())/(24*3600*1000)));
           if(o.maxUnits) unitsLeft = `${Math.max(0, o.maxUnits-(o.soldUnits||0))}/${o.maxUnits}`;
-          const badge = pctOff>0 ? `<div style="position:absolute;top:-7px;${lang==='ar'?'right':'left'}:-7px;background:linear-gradient(135deg,#C9A84C,#B8973C);color:#1A1A1A;font-weight:800;font-size:13px;padding:4px 11px;border-radius:6px;box-shadow:0 3px 8px rgba(0,0,0,0.4);font-family:system-ui,sans-serif;transform:rotate(-8deg);border:1.5px solid rgba(255,255,255,0.3);">−${pctOff}%</div>` : '';
+          const badge = pctOff>0 ? `<div style="position:absolute;top:-7px;${lang==='ar'?'right':'left'}:-7px;background:linear-gradient(135deg,#C9A84C,#B8973C);color:#1A1A1A;font-weight:800;font-size:13px;padding:4px 11px;border-radius:6px;box-shadow:0 3px 8px rgba(0,0,0,0.4);font-family:system-ui,sans-serif;transform:rotate(-8deg);border:1.5px solid rgba(255,255,255,0.3);z-index:2;">−${pctOff}%</div>` : '';
           const dataAttrs = `data-product-id="${p.id}" data-product-name="${esc(pName(p))}" data-product-price="${o.priceNew||0}" data-product-photo="${p.photoUrl||''}" data-offer-price="${p.price||0}" data-offer-discount="${pctOff}" data-offer-days="${daysLeft}" data-offer-units="${unitsLeft}"`;
           if(isHero){
-            return `<div class="chalk-product-card" ${dataAttrs} style="position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;background:rgba(0,0,0,0.13);border:1px solid rgba(201,168,76,0.3);border-radius:16px;padding:24px;max-width:340px;margin:0 auto;">
+            return `<div class="chalk-product-card" ${dataAttrs} style="position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px;background:rgba(0,0,0,0.13);border:1px solid rgba(201,168,76,0.3);border-radius:16px;padding:28px 24px;max-width:${offersFullWidth?500:380}px;margin:0 auto;">
               ${badge}
               ${photo}
-              <div>
-                <div style="${bodyChalk};font-size:32px;line-height:1.2;margin-bottom:8px;">${esc(pName(p))}</div>
-                <div style="display:flex;align-items:baseline;justify-content:center;gap:12px;">
-                  <span style="font-family:${chalkFont};${chalkDust}${chalkRough}font-size:42px;color:${GOLD};line-height:1;">${newP} <span style="font-size:24px;opacity:0.85;">${currency}</span></span>
-                  <span style="${softChalk};font-size:24px;text-decoration:line-through;opacity:0.6;">${oldP}</span>
+              <div style="width:100%;">
+                <div style="${bodyChalk};font-size:${heroNameSize}px;line-height:1.2;margin-bottom:10px;word-break:break-word;">${esc(pName(p))}</div>
+                <div style="display:flex;align-items:baseline;justify-content:center;gap:14px;flex-wrap:wrap;">
+                  <span style="font-family:${chalkFont};${chalkDust}${chalkRough}font-size:${heroPriceSize}px;color:${GOLD};line-height:1;">${newP} <span style="font-size:${Math.round(heroPriceSize*0.55)}px;opacity:0.85;">${currency}</span></span>
+                  <span style="${softChalk};font-size:${Math.round(heroPriceSize*0.55)}px;text-decoration:line-through;opacity:0.6;">${oldP}</span>
                 </div>
               </div>
             </div>`;
           }
-          return `<div class="chalk-product-card" ${dataAttrs} style="position:relative;display:inline-flex;width:fit-content;max-width:100%;box-sizing:border-box;align-items:center;gap:${sc.gap}px;background:rgba(0,0,0,0.13);border:1px solid rgba(201,168,76,0.3);border-radius:14px;padding:${sc.pad}px;margin-bottom:14px;">
+          const cardMaxW = sc.ph + sc.gap + 200 + (sc.pad*2);
+          return `<div class="chalk-product-card" ${dataAttrs} style="position:relative;display:inline-flex;width:fit-content;max-width:${cardMaxW}px;box-sizing:border-box;align-items:center;gap:${sc.gap}px;background:rgba(0,0,0,0.13);border:1px solid rgba(201,168,76,0.3);border-radius:14px;padding:${sc.pad}px;margin-bottom:14px;">
             ${badge}
             ${photo}
-            <div style="min-width:0;max-width:260px;">
-              <div style="${bodyChalk};font-size:${sc.nm}px;line-height:1.2;margin-bottom:5px;">${esc(pName(p))}</div>
+            <div style="min-width:0;flex:1;">
+              <div style="${bodyChalk};font-size:${sc.nm}px;line-height:1.2;margin-bottom:5px;word-break:break-word;">${esc(pName(p))}</div>
               <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;">
                 <span style="font-family:${chalkFont};${chalkDust}${chalkRough}font-size:${sc.pr}px;color:${GOLD};line-height:1;white-space:nowrap;">${newP} <span style="font-size:${Math.round(sc.pr*0.6)}px;opacity:0.85;">${currency}</span></span>
                 <span style="${softChalk};font-size:${Math.round(sc.pr*0.62)}px;text-decoration:line-through;opacity:0.6;white-space:nowrap;">${oldP}</span>
