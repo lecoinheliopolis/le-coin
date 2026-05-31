@@ -2672,6 +2672,8 @@
           <div class="field"><label class="lbl">${t('nameAr')}</label><input class="input" id="b-ar" value="${f.nameAr||''}" dir="rtl"></div>
           <div class="field"><label class="lbl">${t('nameEn')}</label><input class="input fr" id="b-en" value="${f.nameEn||''}" dir="ltr"></div>
           <div class="field"><label class="lbl">💎 ${t('branchPointsPct')}</label><input class="input num" id="b-pts" type="number" min="0" max="100" step="0.1" value="${f.pointsPct!=null?f.pointsPct:1}" dir="ltr"></div>
+          <!-- 🆕 v2.7.3 — Numero WhatsApp filiale per chat cliente -->
+          <div class="field"><label class="lbl">💬 ${lang==='ar'?'رقم واتساب الفرع':'Branch WhatsApp number'}</label><input class="input" id="b-wa" type="tel" placeholder="201001234567" value="${f.whatsapp||''}" dir="ltr"><div style="font-size:11px;color:rgba(26,26,26,0.55);margin-top:4px;">${lang==='ar'?'مع كود الدولة، بدون + أو مسافات (مثل 201001234567)':'With country code, no + or spaces (e.g. 201001234567)'}</div></div>
           <!-- 🆕 v2.7.0 — Orari settimanali -->
           <div style="background:white;border-radius:10px;padding:12px;border:1px solid var(--ivory-dark);margin-bottom:12px;">
             <div style="font-size:11.5px;color:var(--forest);font-weight:700;margin-bottom:8px;">🕐 ${t('branchHoursTitle')}</div>
@@ -2725,10 +2727,11 @@
         $('b-save').onclick=async()=>{
           const nameAr=$('b-ar').value.trim(),nameEn=$('b-en').value.trim();
           const pointsPct=Math.max(0,parseFloat($('b-pts').value)||0);
+          const whatsapp=$('b-wa').value.trim().replace(/[^\d]/g,''); // 🆕 v2.7.3 — solo cifre
           if(!nameAr||!nameEn){toast(t('required'),true);return;}
           $('b-save').textContent='...';
           try{
-            const payload={nameAr,nameEn,active:act,pointsPct,clientCategoryIds:selectedCatIds, hours};
+            const payload={nameAr,nameEn,active:act,pointsPct,whatsapp,clientCategoryIds:selectedCatIds, hours};
             if(br){ await updateDoc(doc(db,'branches',br.id),payload); }
             else{ await addDoc(collection(db,'branches'),{...payload,createdAt:Date.now()}); }
             closeSheet(); await refreshBranchSelector(); renderBranches(); toast(t('saved'));
@@ -7594,7 +7597,7 @@
       // ⚙️ قائمة الإعدادات: بياناتي + خروج
       $('client-gear-btn').onclick=()=>openClientGearMenu();
       // شريط تنقل العميل (بدون "خروج" — صار في قائمة ⚙️)
-      const tabs=[{k:'home',ico:'🏠',l:t('shopNow')},{k:'orders',ico:'🧾',l:t('myOrders')},{k:'points',ico:'💎',l:t('myPoints')},{k:'mydata',ico:'👤',l:t('myData')}];
+      const tabs=[{k:'home',ico:'🏠',l:lang==='ar'?'الرئيسية':'Home'},{k:'shop',ico:'🛍️',l:t('shopNow')},{k:'orders',ico:'🧾',l:t('myOrders')},{k:'points',ico:'💎',l:t('myPoints')},{k:'mydata',ico:'👤',l:t('myData')}];
       $('client-nav').innerHTML=tabs.map(x=>`<button class="nav-btn ${x.k===clientTab?'active':''}" data-ctab="${x.k}"><span class="ico">${x.ico}</span><span class="lbl2">${x.l}</span></button>`).join('');
       document.querySelectorAll('[data-ctab]').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#client-nav .nav-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); clientTab=b.dataset.ctab; renderClientTab(); });
       if(!clientTab) clientTab='home';
@@ -7729,7 +7732,7 @@
       $('cx').onclick=closeSheet;
       $('cg-shop').onclick=()=>{ closeSheet(); clientTab='home'; renderClientTab(); };
     }
-    function renderClientTab(){ if(clientTab==='home') renderClientHome(); else if(clientTab==='orders') renderClientOrders(); else if(clientTab==='points') renderClientPoints(); else if(clientTab==='mydata') renderClientMyData(); }
+    function renderClientTab(){ if(clientTab==='home') renderClientHome(); else if(clientTab==='shop') renderClientShop(); else if(clientTab==='orders') renderClientOrders(); else if(clientTab==='points') renderClientPoints(); else if(clientTab==='mydata') renderClientMyData(); }
     // 🆕 v2.7.3 — Helper: preserva la posizione di scroll attraverso un re-render
     // Uso: withScrollPreserved(() => renderClientHome())
     // Salva scrollY, chiama fn, ripristina scrollY più volte per coprire render async
@@ -7745,7 +7748,55 @@
         result.finally(restore).catch(()=>{});
       }
     }
+    // 🆕 v2.7.3 — Nuova home cliente: SOLO lavagna + pulsante WhatsApp + CTA per andare allo shop
     async function renderClientHome(){
+      const c = $('client-content');
+      await refreshClientProfile();
+      const suspendedBanner = (clientProfile&&clientProfile.suspended)
+        ? `<div class="card" style="background:rgba(192,72,72,0.12);border:1px solid var(--red);color:var(--red);text-align:center;font-weight:700;font-size:13px;">⏸️ ${t('accountSuspended')}</div>`
+        : '';
+      // Identifica filiale per WhatsApp (solo se cliente ha scelto)
+      const wa = clientBranchId ? branches.find(b=>b.id===clientBranchId) : null;
+      const waNum = wa && wa.whatsapp ? String(wa.whatsapp).replace(/[^\d]/g,'') : '';
+      const waEnabled = !!waNum;
+      const waBranchName = wa ? esc(lang==='ar'?wa.nameAr:wa.nameEn) : '';
+      const chatLbl = lang==='ar' ? 'دردشة واتساب' : 'WhatsApp chat';
+      const chatHintNoBranch = lang==='ar' ? 'اختر فرعاً أولاً من ☰' : 'Choose a branch first from ☰';
+      const shopLbl = lang==='ar' ? 'تصفّح المنتجات' : 'Browse products';
+
+      c.innerHTML = suspendedBanner + `
+        <!-- Lavagna fullscreen -->
+        <div id="chalkboard-wrap" style="margin:0 0 16px;padding:0;display:none;"></div>
+        <!-- Azioni: WhatsApp + Vai allo shop -->
+        <div style="display:grid;gap:10px;margin-bottom:16px;">
+          <button id="cli-wa-btn" ${waEnabled?'':'disabled'} style="all:unset;cursor:${waEnabled?'pointer':'not-allowed'};display:flex;align-items:center;justify-content:center;gap:10px;background:${waEnabled?'#25D366':'rgba(26,26,26,0.12)'};color:${waEnabled?'#fff':'rgba(26,26,26,0.5)'};border-radius:12px;padding:14px;font-weight:700;font-size:15px;font-family:inherit;text-align:center;box-shadow:${waEnabled?'0 4px 14px rgba(37,211,102,0.35)':'none'};">
+            <span style="font-size:20px;">💬</span>
+            <span>${chatLbl}${waBranchName?` · ${waBranchName}`:''}</span>
+          </button>
+          ${!waEnabled && !waNum ? `<div style="font-size:11.5px;color:rgba(26,26,26,0.55);text-align:center;">${chatHintNoBranch}</div>` : ''}
+          <button id="cli-go-shop" class="btn-gold btn-wide" style="padding:14px;font-size:15px;font-weight:700;">🛍️ ${shopLbl}</button>
+        </div>
+      `;
+      // Render lavagna (carica prodotti dietro per offerte/nuovi se non ancora)
+      renderChalkboard();
+      try{ if(!products.length) await loadCatalog(); renderChalkboard(); }catch(e){ console.warn(e); }
+      // WhatsApp click → wa.me con numero filiale
+      if(waEnabled){
+        $('cli-wa-btn').onclick = () => {
+          const msg = encodeURIComponent(lang==='ar' ? `مرحباً، أنا ${clientProfile.name||''}` : `Hello, I'm ${clientProfile.name||''}`);
+          window.open(`https://wa.me/${waNum}?text=${msg}`, '_blank', 'noopener');
+        };
+      }
+      // CTA → vai allo shop
+      $('cli-go-shop').onclick = () => {
+        clientTab = 'shop';
+        document.querySelectorAll('#client-nav .nav-btn').forEach(x=>x.classList.remove('active'));
+        const b = document.querySelector('[data-ctab="shop"]'); if(b) b.classList.add('active');
+        renderClientTab();
+      };
+    }
+    // 🆕 v2.7.3 — Era renderClientHome; ora renderClientShop (scelta filiale + prodotti + carrello)
+    async function renderClientShop(){
       const c=$('client-content');
       await refreshClientProfile(); // ⭐ نحدّث بيانات العميل عشان نشوف الرصيد الحالي
       const pts=(clientProfile&&clientProfile.points)||0;
@@ -7899,13 +7950,27 @@
             <div style="flex:1;"><div style="font-weight:700;font-size:13.5px;">${t('instapayNow')}</div><div style="font-size:11.5px;color:rgba(26,26,26,0.55);">${t('payNow')}</div></div>
           </label>
         </div>
-        <button class="btn-forest btn-wide" id="cli-send" style="padding:14px;">📤 ${t('sendOrder')}</button>
+        <!-- 🆕 v2.7.3 — Pulsante annulla carrello (svuota prima di inviare) -->
+        <div style="display:grid;grid-template-columns:1fr 2fr;gap:8px;">
+          <button class="btn-wide" id="cli-cancel-cart" style="padding:14px;background:#fff;color:var(--red);border:1.5px solid var(--red);border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;">✕ ${t('clearCart')}</button>
+          <button class="btn-forest btn-wide" id="cli-send" style="padding:14px;">📤 ${t('sendOrder')}</button>
+        </div>
       </div></div>`;
       $('cx').onclick=closeSheet;
       document.querySelectorAll('.cli-plus').forEach(b=>b.onclick=()=>{ const it=clientCart.find(i=>i.id===b.dataset.pid); if(it){it.qty++; openClientCart();} });
       document.querySelectorAll('.cli-minus').forEach(b=>b.onclick=()=>{ const it=clientCart.find(i=>i.id===b.dataset.pid); if(it){ it.qty--; if(it.qty<=0) clientCart=clientCart.filter(x=>x.id!==it.id); openClientCart(); } });
       $('cli-usepts')&&($('cli-usepts').onchange=e=>{ clientCart.__usePoints=e.target.checked; openClientCart(); });
       document.querySelectorAll('.pay-choice input').forEach(r=>r.onchange=e=>{ clientCart.__payMethod=e.target.value; openClientCart(); });
+      // 🆕 v2.7.3 — Annulla carrello: svuota dopo conferma
+      $('cli-cancel-cart').onclick=()=>{
+        if(!confirm(t('confirmClear'))) return;
+        clientCart = [];
+        closeSheet();
+        updateClientCartBar(); // rimuove la barra carrello in fondo alla home
+        // Resetta i bottoni .cli-add tornando a "+ Aggiungi" senza re-render full
+        document.querySelectorAll('.cli-add').forEach(b => { b.textContent = '+ ' + t('addToCartC'); });
+        toast(t('clearCart')+' ✓');
+      };
       $('cli-send').onclick=()=>{
         const pm = clientCart.__payMethod||'cash';
         if(pm==='instapay') openClientInstapayPay(toPay);
