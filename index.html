@@ -7785,17 +7785,53 @@
         const cartCount=clientCart.reduce((a,i)=>a+i.qty,0);
         const cartBar = cartCount>0 ? `<button class="btn-gold btn-wide" id="cli-cart-btn" style="position:sticky;bottom:8px;margin-top:10px;padding:14px;font-size:15px;box-shadow:0 4px 14px rgba(201,168,76,0.4);">🛒 ${t('myCart')} (${cartCount}) — ${fmt(clientCart.reduce((a,i)=>a+i.qty*i.price,0))} ${t('currency')}</button>` : '';
         $('cli-prods').innerHTML=favSection+`<div style="font-size:11px;letter-spacing:0.5px;color:var(--forest);font-weight:700;margin:8px 0 6px;">🛒 ${t('browseProducts')}</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:6px;">${grid}</div>${cartBar}`;
-        document.querySelectorAll('.cli-add').forEach(b=>b.onclick=()=>{ const p=products.find(x=>x.id===b.dataset.pid); if(!p)return; const it=clientCart.find(i=>i.id===p.id); if(it) it.qty++; else clientCart.push({id:p.id,name:pName(p),price:p.price||0,qty:1}); beep(); withScrollPreserved(()=>renderClientHome()); });
+        document.querySelectorAll('.cli-add').forEach(b=>b.onclick=()=>{
+          const p=products.find(x=>x.id===b.dataset.pid); if(!p)return;
+          const it=clientCart.find(i=>i.id===p.id);
+          if(it) it.qty++; else clientCart.push({id:p.id,name:pName(p),price:p.price||0,qty:1});
+          beep();
+          // 🆕 v2.7.3 — Aggiornamento chirurgico: NON re-render (scroll rimane esatto)
+          const newQty = clientCart.find(i=>i.id===p.id).qty;
+          b.textContent = '🛒 ×' + newQty;
+          updateClientCartBar();
+        });
         document.querySelectorAll('.cli-fav').forEach(b=>b.onclick=async(ev)=>{
           ev.stopPropagation();
           const pid=b.dataset.pid; const arr=[...(clientProfile.favorites||[])];
           const idx=arr.indexOf(pid); if(idx>=0) arr.splice(idx,1); else arr.push(pid);
           clientProfile.favorites=arr;
+          // 🆕 v2.7.3 — Aggiornamento chirurgico: NON re-render (scroll rimane esatto)
+          const isFav = arr.includes(pid);
+          b.textContent = isFav ? '❤️' : '🤍';
           try{ await updateDoc(doc(db,'customers',clientProfile.id),{favorites:arr}); }catch(e){console.warn(e);}
-          withScrollPreserved(()=>renderClientHome());
         });
         $('cli-cart-btn')&&($('cli-cart-btn').onclick=openClientCart);
       }catch(e){ console.error(e); $('cli-prods').innerHTML=`<div class="empty">${t('errorGen')}</div>`; }
+    }
+    // 🆕 v2.7.3 — Aggiorna SOLO la barra carrello (no re-render full home → scroll resta)
+    function updateClientCartBar(){
+      const cartCount = clientCart.reduce((a,i)=>a+i.qty,0);
+      const cartTotal = clientCart.reduce((a,i)=>a+i.qty*i.price,0);
+      const btn = $('cli-cart-btn');
+      if(cartCount === 0){
+        if(btn) btn.remove();
+        return;
+      }
+      const label = `🛒 ${t('myCart')} (${cartCount}) — ${fmt(cartTotal)} ${t('currency')}`;
+      if(btn){
+        btn.innerHTML = label;
+      } else {
+        const prods = $('cli-prods');
+        if(prods){
+          const bar = document.createElement('button');
+          bar.id = 'cli-cart-btn';
+          bar.className = 'btn-gold btn-wide';
+          bar.style.cssText = 'position:sticky;bottom:8px;margin-top:10px;padding:14px;font-size:15px;box-shadow:0 4px 14px rgba(201,168,76,0.4);';
+          bar.innerHTML = label;
+          bar.onclick = openClientCart;
+          prods.appendChild(bar);
+        }
+      }
     }
     // بطاقة المنتج عند العميل: صورة + سعر + زر المفضلة + زر الإضافة
     function productCardHTML(p,stock,favIds){
