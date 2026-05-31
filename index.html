@@ -1111,6 +1111,24 @@
         : `<span style="${bodyChalk};font-size:20px;opacity:0.7;">${t('hoursClosedToday')}</span>`;
       // === SEZIONE FISSA: data + stato + orari COMPATTA PREMIUM ===
       const GOLD_HDR = '#C9A84C';
+      // 🆕 v2.7.3 — Countdown alla chiusura (mostrato quando aperto)
+      let closingSoonHtml = '';
+      if(status.state==='open' && status.hoursToday && status.hoursToday.close){
+        const nowD = new Date();
+        const [ch, cm] = String(status.hoursToday.close).split(':').map(Number);
+        if(!isNaN(ch)){
+          const closeD = new Date(nowD); closeD.setHours(ch, cm||0, 0, 0);
+          let diffMs = closeD - nowD;
+          if(diffMs < 0) diffMs += 24*3600*1000; // chiusura dopo mezzanotte
+          const dH = Math.floor(diffMs/3600000);
+          const dM = Math.floor((diffMs%3600000)/60000);
+          const timeLeft = lang==='ar'
+            ? `${dH>0?dH+' س ':''}${dM} د`
+            : `${dH>0?dH+'h ':''}${dM}min`;
+          const closeLbl = lang==='ar' ? 'هنقفل بعد' : 'Chiude tra';
+          closingSoonHtml = `<div style="text-align:center;margin-top:10px;"><span style="display:inline-flex;align-items:center;gap:7px;background:rgba(201,168,76,0.13);border:1px solid rgba(201,168,76,0.4);border-radius:20px;padding:5px 14px;${bodyChalk}font-size:17px;color:${GOLD_HDR};">⏳ ${closeLbl} <span dir="ltr" style="font-weight:700;">${timeLeft}</span></span></div>`;
+        }
+      }
       const fixedSectionHtml = `
         <div style="margin-bottom:18px;padding-bottom:16px;border-bottom:1px dashed rgba(245,240,220,0.22);">
           <!-- Titolo filiale + stato aperto/chiuso ACCANTO -->
@@ -1128,6 +1146,7 @@
             <span style="color:${GOLD_HDR};font-size:14px;opacity:0.8;">◆</span>
             <span style="${bodyChalk};font-size:19px;" dir="ltr">🕐 ${status.hoursToday ? status.hoursToday.open + ' — ' + status.hoursToday.close : t('hoursClosedToday')}</span>
           </div>
+          ${closingSoonHtml}
           ${st.msg ? `<div style="text-align:center;margin-top:10px;${bodyChalk};font-size:16px;opacity:0.85;">${esc(st.msg)}</div>` : ''}
         </div>`;
       // === SEZIONE ANNUNCI (esistente) — filtrata per branchId quando v2.7.0 stage 5 attivo ===
@@ -1150,25 +1169,23 @@
       let annSectionHtml = '';
       if(annItems.length){
         const itemsHtml = annItems.map((a, i) => {
-          const sep = i<annItems.length-1 ? 'padding-bottom:14px;margin-bottom:14px;border-bottom:1px dashed rgba(245,240,220,0.18);' : '';
           const ic = a.icon || '📢';
-          const pin = a.pinned ? '<span style="font-size:13px;color:'+CHALK+';opacity:0.6;">📌</span>' : '';
-          const tilt = (((a.id||'x').charCodeAt(0) % 5) - 2) * 0.15;
+          const pin = a.pinned ? '<span style="font-size:12px;opacity:0.7;">📌</span>' : '';
+          const tilt = (((a.id||'x').charCodeAt(0) % 5) - 2) * 0.4;
           // 🆕 v2.7.3 — Testo nella lingua corrente con fallback al campo legacy
           const annTitle = lang==='ar' ? (a.titleAr||a.title||'') : (a.titleEn||a.title||'');
           const annMsg = lang==='ar' ? (a.messageAr||a.message||'') : (a.messageEn||a.message||'');
-          return `<div style="${sep}transform:rotate(${tilt}deg);">
-            <div style="display:flex;align-items:flex-start;gap:12px;">
-              <span style="font-size:24px;line-height:1;flex-shrink:0;filter:drop-shadow(0 0 3px rgba(245,240,220,0.18));margin-top:2px;">${ic}</span>
-              <div style="flex:1;min-width:0;">
-                <div style="${titleDouble};font-size:22px;line-height:1.15;margin-bottom:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${esc(annTitle)} ${pin}</div>
-                ${annMsg ? `<div style="${bodyChalk};font-size:18px;line-height:1.3;">${esc(annMsg)}</div>` : ''}
-              </div>
-            </div>
+          // 🆕 v2.7.3 — Ogni annuncio è una "nota" stile post-it, distribuita in griglia
+          return `<div style="background:rgba(0,0,0,0.13);border:1px solid rgba(201,168,76,0.22);border-radius:14px;padding:14px 16px;transform:rotate(${tilt}deg);text-align:center;">
+            <div style="font-size:30px;line-height:1;margin-bottom:8px;filter:drop-shadow(0 0 4px rgba(245,240,220,0.2));">${ic}</div>
+            <div style="${titleDouble};font-size:21px;line-height:1.2;margin-bottom:5px;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;">${esc(annTitle)} ${pin}</div>
+            ${annMsg ? `<div style="${bodyChalk};font-size:17px;line-height:1.3;opacity:0.9;">${esc(annMsg)}</div>` : ''}
           </div>`;
         }).join('');
-        // 🆕 v2.7.2 — Aggiungi border-bottom per separare sezione annunci da quella successiva
-        annSectionHtml = `<div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px dashed rgba(245,240,220,0.22);">${itemsHtml}</div>`;
+        // 🆕 v2.7.3 — Griglia responsive: le note si distribuiscono e centrano automaticamente
+        annSectionHtml = `<div style="margin-bottom:18px;padding-bottom:16px;border-bottom:1px dashed rgba(245,240,220,0.22);">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;justify-content:center;">${itemsHtml}</div>
+        </div>`;
       }
       // === 🆕 SEZIONE NUOVI ARRIVI + OFFERTE — calcolo count PRIMA per scala adattiva ===
       // 🆕 v2.7.3 — Quando una categoria è vuota, l'altra usa la "scala full-width" (card più grandi)
@@ -1214,17 +1231,30 @@
       // === RENDER NUOVI ARRIVI ===
       let newArrivalsHtml = '';
       if(arrivals.length){
+        const isHero = arrivals.length===1 && arrivalsFullWidth; // 🆕 v2.7.3 — prodotto unico centrato
         const sc = getCardScale(arrivals.length, arrivalsFullWidth);
         const cardsHtml = arrivals.map((p,i)=>{
+          const phSize = isHero ? 240 : sc.ph;
           const photo = p.photoUrl
-            ? `<img src="${p.photoUrl}" style="width:${sc.ph}px;height:${sc.ph}px;border-radius:10px;object-fit:contain;background:rgba(0,0,0,0.2);flex-shrink:0;border:1px solid rgba(201,168,76,0.25);">`
-            : `<div style="width:${sc.ph}px;height:${sc.ph}px;border-radius:10px;background:rgba(0,0,0,0.2);flex-shrink:0;border:1px solid rgba(201,168,76,0.25);display:flex;align-items:center;justify-content:center;font-size:${Math.round(sc.ph*0.4)}px;">✨</div>`;
+            ? `<img src="${p.photoUrl}" style="width:${phSize}px;height:${phSize}px;border-radius:12px;object-fit:contain;background:rgba(0,0,0,0.2);flex-shrink:0;border:1px solid rgba(201,168,76,0.25);">`
+            : `<div style="width:${phSize}px;height:${phSize}px;border-radius:12px;background:rgba(0,0,0,0.2);flex-shrink:0;border:1px solid rgba(201,168,76,0.25);display:flex;align-items:center;justify-content:center;font-size:${Math.round(phSize*0.4)}px;">✨</div>`;
           const newSticker = `<div style="position:absolute;top:-7px;${lang==='ar'?'right':'left'}:-7px;background:linear-gradient(135deg,#E53935,#C62828);color:#fff;font-weight:800;font-size:12px;padding:4px 10px;border-radius:6px;box-shadow:0 3px 8px rgba(0,0,0,0.4);font-family:system-ui,sans-serif;letter-spacing:0.5px;transform:rotate(-8deg);border:1.5px solid rgba(255,255,255,0.3);">${newLabel}</div>`;
+          if(isHero){
+            // Layout verticale centrato: foto sopra, nome+prezzo sotto, nome su più righe
+            return `<div class="chalk-product-card" data-product-id="${p.id}" data-product-name="${esc(pName(p))}" data-product-price="${p.price||0}" data-product-photo="${p.photoUrl||''}" style="position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;background:rgba(0,0,0,0.13);border:1px solid rgba(201,168,76,0.22);border-radius:16px;padding:24px;max-width:340px;margin:0 auto;">
+              ${newSticker}
+              ${photo}
+              <div>
+                <div style="${bodyChalk};font-size:32px;line-height:1.2;margin-bottom:8px;">${esc(pName(p))}</div>
+                <div style="font-family:${chalkFont};${chalkDust}${chalkRough}font-size:42px;color:${GOLD};line-height:1;">${fmt(p.price||0)} <span style="font-size:24px;opacity:0.85;">${currency}</span></div>
+              </div>
+            </div>`;
+          }
           return `<div class="chalk-product-card" data-product-id="${p.id}" data-product-name="${esc(pName(p))}" data-product-price="${p.price||0}" data-product-photo="${p.photoUrl||''}" style="position:relative;display:inline-flex;width:fit-content;max-width:100%;box-sizing:border-box;align-items:center;gap:${sc.gap}px;background:rgba(0,0,0,0.13);border:1px solid rgba(201,168,76,0.22);border-radius:14px;padding:${sc.pad}px;margin-bottom:14px;">
             ${newSticker}
             ${photo}
-            <div style="min-width:0;">
-              <div style="${bodyChalk};font-size:${sc.nm}px;line-height:1.25;margin-bottom:5px;white-space:nowrap;">${esc(pName(p))}</div>
+            <div style="min-width:0;max-width:260px;">
+              <div style="${bodyChalk};font-size:${sc.nm}px;line-height:1.2;margin-bottom:5px;">${esc(pName(p))}</div>
               <div style="font-family:${chalkFont};${chalkDust}${chalkRough}font-size:${sc.pr}px;color:${GOLD};line-height:1;white-space:nowrap;">${fmt(p.price||0)} <span style="font-size:${Math.round(sc.pr*0.6)}px;opacity:0.85;">${currency}</span></div>
             </div>
           </div>`;
@@ -1235,25 +1265,41 @@
       // === RENDER OFFERTE ===
       let offersHtml = '';
       if(branchOffers.length){
+        const isHero = branchOffers.length===1 && offersFullWidth; // 🆕 v2.7.3 — offerta unica centrata
         const sc = getCardScale(branchOffers.length, offersFullWidth);
         const offerCards = branchOffers.map((o,i)=>{
           const p = products.find(x=>x.id===o.productId);
           const oldP = fmt(p.price||0);
           const newP = fmt(o.priceNew||0);
           const pctOff = (p.price>0) ? Math.round((1 - (o.priceNew/p.price))*100) : 0;
+          const phSize = isHero ? 240 : sc.ph;
           const photo = p.photoUrl
-            ? `<img src="${p.photoUrl}" style="width:${sc.ph}px;height:${sc.ph}px;border-radius:10px;object-fit:contain;background:rgba(0,0,0,0.2);flex-shrink:0;border:1px solid rgba(201,168,76,0.25);">`
-            : `<div style="width:${sc.ph}px;height:${sc.ph}px;border-radius:10px;background:rgba(0,0,0,0.2);flex-shrink:0;border:1px solid rgba(201,168,76,0.25);display:flex;align-items:center;justify-content:center;font-size:${Math.round(sc.ph*0.4)}px;">🔥</div>`;
+            ? `<img src="${p.photoUrl}" style="width:${phSize}px;height:${phSize}px;border-radius:12px;object-fit:contain;background:rgba(0,0,0,0.2);flex-shrink:0;border:1px solid rgba(201,168,76,0.25);">`
+            : `<div style="width:${phSize}px;height:${phSize}px;border-radius:12px;background:rgba(0,0,0,0.2);flex-shrink:0;border:1px solid rgba(201,168,76,0.25);display:flex;align-items:center;justify-content:center;font-size:${Math.round(phSize*0.4)}px;">🔥</div>`;
           let daysLeft = '', unitsLeft = '';
           if(o.expiresAt) daysLeft = Math.max(0, Math.ceil((o.expiresAt - Date.now())/(24*3600*1000)));
           if(o.maxUnits) unitsLeft = `${Math.max(0, o.maxUnits-(o.soldUnits||0))}/${o.maxUnits}`;
           const badge = pctOff>0 ? `<div style="position:absolute;top:-7px;${lang==='ar'?'right':'left'}:-7px;background:linear-gradient(135deg,#C9A84C,#B8973C);color:#1A1A1A;font-weight:800;font-size:13px;padding:4px 11px;border-radius:6px;box-shadow:0 3px 8px rgba(0,0,0,0.4);font-family:system-ui,sans-serif;transform:rotate(-8deg);border:1.5px solid rgba(255,255,255,0.3);">−${pctOff}%</div>` : '';
-          return `<div class="chalk-product-card" data-product-id="${p.id}" data-product-name="${esc(pName(p))}" data-product-price="${o.priceNew||0}" data-product-photo="${p.photoUrl||''}" data-offer-price="${p.price||0}" data-offer-discount="${pctOff}" data-offer-days="${daysLeft}" data-offer-units="${unitsLeft}" style="position:relative;display:inline-flex;width:fit-content;max-width:100%;box-sizing:border-box;align-items:center;gap:${sc.gap}px;background:rgba(0,0,0,0.13);border:1px solid rgba(201,168,76,0.3);border-radius:14px;padding:${sc.pad}px;margin-bottom:14px;">
+          const dataAttrs = `data-product-id="${p.id}" data-product-name="${esc(pName(p))}" data-product-price="${o.priceNew||0}" data-product-photo="${p.photoUrl||''}" data-offer-price="${p.price||0}" data-offer-discount="${pctOff}" data-offer-days="${daysLeft}" data-offer-units="${unitsLeft}"`;
+          if(isHero){
+            return `<div class="chalk-product-card" ${dataAttrs} style="position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;background:rgba(0,0,0,0.13);border:1px solid rgba(201,168,76,0.3);border-radius:16px;padding:24px;max-width:340px;margin:0 auto;">
+              ${badge}
+              ${photo}
+              <div>
+                <div style="${bodyChalk};font-size:32px;line-height:1.2;margin-bottom:8px;">${esc(pName(p))}</div>
+                <div style="display:flex;align-items:baseline;justify-content:center;gap:12px;">
+                  <span style="font-family:${chalkFont};${chalkDust}${chalkRough}font-size:42px;color:${GOLD};line-height:1;">${newP} <span style="font-size:24px;opacity:0.85;">${currency}</span></span>
+                  <span style="${softChalk};font-size:24px;text-decoration:line-through;opacity:0.6;">${oldP}</span>
+                </div>
+              </div>
+            </div>`;
+          }
+          return `<div class="chalk-product-card" ${dataAttrs} style="position:relative;display:inline-flex;width:fit-content;max-width:100%;box-sizing:border-box;align-items:center;gap:${sc.gap}px;background:rgba(0,0,0,0.13);border:1px solid rgba(201,168,76,0.3);border-radius:14px;padding:${sc.pad}px;margin-bottom:14px;">
             ${badge}
             ${photo}
-            <div style="min-width:0;">
-              <div style="${bodyChalk};font-size:${sc.nm}px;line-height:1.25;margin-bottom:5px;white-space:nowrap;">${esc(pName(p))}</div>
-              <div style="display:flex;align-items:baseline;gap:9px;">
+            <div style="min-width:0;max-width:260px;">
+              <div style="${bodyChalk};font-size:${sc.nm}px;line-height:1.2;margin-bottom:5px;">${esc(pName(p))}</div>
+              <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;">
                 <span style="font-family:${chalkFont};${chalkDust}${chalkRough}font-size:${sc.pr}px;color:${GOLD};line-height:1;white-space:nowrap;">${newP} <span style="font-size:${Math.round(sc.pr*0.6)}px;opacity:0.85;">${currency}</span></span>
                 <span style="${softChalk};font-size:${Math.round(sc.pr*0.62)}px;text-decoration:line-through;opacity:0.6;white-space:nowrap;">${oldP}</span>
               </div>
@@ -1292,6 +1338,8 @@
             ${fixedSectionHtml}
             ${annSectionHtml}
             ${bottomSectionsHtml}
+            <!-- 🆕 v2.7.3 — Bottone refresh discreto -->
+            <button id="chalk-refresh-btn" title="${lang==='ar'?'تحديث':'Refresh'}" style="position:absolute;top:12px;${lang==='ar'?'left':'right'}:14px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,0.25);border:1px solid rgba(201,168,76,0.35);color:#f5f0dc;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;transition:transform 0.3s;z-index:5;">↻</button>
           </div>
           <div style="position:absolute;top:6px;left:6px;width:9px;height:9px;background:radial-gradient(circle at 30% 30%,#4a3020 0%,#1a0f08 100%);border-radius:50%;box-shadow:0 1px 2px rgba(0,0,0,0.7),inset 0 0 1px rgba(255,255,255,0.2);"></div>
           <div style="position:absolute;top:6px;right:6px;width:9px;height:9px;background:radial-gradient(circle at 30% 30%,#4a3020 0%,#1a0f08 100%);border-radius:50%;box-shadow:0 1px 2px rgba(0,0,0,0.7),inset 0 0 1px rgba(255,255,255,0.2);"></div>
@@ -1303,6 +1351,13 @@
       if(!wrap._chalkClickBound){
         wrap._chalkClickBound = true;
         wrap.addEventListener('click', (e) => {
+        // 🆕 v2.7.3 — Click sul bottone refresh: rerender la lavagna
+        const refreshBtn = e.target.closest('#chalk-refresh-btn');
+        if(refreshBtn){
+          refreshBtn.style.transform = 'rotate(360deg)';
+          renderChalkboard();
+          return;
+        }
         const card = e.target.closest('.chalk-product-card');
         if(!card) return;
         const productName = card.getAttribute('data-product-name');
