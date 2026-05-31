@@ -3701,7 +3701,9 @@
 
     async function renderDashboard(){
       $('content').innerHTML=`<div class="spinner"></div>`;
+      console.log('[DASH] renderDashboard start');
       const [fromTs,toTs]=dashRangeTs();
+      console.log('[DASH] Date range:', new Date(fromTs).toISOString(), '→', new Date(toTs).toISOString());
       let visIds = profile.role==='admin' ? branches.map(b=>b.id) : (profile.branchIds||[]);
       // 🆕 v2.5.4 — filtro filiale dashboard
       if(dashRange.branchId && dashRange.branchId!=='all'){
@@ -3710,37 +3712,65 @@
       // حمّل البيانات
       let sales=[], loadsArr=[], invAll=[], shiftsArr=[], customersArr=[];
       try{
+        console.log('[DASH] Loading sales with date filter...');
+        const t0 = Date.now();
         // 🆕 v2.7.2 — Query Firestore CON filtro data (non dopo download) per evitare blocco memoria
         const salesConds = [
           where('createdAt','>=',fromTs),
           where('createdAt','<=',toTs)
         ];
         if(profile.role==='admin'){ 
-          try{ (await getDocs(query(collection(db,'sales'), ...salesConds))).forEach(d=>sales.push({id:d.id,...d.data()})); }
-          catch(e){ if(e.code==='failed-precondition') { console.warn('[dash] Need index for date range query on sales'); sales=[]; } else throw e; }
+          try{ 
+            const qs = await getDocs(query(collection(db,'sales'), ...salesConds));
+            console.log('[DASH] Admin sales loaded:', qs.docs.length, 'docs in', Date.now()-t0, 'ms');
+            qs.forEach(d=>sales.push({id:d.id,...d.data()})); 
+          }
+          catch(e){ 
+            console.warn('[DASH] Admin sales error:', e.code, e.message);
+            if(e.code==='failed-precondition') { 
+              console.warn('[DASH] ⚠️ Firestore index needed for date range query. This should auto-create.');
+              $('content').innerHTML=`<div class="empty" style="padding:20px;text-align:center;"><div style="font-size:14px;color:var(--amber);margin-bottom:10px;">⏳ Index creato (2-5 min)</div><div style="font-size:12px;color:rgba(26,26,26,0.5);">Firestore sta creando un indice per le query di data.<br/>Riprova tra 1-2 minuti.</div></div>`; 
+              sales=[]; 
+            } else throw e; 
+          }
         }
         else { 
           for(const b of visIds){ 
-            try{ (await getDocs(query(collection(db,'sales'), where('branchId','==',b), ...salesConds))).forEach(d=>sales.push({id:d.id,...d.data()})); }
-            catch(e){ if(e.code!=='failed-precondition') throw e; }
+            try{ 
+              const qs = await getDocs(query(collection(db,'sales'), where('branchId','==',b), ...salesConds));
+              console.log('[DASH] Branch', b, 'sales:', qs.docs.length);
+              qs.forEach(d=>sales.push({id:d.id,...d.data()})); 
+            }
+            catch(e){ console.warn('[DASH] Branch sales error:', e.code); if(e.code!=='failed-precondition') throw e; }
           } 
         }
+        console.log('[DASH] Total sales loaded:', sales.length, 'in', Date.now()-t0, 'ms');
         // loads: same filtering
         const loadsConds = [where('createdAt','>=',fromTs), where('createdAt','<=',toTs)];
-        try{ (await getDocs(query(collection(db,'loads'), ...loadsConds))).forEach(d=>loadsArr.push(d.data())); }
+        try{ 
+          const ql = await getDocs(query(collection(db,'loads'), ...loadsConds));
+          console.log('[DASH] Loads loaded:', ql.docs.length);
+          ql.forEach(d=>loadsArr.push(d.data())); 
+        }
         catch(e){ if(e.code!=='failed-precondition') console.warn('[dash] loads:',e.message); }
         (await getDocs(collection(db,'inventory'))).forEach(d=>invAll.push(d.data()));
         (await getDocs(collection(db,'shifts'))).forEach(d=>shiftsArr.push(d.data()));
         // 🆕 v2.5.4 — clienti (solo admin)
         if(profile.role==='admin'){ try{(await getDocs(collection(db,'customers'))).forEach(d=>customersArr.push({id:d.id,...d.data()}));}catch(e){console.warn('[dash] customers load:',e.message);} }
+        console.log('[DASH] All data loaded in', Date.now()-t0, 'ms');
       }catch(e){ console.error('[dash] load error:',e); $('content').innerHTML=`<div class="empty">${t('errorGen')}</div>`; return; }
       const vis=id=>visIds.includes(id);
       const inRange=ts=>ts>=fromTs&&ts<=toTs;
       // 🆕 v2.7.2 — Non re-filtrare per data (già fatto in Firestore), ma filtrare per visibilità branch
+      console.log('[DASH] Filtering by branch visibility...');
+      const t1 = Date.now();
       sales=sales.filter(s=>vis(s.branchId));
       loadsArr=loadsArr.filter(l=>vis(l.branchId));
       invAll=invAll.filter(i=>vis(i.branchId));
+      console.log('[DASH] Filtered in', Date.now()-t1, 'ms. Sales:', sales.length, 'Loads:', loadsArr.length, 'Inv:', invAll.length);
       // حسابات
+      console.log('[DASH] Starting calculations...');
+      const t2 = Date.now();
       const rmFn=s=>{ const m={}; if(s.voided)(s.items||[]).forEach(it=>m[it.productId]=(m[it.productId]||0)+it.qty); (s.returns||[]).forEach(r=>(r.lines||[]).forEach(l=>m[l.productId]=(m[l.productId]||0)+l.qty)); return m; };
       const eff=s=>s.voided?0:Math.max(0,(s.total||0)-(s.refundTotal||0));
       let revenue=0, cogs=0, itemsSold=0, orders=0, returnAmt=0, returnEntries=0;
@@ -3869,7 +3899,9 @@
           <div style="font-size:18px;color:var(--amber);white-space:nowrap;">›</div></button>`).join('');
         html+=`</div>`;
       }
+      console.log('[DASH] Rendering complete. HTML size:', html.length, 'chars. Total calculation:', Date.now()-t2, 'ms');
       $('content').innerHTML=html;
+      console.log('[DASH] DOM updated. Total time:', Date.now()-t0, 'ms');
       // نحفظ المبيعات والمشتريات والورديات لاستخدامها في popup التفاصيل
       window.__dashSales = sales;
       window.__dashLoads = loadsArr;
@@ -8322,12 +8354,31 @@
 
     // ============ INIT ============
     refreshLoginLabels(); applyLang();
-    // فصل أي service worker قديم ومسح الكاش (المؤجّل من قبل)
+    // 🆕 v2.7.2 — Global handler per "async response" errors da extension/service worker
+    window.addEventListener('unhandledrejection', ev => {
+      const msg = ev.reason?.message || String(ev.reason);
+      if(msg.includes('listener indicated an asynchronous response') || msg.includes('message channel closed')){
+        console.warn('[sw] Ignored async listener error (Chrome extension issue):', msg);
+        ev.preventDefault(); // non propagate
+      }
+    });
+    // Pulisci service worker vecchi e cache in modo sicuro (no "async response" errors)
     if('serviceWorker' in navigator){
-      navigator.serviceWorker.getRegistrations().then(regs=>regs.forEach(r=>r.unregister())).catch(()=>{});
+      navigator.serviceWorker.getRegistrations()
+        .then(regs => {
+          regs.forEach(r => {
+            r.unregister().catch(err => console.warn('[sw] unregister error:', err.message));
+          });
+        })
+        .catch(err => console.warn('[sw] getRegistrations error:', err.message));
     }
     if('caches' in window){
-      caches.keys().then(keys=>keys.forEach(k=>caches.delete(k))).catch(()=>{});
+      caches.keys()
+        .then(keys => {
+          Promise.all(keys.map(k => caches.delete(k).catch(()=>null)))
+            .catch(err => console.warn('[cache] delete error:', err.message));
+        })
+        .catch(err => console.warn('[cache] keys error:', err.message));
     }
   </script>
 </body>
