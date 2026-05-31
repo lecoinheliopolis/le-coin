@@ -1170,87 +1170,97 @@
         // 🆕 v2.7.2 — Aggiungi border-bottom per separare sezione annunci da quella successiva
         annSectionHtml = `<div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px dashed rgba(245,240,220,0.22);">${itemsHtml}</div>`;
       }
-      // === 🆕 SEZIONE NUOVI ARRIVI (Stage 3) ===
-      let newArrivalsHtml = '';
+      // === 🆕 SEZIONE NUOVI ARRIVI + OFFERTE — calcolo count PRIMA per scala adattiva ===
+      // 🆕 v2.7.3 — Quando una categoria è vuota, l'altra usa la "scala full-width" (card più grandi)
+      const currency = t('currency');
+      const GOLD = '#C9A84C';
+      const newLabel = lang==='ar' ? 'جديد' : 'NEW';
+      
+      // 1. Carico nuovi arrivi
+      let arrivals = [];
       if(branchId && products.length){
-        // 🆕 v2.7.2 — Se il cliente non ha scelto filiale, ignora il filtro clientCategoryIds (passa null)
         const arrivalsBranchId = isClientChoice ? branchId : null;
-        const arrivals = getNewArrivals(arrivalsBranchId, 7, 6);
-        if(arrivals.length){
-          const currency = t('currency');
-          const GOLD = '#C9A84C';
-          const newLabel = lang==='ar' ? 'جديد' : 'NEW';
-          const list = arrivals.slice(0,4);
-          // 🆕 v2.7.3 — Scala dinamica: meno prodotti = più grandi (coprono lo spazio vuoto)
-          const n = list.length;
-          const sc = n<=1 ? {ph:140,nm:30,pr:36,pad:18,gap:18} : n===2 ? {ph:112,nm:26,pr:31,pad:15,gap:16} : {ph:88,nm:22,pr:26,pad:12,gap:14};
-          const cardsHtml = list.map((p,i)=>{
-            const photo = p.photoUrl
-              ? `<img src="${p.photoUrl}" style="width:${sc.ph}px;height:${sc.ph}px;border-radius:10px;object-fit:contain;background:rgba(0,0,0,0.2);flex-shrink:0;border:1px solid rgba(201,168,76,0.25);">`
-              : `<div style="width:${sc.ph}px;height:${sc.ph}px;border-radius:10px;background:rgba(0,0,0,0.2);flex-shrink:0;border:1px solid rgba(201,168,76,0.25);display:flex;align-items:center;justify-content:center;font-size:${Math.round(sc.ph*0.4)}px;">✨</div>`;
-            const newSticker = `<div style="position:absolute;top:-7px;${lang==='ar'?'right':'left'}:-7px;background:linear-gradient(135deg,#E53935,#C62828);color:#fff;font-weight:800;font-size:12px;padding:4px 10px;border-radius:6px;box-shadow:0 3px 8px rgba(0,0,0,0.4);font-family:system-ui,sans-serif;letter-spacing:0.5px;transform:rotate(-8deg);border:1.5px solid rgba(255,255,255,0.3);">${newLabel}</div>`;
-            return `<div class="chalk-product-card" data-product-id="${p.id}" data-product-name="${esc(pName(p))}" data-product-price="${p.price||0}" data-product-photo="${p.photoUrl||''}" style="position:relative;display:inline-flex;width:fit-content;max-width:100%;box-sizing:border-box;align-items:center;gap:${sc.gap}px;background:rgba(0,0,0,0.13);border:1px solid rgba(201,168,76,0.22);border-radius:14px;padding:${sc.pad}px;margin-bottom:14px;">
-              ${newSticker}
-              ${photo}
-              <div style="min-width:0;">
-                <div style="${bodyChalk};font-size:${sc.nm}px;line-height:1.25;margin-bottom:5px;white-space:nowrap;">${esc(pName(p))}</div>
-                <div style="font-family:${chalkFont};${chalkDust}${chalkRough}font-size:${sc.pr}px;color:${GOLD};line-height:1;white-space:nowrap;">${fmt(p.price||0)} <span style="font-size:${Math.round(sc.pr*0.6)}px;opacity:0.85;">${currency}</span></div>
-              </div>
-            </div>`;
-          }).join('');
-          newArrivalsHtml = `<div>${cardsHtml}</div>`;
-        }
+        arrivals = getNewArrivals(arrivalsBranchId, 7, 6).slice(0,4);
       }
-      // === 🆕 SEZIONE OFFERTE (Stage 4) ===
-      let offersHtml = '';
+      // 2. Carico offerte
+      let branchOffers = [];
       if(branchId){
         try{
           const allOffers = await loadActiveOffers();
-          const branchOffers = allOffers.filter(o => {
+          branchOffers = allOffers.filter(o => {
             if(o.productId == null) return false;
-            // 🆕 v2.7.2 — Se il cliente non ha scelto filiale, mostra tutte le offerte (no filtro filiale)
             if(isClientChoice && Array.isArray(o.branchIds) && o.branchIds.length>0){
               if(!o.branchIds.includes('all') && !o.branchIds.includes(branchId)) return false;
             }
-            return true;
-          });
-          if(branchOffers.length && products.length){
-            const currency = t('currency');
-            const GOLD = '#C9A84C';
-            const list = branchOffers.slice(0,4).filter(o=>products.find(x=>x.id===o.productId));
-            // 🆕 v2.7.3 — Scala dinamica
-            const n = list.length;
-            const sc = n<=1 ? {ph:140,nm:30,pr:36,pad:18,gap:18} : n===2 ? {ph:112,nm:26,pr:31,pad:15,gap:16} : {ph:88,nm:22,pr:26,pad:12,gap:14};
-            const offerCards = list.map((o,i)=>{
-              const p = products.find(x=>x.id===o.productId);
-              const oldP = fmt(p.price||0);
-              const newP = fmt(o.priceNew||0);
-              const pctOff = (p.price>0) ? Math.round((1 - (o.priceNew/p.price))*100) : 0;
-              const photo = p.photoUrl
-                ? `<img src="${p.photoUrl}" style="width:${sc.ph}px;height:${sc.ph}px;border-radius:10px;object-fit:contain;background:rgba(0,0,0,0.2);flex-shrink:0;border:1px solid rgba(201,168,76,0.25);">`
-                : `<div style="width:${sc.ph}px;height:${sc.ph}px;border-radius:10px;background:rgba(0,0,0,0.2);flex-shrink:0;border:1px solid rgba(201,168,76,0.25);display:flex;align-items:center;justify-content:center;font-size:${Math.round(sc.ph*0.4)}px;">🔥</div>`;
-              // 🆕 v2.7.3 — Dettagli (durata/quantità) salvati nei data-attr, mostrati SOLO nella modal al click
-              let daysLeft = '', unitsLeft = '';
-              if(o.expiresAt) daysLeft = Math.max(0, Math.ceil((o.expiresAt - Date.now())/(24*3600*1000)));
-              if(o.maxUnits) unitsLeft = `${Math.max(0, o.maxUnits-(o.soldUnits||0))}/${o.maxUnits}`;
-              const badge = pctOff>0 ? `<div style="position:absolute;top:-7px;${lang==='ar'?'right':'left'}:-7px;background:linear-gradient(135deg,#C9A84C,#B8973C);color:#1A1A1A;font-weight:800;font-size:13px;padding:4px 11px;border-radius:6px;box-shadow:0 3px 8px rgba(0,0,0,0.4);font-family:system-ui,sans-serif;transform:rotate(-8deg);border:1.5px solid rgba(255,255,255,0.3);">−${pctOff}%</div>` : '';
-              return `<div class="chalk-product-card" data-product-id="${p.id}" data-product-name="${esc(pName(p))}" data-product-price="${o.priceNew||0}" data-product-photo="${p.photoUrl||''}" data-offer-price="${p.price||0}" data-offer-discount="${pctOff}" data-offer-days="${daysLeft}" data-offer-units="${unitsLeft}" style="position:relative;display:inline-flex;width:fit-content;max-width:100%;box-sizing:border-box;align-items:center;gap:${sc.gap}px;background:rgba(0,0,0,0.13);border:1px solid rgba(201,168,76,0.3);border-radius:14px;padding:${sc.pad}px;margin-bottom:14px;">
-                ${badge}
-                ${photo}
-                <div style="min-width:0;">
-                  <div style="${bodyChalk};font-size:${sc.nm}px;line-height:1.25;margin-bottom:5px;white-space:nowrap;">${esc(pName(p))}</div>
-                  <div style="display:flex;align-items:baseline;gap:9px;">
-                    <span style="font-family:${chalkFont};${chalkDust}${chalkRough}font-size:${sc.pr}px;color:${GOLD};line-height:1;white-space:nowrap;">${newP} <span style="font-size:${Math.round(sc.pr*0.6)}px;opacity:0.85;">${currency}</span></span>
-                    <span style="${softChalk};font-size:${Math.round(sc.pr*0.62)}px;text-decoration:line-through;opacity:0.6;white-space:nowrap;">${oldP}</span>
-                  </div>
-                </div>
-              </div>`;
-            }).filter(Boolean).join('');
-            if(offerCards){
-              offersHtml = `<div>${offerCards}</div>`;
-            }
-          }
+            return !!products.find(x=>x.id===o.productId);
+          }).slice(0,4);
         } catch(e){ console.warn('[chalkboard] offers failed:', e); }
+      }
+      // 3. Calcolo flag full-width: se l'altra sezione è vuota, questa si ingrandisce
+      const arrivalsFullWidth = arrivals.length > 0 && branchOffers.length === 0;
+      const offersFullWidth = branchOffers.length > 0 && arrivals.length === 0;
+      // 4. Helper scala: con isFull, foto e testo crescono per riempire lo spazio
+      function getCardScale(n, isFull){
+        if(isFull){
+          if(n<=1) return {ph:200,nm:38,pr:46,pad:22,gap:22};
+          if(n===2) return {ph:160,nm:32,pr:38,pad:18,gap:20};
+          return {ph:120,nm:28,pr:32,pad:16,gap:18};
+        }
+        if(n<=1) return {ph:140,nm:30,pr:36,pad:18,gap:18};
+        if(n===2) return {ph:112,nm:26,pr:31,pad:15,gap:16};
+        return {ph:88,nm:22,pr:26,pad:12,gap:14};
+      }
+      
+      // === RENDER NUOVI ARRIVI ===
+      let newArrivalsHtml = '';
+      if(arrivals.length){
+        const sc = getCardScale(arrivals.length, arrivalsFullWidth);
+        const cardsHtml = arrivals.map((p,i)=>{
+          const photo = p.photoUrl
+            ? `<img src="${p.photoUrl}" style="width:${sc.ph}px;height:${sc.ph}px;border-radius:10px;object-fit:contain;background:rgba(0,0,0,0.2);flex-shrink:0;border:1px solid rgba(201,168,76,0.25);">`
+            : `<div style="width:${sc.ph}px;height:${sc.ph}px;border-radius:10px;background:rgba(0,0,0,0.2);flex-shrink:0;border:1px solid rgba(201,168,76,0.25);display:flex;align-items:center;justify-content:center;font-size:${Math.round(sc.ph*0.4)}px;">✨</div>`;
+          const newSticker = `<div style="position:absolute;top:-7px;${lang==='ar'?'right':'left'}:-7px;background:linear-gradient(135deg,#E53935,#C62828);color:#fff;font-weight:800;font-size:12px;padding:4px 10px;border-radius:6px;box-shadow:0 3px 8px rgba(0,0,0,0.4);font-family:system-ui,sans-serif;letter-spacing:0.5px;transform:rotate(-8deg);border:1.5px solid rgba(255,255,255,0.3);">${newLabel}</div>`;
+          return `<div class="chalk-product-card" data-product-id="${p.id}" data-product-name="${esc(pName(p))}" data-product-price="${p.price||0}" data-product-photo="${p.photoUrl||''}" style="position:relative;display:inline-flex;width:fit-content;max-width:100%;box-sizing:border-box;align-items:center;gap:${sc.gap}px;background:rgba(0,0,0,0.13);border:1px solid rgba(201,168,76,0.22);border-radius:14px;padding:${sc.pad}px;margin-bottom:14px;">
+            ${newSticker}
+            ${photo}
+            <div style="min-width:0;">
+              <div style="${bodyChalk};font-size:${sc.nm}px;line-height:1.25;margin-bottom:5px;white-space:nowrap;">${esc(pName(p))}</div>
+              <div style="font-family:${chalkFont};${chalkDust}${chalkRough}font-size:${sc.pr}px;color:${GOLD};line-height:1;white-space:nowrap;">${fmt(p.price||0)} <span style="font-size:${Math.round(sc.pr*0.6)}px;opacity:0.85;">${currency}</span></div>
+            </div>
+          </div>`;
+        }).join('');
+        newArrivalsHtml = `<div>${cardsHtml}</div>`;
+      }
+      
+      // === RENDER OFFERTE ===
+      let offersHtml = '';
+      if(branchOffers.length){
+        const sc = getCardScale(branchOffers.length, offersFullWidth);
+        const offerCards = branchOffers.map((o,i)=>{
+          const p = products.find(x=>x.id===o.productId);
+          const oldP = fmt(p.price||0);
+          const newP = fmt(o.priceNew||0);
+          const pctOff = (p.price>0) ? Math.round((1 - (o.priceNew/p.price))*100) : 0;
+          const photo = p.photoUrl
+            ? `<img src="${p.photoUrl}" style="width:${sc.ph}px;height:${sc.ph}px;border-radius:10px;object-fit:contain;background:rgba(0,0,0,0.2);flex-shrink:0;border:1px solid rgba(201,168,76,0.25);">`
+            : `<div style="width:${sc.ph}px;height:${sc.ph}px;border-radius:10px;background:rgba(0,0,0,0.2);flex-shrink:0;border:1px solid rgba(201,168,76,0.25);display:flex;align-items:center;justify-content:center;font-size:${Math.round(sc.ph*0.4)}px;">🔥</div>`;
+          let daysLeft = '', unitsLeft = '';
+          if(o.expiresAt) daysLeft = Math.max(0, Math.ceil((o.expiresAt - Date.now())/(24*3600*1000)));
+          if(o.maxUnits) unitsLeft = `${Math.max(0, o.maxUnits-(o.soldUnits||0))}/${o.maxUnits}`;
+          const badge = pctOff>0 ? `<div style="position:absolute;top:-7px;${lang==='ar'?'right':'left'}:-7px;background:linear-gradient(135deg,#C9A84C,#B8973C);color:#1A1A1A;font-weight:800;font-size:13px;padding:4px 11px;border-radius:6px;box-shadow:0 3px 8px rgba(0,0,0,0.4);font-family:system-ui,sans-serif;transform:rotate(-8deg);border:1.5px solid rgba(255,255,255,0.3);">−${pctOff}%</div>` : '';
+          return `<div class="chalk-product-card" data-product-id="${p.id}" data-product-name="${esc(pName(p))}" data-product-price="${o.priceNew||0}" data-product-photo="${p.photoUrl||''}" data-offer-price="${p.price||0}" data-offer-discount="${pctOff}" data-offer-days="${daysLeft}" data-offer-units="${unitsLeft}" style="position:relative;display:inline-flex;width:fit-content;max-width:100%;box-sizing:border-box;align-items:center;gap:${sc.gap}px;background:rgba(0,0,0,0.13);border:1px solid rgba(201,168,76,0.3);border-radius:14px;padding:${sc.pad}px;margin-bottom:14px;">
+            ${badge}
+            ${photo}
+            <div style="min-width:0;">
+              <div style="${bodyChalk};font-size:${sc.nm}px;line-height:1.25;margin-bottom:5px;white-space:nowrap;">${esc(pName(p))}</div>
+              <div style="display:flex;align-items:baseline;gap:9px;">
+                <span style="font-family:${chalkFont};${chalkDust}${chalkRough}font-size:${sc.pr}px;color:${GOLD};line-height:1;white-space:nowrap;">${newP} <span style="font-size:${Math.round(sc.pr*0.6)}px;opacity:0.85;">${currency}</span></span>
+                <span style="${softChalk};font-size:${Math.round(sc.pr*0.62)}px;text-decoration:line-through;opacity:0.6;white-space:nowrap;">${oldP}</span>
+              </div>
+            </div>
+          </div>`;
+        }).join('');
+        offersHtml = `<div>${offerCards}</div>`;
       }
       // 🆕 v2.7.2 — Layout: offerte + nuovi arrivi in 2 colonne quando entrambi presenti, altrimenti full width
       // Con separatori visuali tra le sezioni e dimensioni coerenti
