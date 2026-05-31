@@ -2949,9 +2949,16 @@
       if(dashRange.mode==='today') return [dayStart(now), now];
       if(dashRange.mode==='7') return [now-7*86400000, now];
       if(dashRange.mode==='30') return [now-30*86400000, now];
-      const f=dashRange.from?new Date(dashRange.from+'T00:00:00').getTime():dayStart(now);
-      const tt=dashRange.to?new Date(dashRange.to+'T23:59:59').getTime():now;
-      return [f,tt];
+      // 🆕 v2.7.2 — Validazione date input per evitare NaN
+      const vF = dashRange.from?.trim() || '';
+      const vT = dashRange.to?.trim() || '';
+      if(!vF || !vT) return [dayStart(now-29*86400000), now]; // fallback
+      try{
+        const fTs = new Date(vF+'T00:00:00').getTime();
+        const tTs = new Date(vT+'T23:59:59').getTime();
+        if(isNaN(fTs) || isNaN(tTs)) return [dayStart(now-29*86400000), now];
+        return [dayStart(fTs), tTs];
+      }catch(e){ return [dayStart(now-29*86400000), now]; }
     }
     // ============ 🆕 v2.6.0 — ANALYTICS HUB (rivoluzione UX) ============
     // Sostituisce Dashboard + Reports separati.
@@ -3039,7 +3046,30 @@
       else if(r.mode==='30'){ fromTs=dayStart(now-29*86400000); toTs=now; }
       else if(r.mode==='month'){ const d=new Date(); fromTs=new Date(d.getFullYear(),d.getMonth(),1).getTime(); toTs=now; }
       else if(r.mode==='year'){ const d=new Date(); fromTs=new Date(d.getFullYear(),0,1).getTime(); toTs=now; }
-      else { fromTs=dayStart(new Date(r.from+'T00:00:00').getTime()); toTs=new Date(r.to+'T23:59:59').getTime(); }
+      else { 
+        // 🆕 v2.7.2 — Validazione date input (no undefined, no invalid)
+        const vF = r.from?.trim() || '';
+        const vT = r.to?.trim() || '';
+        if(!vF || !vT){ 
+          // Se manca una data, fallback a 30 giorni
+          console.warn('[analytics] Invalid custom range:', {from:r.from, to:r.to}, '→ fallback 30d');
+          fromTs=dayStart(now-29*86400000); toTs=now; 
+        } else {
+          try{
+            const fTs = new Date(vF+'T00:00:00').getTime();
+            const tTs = new Date(vT+'T23:59:59').getTime();
+            if(isNaN(fTs) || isNaN(tTs)){ 
+              console.warn('[analytics] Invalid date parse:', {from:vF, to:vT}, '→ fallback 30d');
+              fromTs=dayStart(now-29*86400000); toTs=now; 
+            } else {
+              fromTs=dayStart(fTs); toTs=tTs;
+            }
+          }catch(e){ 
+            console.warn('[analytics] Date parse error:', e.message, '→ fallback 30d');
+            fromTs=dayStart(now-29*86400000); toTs=now; 
+          }
+        }
+      }
       return [fromTs, toTs];
     }
 
@@ -3099,7 +3129,7 @@
       const rangeBtn = (m,lbl)=>`<button class="an-r" data-m="${m}" style="padding:7px 13px;border-radius:18px;font-weight:700;font-family:inherit;font-size:12px;cursor:pointer;white-space:nowrap;border:1px solid ${analyticsState.range.mode===m?'var(--gold)':'var(--ivory-dark)'};background:${analyticsState.range.mode===m?'var(--gold)':'#fff'};color:var(--charcoal);">${lbl}</button>`;
       const allBr = profile.role==='admin' ? branches : branches.filter(b=>(profile.branchIds||[]).includes(b.id));
       const branchOpts = `<option value="all">${t('allBranches')}</option>` + allBr.map(b=>`<option value="${b.id}" ${analyticsState.branchFilter===b.id?'selected':''}>${lang==='ar'?b.nameAr:b.nameEn}</option>`).join('');
-      const customDates = analyticsState.range.mode==='custom' ? `<div class="row2" style="margin-top:8px;"><div class="field" style="margin:0;"><label class="lbl">${t('repFrom')}</label><input class="input" id="an-from" type="date" value="${analyticsState.range.from||new Date(fromTs).toISOString().slice(0,10)}"></div><div class="field" style="margin:0;"><label class="lbl">${t('repTo')}</label><input class="input" id="an-to" type="date" value="${analyticsState.range.to||new Date(toTs).toISOString().slice(0,10)}"></div></div>` : '';
+      const customDates = analyticsState.range.mode==='custom' ? `<div class="row2" style="margin-top:8px;"><div class="field" style="margin:0;"><label class="lbl">${t('repFrom')}</label><input class="input" id="an-from" type="date" value="${analyticsState.range.from||(isNaN(fromTs)?'':new Date(fromTs).toISOString().slice(0,10))}"></div><div class="field" style="margin:0;"><label class="lbl">${t('repTo')}</label><input class="input" id="an-to" type="date" value="${analyticsState.range.to||(isNaN(toTs)?'':new Date(toTs).toISOString().slice(0,10))}"></div></div>` : '';
       html += `<div style="background:var(--ivory-dark);border-radius:14px;padding:12px;margin-bottom:12px;position:sticky;top:0;z-index:5;">
         <div id="an-range-btns" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;">${rangeBtn('today',t('rToday'))}${rangeBtn('7',t('r7'))}${rangeBtn('30',t('r30'))}${rangeBtn('month',t('rMonth'))}${rangeBtn('year',t('rYear'))}${rangeBtn('custom',t('rCustom'))}</div>
         <div id="an-custom-range">${customDates}</div>
