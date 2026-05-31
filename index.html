@@ -7654,7 +7654,7 @@
       <!-- 🆕 v2.7.2 — Lavagna fullscreen (senza margin, prende tutta la schermata) -->
       <div id="chalkboard-wrap" style="margin:0;padding:0;display:none;"></div>`;
       if(!clientBranchId){
-        c.innerHTML=html+`<div class="empty" style="margin-top:14px;">☰ ${t('chooseBranch')}</div>`;
+        c.innerHTML=html; // 🆕 v2.7.3 — Rimossa scritta "Scegli filiale" (la lavagna è già visibile con fallback)
         // الضغط على كرت النقاط ينقلني لتبويب النقاط
         const ptsCard=$('cli-pts-card'); if(ptsCard) ptsCard.onclick=()=>{ clientTab='points'; document.querySelectorAll('#client-nav .nav-btn').forEach(x=>x.classList.remove('active')); const b=document.querySelector('[data-ctab="points"]'); if(b) b.classList.add('active'); renderClientTab(); };
         renderChalkboard(); // 🆕 v2.6.7
