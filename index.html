@@ -8,7 +8,14 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Le Coin · POS · v2.5</title>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@1,400;1,500&family=JetBrains+Mono:wght@400;500;600;700&family=Caveat:wght@400;500;600;700&family=Marhey:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@1,400;1,500&family=JetBrains+Mono:wght@400;500;600;700&family=Caveat:wght@400;500;600;700&family=Marhey:wght@400;500;700&family=Gochi+Hand&family=Kalam:wght@400;700&family=Lalezar&family=Gulzar&display=swap" rel="stylesheet">
+  <!-- 🆕 v2.7.3 — Filtro SVG per effetto gesso ruvido sulle scritte della lavagna -->
+  <svg width="0" height="0" style="position:absolute;" aria-hidden="true">
+    <filter id="chalk-texture">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.6" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </svg>
   <style>
     * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
     :root {
@@ -113,9 +120,93 @@
       .empty { font-size:14.5px !important; }
       .lbl { font-size:13px !important; }
       .nav-btn .lbl2 { font-size:11px !important; } /* تبويبات الشريط: نخلّيها 11 عشان تكفي 6 أزرار */
-      /* 🆕 v2.7.2 — Lavagna a 2 colonne collassa a 1 su mobile stretto */
-      .chalk-two-col { grid-template-columns:1fr !important; gap:14px !important; }
-      .chalk-two-col > div:first-child { border-left:none !important; border-right:none !important; padding-left:0 !important; padding-right:0 !important; padding-bottom:14px !important; border-bottom:1px dashed rgba(245,240,220,0.18) !important; }
+      /* 🆕 v2.7.2 — Card prodotto clickable con modal */
+      .chalk-product-card {
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        border-radius: 8px;
+        padding: 8px;
+        margin: -8px;
+      }
+      .chalk-product-card:hover {
+        transform: scale(1.02);
+        background: rgba(245,240,220,0.08);
+      }
+      #chalk-product-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.7);
+        z-index: 10000;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      #chalk-product-modal.active {
+        display: flex;
+      }
+      #chalk-product-modal-content {
+        background: #1F4D3D;
+        border-radius: 12px;
+        padding: 20px;
+        max-width: 500px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+      }
+      #chalk-product-modal-close {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: rgba(245,240,220,0.2);
+        border: none;
+        color: #f5f0dc;
+        font-size: 24px;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #chalk-product-modal-content img {
+        width: 100%;
+        max-height: 400px;
+        object-fit: contain;
+        border-radius: 8px;
+        margin-bottom: 16px;
+      }
+      /* Mobile: 1 colonna, compatta */
+      @media (max-width:600px) {
+        #chalkboard-wrap > div:first-child { padding:12px !important; }
+        .chalk-two-col { grid-template-columns:1fr !important; gap:12px !important; }
+        /* Mobile: nome e prezzo su righe separate */
+        .chalk-card-header { display:flex !important; flex-direction:column !important; align-items:flex-start !important; }
+        .chalk-card-header > div:last-child { margin-top:4px !important; }
+      }
+      /* Tablet: 2 colonne */
+      @media (min-width:601px) and (max-width:900px) {
+        .chalk-two-col { grid-template-columns:1fr 1fr !important; gap:16px !important; }
+        /* Tablet: nome e prezzo sulla stessa riga */
+        .chalk-card-header { display:flex !important; flex-direction:row !important; align-items:baseline !important; gap:10px !important; }
+        .chalk-card-header > div:first-child { flex:1; }
+      }
+      /* Desktop: 2 colonne full */
+      @media (min-width:901px) {
+        .chalk-two-col { grid-template-columns:1fr 1fr !important; gap:18px !important; }
+        /* Desktop: nome e prezzo sulla stessa riga */
+        .chalk-card-header { display:flex !important; flex-direction:row !important; align-items:baseline !important; gap:10px !important; }
+        .chalk-card-header > div:first-child { flex:1; }
+      }
+      .chalk-two-col > div:first-child { border-left:none !important; border-right:none !important; padding-left:0 !important; padding-right:0 !important; padding-bottom:14px !important; border-bottom:1px dashed #1F4D3D !important; }
+      #chalkboard-wrap { min-height:0; margin:0 !important; padding:0 !important; }
+      #chalkboard-wrap [style*="border-bottom:1px dashed rgba(245,240,220,0.28)"] { border-bottom:1px dashed #1F4D3D !important; }
+      #chalkboard-wrap [style*="border-bottom:1px dashed rgba(245,240,220,0.22)"] { border-bottom:1px dashed #1F4D3D !important; }
       /* تباعد الأسطر أوسع شوية على الموبايل */
       body, .card, .prod-info, .prod-card { line-height:1.45; }
       /* الأسماء الرئيسية في الكاشير */
@@ -1005,35 +1096,39 @@
       const CHALK_SOFT = 'rgba(245,240,220,0.75)';  // gesso desaturato
       const CHALK_BG = '#1F4D3D';          // verde lavagna scolastica
       const CHALK_BG_DARK = '#163A2E';     // ombra
-      const chalkFont = "'Caveat','Marhey',cursive";
-      // Effetto "scritta doppia" stile titolo "COLE" nell'immagine — outline + ombra layered
-      const titleDouble = `font-family:${chalkFont};font-weight:700;color:${CHALK};-webkit-text-stroke:0.5px rgba(245,240,220,0.55);text-shadow:1px 1px 0 rgba(255,255,255,0.35),2px 2px 0 rgba(245,240,220,0.4),3px 3px 0 rgba(0,0,0,0.28);letter-spacing:1.5px;font-style:italic;`;
-      const bodyChalk = `font-family:${chalkFont};font-style:italic;color:${CHALK};text-shadow:0 0 1px rgba(255,255,255,0.4),1px 1px 0 rgba(0,0,0,0.22);letter-spacing:0.3px;`;
-      const softChalk = `font-family:${chalkFont};font-style:italic;color:${CHALK_SOFT};text-shadow:0 0 1px rgba(255,255,255,0.3);`;
+      // 🆕 v2.7.3 — Font calligrafici diversi per lingua + effetto gesso ruvido
+      const chalkFont = lang==='ar' ? "'Lalezar','Gulzar',cursive" : "'Gochi Hand','Kalam',cursive";
+      // Effetto gesso: bagliore polveroso + texture ruvida via filtro SVG
+      const chalkDust = `text-shadow:0 0 1px rgba(245,240,220,0.55),0 0 4px rgba(245,240,220,0.18),1px 1px 0 rgba(0,0,0,0.2);`;
+      const chalkRough = `filter:url(#chalk-texture);`;
+      // Titolo: grande, polveroso, ruvido
+      const titleDouble = `font-family:${chalkFont};font-weight:700;color:${CHALK};${chalkDust}${chalkRough}letter-spacing:1px;`;
+      const bodyChalk = `font-family:${chalkFont};color:${CHALK};${chalkDust}${chalkRough}letter-spacing:0.3px;`;
+      const softChalk = `font-family:${chalkFont};color:${CHALK_SOFT};text-shadow:0 0 2px rgba(245,240,220,0.35);${chalkRough}`;
       // Orari oggi (se ci sono e non chiuso per giorno)
       const hoursLine = status.hoursToday
         ? `<span dir="ltr" style="${bodyChalk};font-size:22px;">${status.hoursToday.open} — ${status.hoursToday.close}</span>`
         : `<span style="${bodyChalk};font-size:20px;opacity:0.7;">${t('hoursClosedToday')}</span>`;
-      // === SEZIONE FISSA: data + stato + orari ===
+      // === SEZIONE FISSA: data + stato + orari COMPATTA PREMIUM ===
+      const GOLD_HDR = '#C9A84C';
       const fixedSectionHtml = `
-        <div style="margin-bottom:16px;padding-bottom:14px;border-bottom:1px dashed rgba(245,240,220,0.22);">
-          <!-- Data oggi -->
-          <div style="text-align:center;margin-bottom:10px;">
-            <div style="${bodyChalk};font-size:22px;">📅 ${esc(dateStr)}</div>
-          </div>
-          <!-- Stato live (solo il puntino colorato, label gesso) -->
-          <div style="text-align:center;margin-bottom:8px;">
-            <span style="display:inline-flex;align-items:center;gap:8px;${titleDouble};font-size:28px;transform:rotate(-0.5deg);">
-              <span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:${st.dotColor};box-shadow:0 0 8px ${st.dotColor};"></span>
-              ${esc(st.label)}
+        <div style="margin-bottom:18px;padding-bottom:16px;border-bottom:1px dashed rgba(245,240,220,0.22);">
+          <!-- Titolo filiale + stato aperto/chiuso ACCANTO -->
+          <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
+            <span style="font-size:18px;opacity:0.7;filter:drop-shadow(0 0 3px rgba(201,168,76,0.4));">📌</span>
+            <span style="${titleDouble};font-size:34px;letter-spacing:1.5px;transform:rotate(-1deg);">${branch ? esc(lang==='ar'?branch.nameAr:branch.nameEn) : t('chalkboardTitle')}</span>
+            <span style="display:inline-flex;align-items:center;gap:7px;background:rgba(0,0,0,0.2);border:1px solid ${st.dotColor};border-radius:20px;padding:4px 12px;">
+              <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${st.dotColor};box-shadow:0 0 7px ${st.dotColor};"></span>
+              <span style="font-family:${chalkFont};font-style:italic;color:#f5f0dc;font-size:16px;font-weight:600;">${esc(st.label)}</span>
             </span>
           </div>
-          ${st.msg ? `<div style="text-align:center;margin-bottom:8px;${bodyChalk};font-size:20px;opacity:0.85;">${esc(st.msg)}</div>` : ''}
-          <!-- Orari oggi -->
-          <div style="text-align:center;">
-            <span style="${softChalk};font-size:16px;letter-spacing:0.5px;">🕐 ${t('openingHoursToday')}: </span>
-            ${hoursLine}
+          <!-- Data + Orari sulla stessa riga -->
+          <div style="display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;">
+            <span style="${bodyChalk};font-size:19px;">📅 ${esc(dateStr)}</span>
+            <span style="color:${GOLD_HDR};font-size:14px;opacity:0.8;">◆</span>
+            <span style="${bodyChalk};font-size:19px;" dir="ltr">🕐 ${status.hoursToday ? status.hoursToday.open + ' — ' + status.hoursToday.close : t('hoursClosedToday')}</span>
           </div>
+          ${st.msg ? `<div style="text-align:center;margin-top:10px;${bodyChalk};font-size:16px;opacity:0.85;">${esc(st.msg)}</div>` : ''}
         </div>`;
       // === SEZIONE ANNUNCI (esistente) — filtrata per branchId quando v2.7.0 stage 5 attivo ===
       let annItems = [];
@@ -1059,17 +1154,21 @@
           const ic = a.icon || '📢';
           const pin = a.pinned ? '<span style="font-size:13px;color:'+CHALK+';opacity:0.6;">📌</span>' : '';
           const tilt = (((a.id||'x').charCodeAt(0) % 5) - 2) * 0.15;
+          // 🆕 v2.7.3 — Testo nella lingua corrente con fallback al campo legacy
+          const annTitle = lang==='ar' ? (a.titleAr||a.title||'') : (a.titleEn||a.title||'');
+          const annMsg = lang==='ar' ? (a.messageAr||a.message||'') : (a.messageEn||a.message||'');
           return `<div style="${sep}transform:rotate(${tilt}deg);">
             <div style="display:flex;align-items:flex-start;gap:12px;">
               <span style="font-size:24px;line-height:1;flex-shrink:0;filter:drop-shadow(0 0 3px rgba(245,240,220,0.18));margin-top:2px;">${ic}</span>
               <div style="flex:1;min-width:0;">
-                <div style="${titleDouble};font-size:22px;line-height:1.1;margin-bottom:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${esc(a.title||'')} ${pin}</div>
-                ${a.message ? `<div style="${bodyChalk};font-size:18px;font-weight:500;line-height:1.25;">${esc(a.message)}</div>` : ''}
+                <div style="${titleDouble};font-size:22px;line-height:1.15;margin-bottom:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${esc(annTitle)} ${pin}</div>
+                ${annMsg ? `<div style="${bodyChalk};font-size:18px;line-height:1.3;">${esc(annMsg)}</div>` : ''}
               </div>
             </div>
           </div>`;
         }).join('');
-        annSectionHtml = `<div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px dashed rgba(245,240,220,0.22);">${itemsHtml}</div>`;
+        // 🆕 v2.7.2 — Aggiungi border-bottom per separare sezione annunci da quella successiva
+        annSectionHtml = `<div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px dashed rgba(245,240,220,0.22);">${itemsHtml}</div>`;
       }
       // === 🆕 SEZIONE NUOVI ARRIVI (Stage 3) ===
       let newArrivalsHtml = '';
@@ -1079,23 +1178,27 @@
         const arrivals = getNewArrivals(arrivalsBranchId, 7, 6);
         if(arrivals.length){
           const currency = t('currency');
-          const cardsHtml = arrivals.map((p,i)=>{
+          const GOLD = '#C9A84C';
+          const newLabel = lang==='ar' ? 'جديد' : 'NEW';
+          const list = arrivals.slice(0,4);
+          // 🆕 v2.7.3 — Scala dinamica: meno prodotti = più grandi (coprono lo spazio vuoto)
+          const n = list.length;
+          const sc = n<=1 ? {ph:140,nm:30,pr:36,pad:18,gap:18} : n===2 ? {ph:112,nm:26,pr:31,pad:15,gap:16} : {ph:88,nm:22,pr:26,pad:12,gap:14};
+          const cardsHtml = list.map((p,i)=>{
             const photo = p.photoUrl
-              ? `<img src="${p.photoUrl}" style="width:56px;height:56px;border-radius:10px;object-fit:cover;flex-shrink:0;border:1px solid rgba(245,240,220,0.2);box-shadow:0 2px 6px rgba(0,0,0,0.4);">`
-              : `<div style="width:56px;height:56px;border-radius:10px;background:rgba(245,240,220,0.06);border:1px solid rgba(245,240,220,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:24px;opacity:0.7;">📦</div>`;
-            const sep = i<arrivals.length-1 ? 'margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed rgba(245,240,220,0.12);' : '';
-            return `<div style="display:flex;align-items:center;gap:12px;${sep}">
+              ? `<img src="${p.photoUrl}" style="width:${sc.ph}px;height:${sc.ph}px;border-radius:10px;object-fit:contain;background:rgba(0,0,0,0.2);flex-shrink:0;border:1px solid rgba(201,168,76,0.25);">`
+              : `<div style="width:${sc.ph}px;height:${sc.ph}px;border-radius:10px;background:rgba(0,0,0,0.2);flex-shrink:0;border:1px solid rgba(201,168,76,0.25);display:flex;align-items:center;justify-content:center;font-size:${Math.round(sc.ph*0.4)}px;">✨</div>`;
+            const newSticker = `<div style="position:absolute;top:-7px;${lang==='ar'?'right':'left'}:-7px;background:linear-gradient(135deg,#E53935,#C62828);color:#fff;font-weight:800;font-size:12px;padding:4px 10px;border-radius:6px;box-shadow:0 3px 8px rgba(0,0,0,0.4);font-family:system-ui,sans-serif;letter-spacing:0.5px;transform:rotate(-8deg);border:1.5px solid rgba(255,255,255,0.3);">${newLabel}</div>`;
+            return `<div class="chalk-product-card" data-product-id="${p.id}" data-product-name="${esc(pName(p))}" data-product-price="${p.price||0}" data-product-photo="${p.photoUrl||''}" style="position:relative;display:inline-flex;width:fit-content;max-width:100%;box-sizing:border-box;align-items:center;gap:${sc.gap}px;background:rgba(0,0,0,0.13);border:1px solid rgba(201,168,76,0.22);border-radius:14px;padding:${sc.pad}px;margin-bottom:14px;">
+              ${newSticker}
               ${photo}
-              <div style="flex:1;min-width:0;">
-                <div style="${bodyChalk};font-size:19px;font-weight:600;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(pName(p))}</div>
-                <div style="${titleDouble};font-size:22px;margin-top:2px;">${fmt(p.price||0)} <span style="font-size:14px;opacity:0.8;">${currency}</span></div>
+              <div style="min-width:0;">
+                <div style="${bodyChalk};font-size:${sc.nm}px;line-height:1.25;margin-bottom:5px;white-space:nowrap;">${esc(pName(p))}</div>
+                <div style="font-family:${chalkFont};${chalkDust}${chalkRough}font-size:${sc.pr}px;color:${GOLD};line-height:1;white-space:nowrap;">${fmt(p.price||0)} <span style="font-size:${Math.round(sc.pr*0.6)}px;opacity:0.85;">${currency}</span></div>
               </div>
             </div>`;
           }).join('');
-          newArrivalsHtml = `<div>
-            <div style="${titleDouble};font-size:26px;letter-spacing:1.5px;margin-bottom:12px;text-align:center;transform:rotate(-0.5deg);">✨ ${t('newArrivalsTitle')}</div>
-            ${cardsHtml}
-          </div>`;
+          newArrivalsHtml = `<div>${cardsHtml}</div>`;
         }
       }
       // === 🆕 SEZIONE OFFERTE (Stage 4) ===
@@ -1113,57 +1216,57 @@
           });
           if(branchOffers.length && products.length){
             const currency = t('currency');
-            const offerCards = branchOffers.slice(0,5).map((o,i)=>{
+            const GOLD = '#C9A84C';
+            const list = branchOffers.slice(0,4).filter(o=>products.find(x=>x.id===o.productId));
+            // 🆕 v2.7.3 — Scala dinamica
+            const n = list.length;
+            const sc = n<=1 ? {ph:140,nm:30,pr:36,pad:18,gap:18} : n===2 ? {ph:112,nm:26,pr:31,pad:15,gap:16} : {ph:88,nm:22,pr:26,pad:12,gap:14};
+            const offerCards = list.map((o,i)=>{
               const p = products.find(x=>x.id===o.productId);
-              if(!p) return '';
-              const sep = i<Math.min(branchOffers.length,5)-1 ? 'margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed rgba(245,240,220,0.12);' : '';
-              const photo = p.photoUrl
-                ? `<img src="${p.photoUrl}" style="width:56px;height:56px;border-radius:10px;object-fit:cover;flex-shrink:0;border:1px solid rgba(245,240,220,0.2);box-shadow:0 2px 6px rgba(0,0,0,0.4);">`
-                : `<div style="width:56px;height:56px;border-radius:10px;background:rgba(245,240,220,0.06);border:1px solid rgba(245,240,220,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:24px;opacity:0.7;">🔥</div>`;
               const oldP = fmt(p.price||0);
               const newP = fmt(o.priceNew||0);
               const pctOff = (p.price>0) ? Math.round((1 - (o.priceNew/p.price))*100) : 0;
-              const cond = [];
-              if(o.expiresAt){
-                const daysLeft = Math.max(0, Math.ceil((o.expiresAt - Date.now())/(24*3600*1000)));
-                cond.push(`⏰ ${daysLeft} ${daysLeft===1?t('dayUnit'):t('daysUnit')}`);
-              }
-              if(o.maxUnits){
-                const left = Math.max(0, o.maxUnits - (o.soldUnits||0));
-                cond.push(`📦 ${left}/${o.maxUnits}`);
-              }
-              const condHtml = cond.length ? `<div style="${softChalk};font-size:14px;margin-top:2px;">${cond.join(' · ')}</div>` : '';
-              return `<div style="display:flex;align-items:center;gap:12px;${sep}">
+              const photo = p.photoUrl
+                ? `<img src="${p.photoUrl}" style="width:${sc.ph}px;height:${sc.ph}px;border-radius:10px;object-fit:contain;background:rgba(0,0,0,0.2);flex-shrink:0;border:1px solid rgba(201,168,76,0.25);">`
+                : `<div style="width:${sc.ph}px;height:${sc.ph}px;border-radius:10px;background:rgba(0,0,0,0.2);flex-shrink:0;border:1px solid rgba(201,168,76,0.25);display:flex;align-items:center;justify-content:center;font-size:${Math.round(sc.ph*0.4)}px;">🔥</div>`;
+              // 🆕 v2.7.3 — Dettagli (durata/quantità) salvati nei data-attr, mostrati SOLO nella modal al click
+              let daysLeft = '', unitsLeft = '';
+              if(o.expiresAt) daysLeft = Math.max(0, Math.ceil((o.expiresAt - Date.now())/(24*3600*1000)));
+              if(o.maxUnits) unitsLeft = `${Math.max(0, o.maxUnits-(o.soldUnits||0))}/${o.maxUnits}`;
+              const badge = pctOff>0 ? `<div style="position:absolute;top:-7px;${lang==='ar'?'right':'left'}:-7px;background:linear-gradient(135deg,#C9A84C,#B8973C);color:#1A1A1A;font-weight:800;font-size:13px;padding:4px 11px;border-radius:6px;box-shadow:0 3px 8px rgba(0,0,0,0.4);font-family:system-ui,sans-serif;transform:rotate(-8deg);border:1.5px solid rgba(255,255,255,0.3);">−${pctOff}%</div>` : '';
+              return `<div class="chalk-product-card" data-product-id="${p.id}" data-product-name="${esc(pName(p))}" data-product-price="${o.priceNew||0}" data-product-photo="${p.photoUrl||''}" data-offer-price="${p.price||0}" data-offer-discount="${pctOff}" data-offer-days="${daysLeft}" data-offer-units="${unitsLeft}" style="position:relative;display:inline-flex;width:fit-content;max-width:100%;box-sizing:border-box;align-items:center;gap:${sc.gap}px;background:rgba(0,0,0,0.13);border:1px solid rgba(201,168,76,0.3);border-radius:14px;padding:${sc.pad}px;margin-bottom:14px;">
+                ${badge}
                 ${photo}
-                <div style="flex:1;min-width:0;">
-                  <div style="${bodyChalk};font-size:19px;font-weight:600;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(pName(p))}</div>
-                  <div style="display:flex;align-items:baseline;gap:8px;margin-top:2px;flex-wrap:wrap;">
-                    <span style="${softChalk};font-size:17px;text-decoration:line-through;text-decoration-color:rgba(245,240,220,0.5);">${oldP}</span>
-                    <span style="${titleDouble};font-size:22px;">${newP} <span style="font-size:14px;opacity:0.8;">${currency}</span></span>
-                    ${pctOff>0?`<span style="${bodyChalk};font-size:16px;font-weight:700;">−${pctOff}%</span>`:''}
+                <div style="min-width:0;">
+                  <div style="${bodyChalk};font-size:${sc.nm}px;line-height:1.25;margin-bottom:5px;white-space:nowrap;">${esc(pName(p))}</div>
+                  <div style="display:flex;align-items:baseline;gap:9px;">
+                    <span style="font-family:${chalkFont};${chalkDust}${chalkRough}font-size:${sc.pr}px;color:${GOLD};line-height:1;white-space:nowrap;">${newP} <span style="font-size:${Math.round(sc.pr*0.6)}px;opacity:0.85;">${currency}</span></span>
+                    <span style="${softChalk};font-size:${Math.round(sc.pr*0.62)}px;text-decoration:line-through;opacity:0.6;white-space:nowrap;">${oldP}</span>
                   </div>
-                  ${condHtml}
                 </div>
               </div>`;
             }).filter(Boolean).join('');
             if(offerCards){
-              offersHtml = `<div>
-                <div style="${titleDouble};font-size:26px;letter-spacing:1.5px;margin-bottom:12px;text-align:center;transform:rotate(0.5deg);">🔥 ${t('offersTitle')}</div>
-                ${offerCards}
-              </div>`;
+              offersHtml = `<div>${offerCards}</div>`;
             }
           }
         } catch(e){ console.warn('[chalkboard] offers failed:', e); }
       }
       // 🆕 v2.7.2 — Layout: offerte + nuovi arrivi in 2 colonne quando entrambi presenti, altrimenti full width
+      // Con separatori visuali tra le sezioni e dimensioni coerenti
       let bottomSectionsHtml = '';
       if(newArrivalsHtml && offersHtml){
-        bottomSectionsHtml = `<div class="chalk-two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:14px 22px;align-items:start;">
-          <div style="border-${lang==='ar'?'left':'right'}:1px dashed rgba(245,240,220,0.18);padding-${lang==='ar'?'left':'right'}:18px;">${offersHtml}</div>
+        // Due colonne: offerte a sinistra, nuovi arrivi a destra (RTL-aware)
+        bottomSectionsHtml = `<div class="chalk-two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:14px 28px;align-items:start;">
+          <div>${offersHtml}</div>
           <div>${newArrivalsHtml}</div>
         </div>`;
-      } else {
-        bottomSectionsHtml = (newArrivalsHtml ? `<div style="margin-bottom:14px;">${newArrivalsHtml}</div>` : '') + (offersHtml ? offersHtml : '');
+      } else if(newArrivalsHtml){
+        // Solo nuovi arrivi → prende tutta la larghezza
+        bottomSectionsHtml = `<div>${newArrivalsHtml}</div>`;
+      } else if(offersHtml){
+        // Solo offerte → prende tutta la larghezza
+        bottomSectionsHtml = `<div>${offersHtml}</div>`;
       }
       // ====== Lavagna SEMPRE visibile ora (ha sempre la sezione fissa) ======
       wrap.style.display='block';
@@ -1175,12 +1278,7 @@
             <div style="position:absolute;inset:0;background:radial-gradient(ellipse 50% 40% at 80% 100%,rgba(245,240,220,0.04) 0%,transparent 70%);pointer-events:none;"></div>
             <div style="position:absolute;top:-20px;left:-30px;width:120px;height:60px;background:radial-gradient(ellipse,rgba(245,240,220,0.05) 0%,transparent 60%);pointer-events:none;"></div>
             <div style="position:absolute;bottom:-20px;right:-30px;width:120px;height:60px;background:radial-gradient(ellipse,rgba(245,240,220,0.04) 0%,transparent 60%);pointer-events:none;"></div>
-            <!-- Titolo lavagna (scritta doppia stile "COLE") -->
-            <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px dashed rgba(245,240,220,0.22);position:relative;">
-              <span style="font-size:20px;filter:drop-shadow(0 0 4px rgba(245,240,220,0.3));">📌</span>
-              <span style="${titleDouble};font-size:30px;letter-spacing:2px;transform:rotate(-1deg);display:inline-block;">${branch ? esc(lang==='ar'?branch.nameAr:branch.nameEn) : t('chalkboardTitle')}</span>
-              <span style="font-size:20px;filter:drop-shadow(0 0 4px rgba(245,240,220,0.3));">📌</span>
-            </div>
+            <!-- Titolo e stato renderizzati nella sezione fissa per layout compatto -->
             ${fixedSectionHtml}
             ${annSectionHtml}
             ${bottomSectionsHtml}
@@ -1190,6 +1288,55 @@
           <div style="position:absolute;bottom:6px;left:6px;width:9px;height:9px;background:radial-gradient(circle at 30% 30%,#4a3020 0%,#1a0f08 100%);border-radius:50%;box-shadow:0 1px 2px rgba(0,0,0,0.7),inset 0 0 1px rgba(255,255,255,0.2);"></div>
           <div style="position:absolute;bottom:6px;right:6px;width:9px;height:9px;background:radial-gradient(circle at 30% 30%,#4a3020 0%,#1a0f08 100%);border-radius:50%;box-shadow:0 1px 2px rgba(0,0,0,0.7),inset 0 0 1px rgba(255,255,255,0.2);"></div>
         </div>`;
+      // 🆕 v2.7.2 — Event delegato per card prodotto clickable (apre modal con dettagli premium)
+      // 🆕 v2.7.3 — Aggiunto UNA SOLA volta per evitare listener duplicati su re-render
+      if(!wrap._chalkClickBound){
+        wrap._chalkClickBound = true;
+        wrap.addEventListener('click', (e) => {
+        const card = e.target.closest('.chalk-product-card');
+        if(!card) return;
+        const productName = card.getAttribute('data-product-name');
+        const productPrice = card.getAttribute('data-product-price');
+        const productPhoto = card.getAttribute('data-product-photo');
+        const offerPrice = card.getAttribute('data-offer-price');
+        const discount = card.getAttribute('data-offer-discount');
+        const offerDays = card.getAttribute('data-offer-days');
+        const offerUnits = card.getAttribute('data-offer-units');
+        const GOLD = '#C9A84C';
+        const CHALK_FONT = lang==='ar' ? "'Lalezar','Gulzar',cursive" : "'Gochi Hand','Kalam',cursive";
+        
+        const modal = document.createElement('div');
+        modal.id = 'chalk-modal-temp';
+        modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.78);display:flex;align-items:center;justify-content:center;z-index:10000;padding:24px;backdrop-filter:blur(4px);';
+        const photoHtml = productPhoto
+          ? `<img src="${productPhoto}" style="width:100%;max-height:340px;object-fit:contain;border-radius:12px;margin-bottom:18px;background:rgba(0,0,0,0.2);border:1px solid rgba(201,168,76,0.3);">`
+          : `<div style="width:100%;height:200px;border-radius:12px;background:rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;font-size:64px;margin-bottom:18px;">🍽️</div>`;
+        const discountHtml = offerPrice && discount && discount>0
+          ? `<div style="display:flex;align-items:center;gap:12px;margin-top:10px;">
+               <span style="font-family:${CHALK_FONT};font-size:22px;color:rgba(245,240,220,0.6);text-decoration:line-through;">${fmt(offerPrice)} EGP</span>
+               <span style="background:${GOLD};color:#1A1A1A;font-weight:800;font-size:15px;padding:4px 12px;border-radius:20px;font-family:system-ui,sans-serif;">−${discount}%</span>
+             </div>`
+          : '';
+        // 🆕 v2.7.3 — Dettagli offerta (durata, quantità) mostrati QUI nella modal
+        const cond = [];
+        if(offerDays) cond.push(`⏰ ${offerDays} ${offerDays==='1'?t('dayUnit'):t('daysUnit')}`);
+        if(offerUnits) cond.push(`📦 ${offerUnits}`);
+        const condHtml = cond.length
+          ? `<div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(201,168,76,0.25);display:flex;gap:18px;flex-wrap:wrap;font-family:${CHALK_FONT};color:rgba(245,240,220,0.85);font-size:19px;">${cond.map(c=>`<span>${c}</span>`).join('')}</div>`
+          : '';
+        modal.innerHTML = `
+          <div style="background:linear-gradient(135deg,#1F4D3D 0%,#163A2E 100%);border-radius:18px;padding:24px;max-width:460px;width:100%;max-height:90vh;overflow-y:auto;position:relative;border:1px solid rgba(201,168,76,0.35);box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+            <button onclick="this.closest('#chalk-modal-temp').remove()" style="position:absolute;top:14px;${lang==='ar'?'left':'right'}:14px;background:rgba(245,240,220,0.15);border:none;color:#f5f0dc;font-size:22px;width:38px;height:38px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;z-index:2;">×</button>
+            ${photoHtml}
+            <div style="font-family:${CHALK_FONT};color:#f5f0dc;font-size:30px;line-height:1.2;margin-bottom:10px;">${esc(productName)}</div>
+            <div style="font-family:${CHALK_FONT};color:${GOLD};font-size:36px;line-height:1;text-shadow:1px 1px 0 rgba(0,0,0,0.3);">${fmt(productPrice)} <span style="font-size:20px;opacity:0.85;">EGP</span></div>
+            ${discountHtml}
+            ${condHtml}
+          </div>`;
+        modal.addEventListener('click', (ev) => { if(ev.target === modal) modal.remove(); });
+        document.body.appendChild(modal);
+        });
+      }
     }
     // Refresh lavagna su cambio lingua (se cliente è loggato e in home)
 
@@ -7495,7 +7642,8 @@
       await refreshClientProfile(); // ⭐ نحدّث بيانات العميل عشان نشوف الرصيد الحالي
       const pts=(clientProfile&&clientProfile.points)||0;
       const suspendedBanner = (clientProfile&&clientProfile.suspended) ? `<div class="card" style="background:rgba(192,72,72,0.12);border:1px solid var(--red);color:var(--red);text-align:center;font-weight:700;font-size:13px;">⏸️ ${t('accountSuspended')}</div>` : '';
-      let html=suspendedBanner+`<button id="cli-pts-card" style="all:unset;cursor:pointer;display:block;width:100%;box-sizing:border-box;background:linear-gradient(135deg,var(--forest),var(--green));color:var(--ivory);border-radius:14px;padding:14px;margin-bottom:12px;font-family:inherit;">
+      // 🆕 v2.7.2 — Box Welcome/Points HIDDEN, lavagna fullscreen
+      let html=suspendedBanner+`<button id="cli-pts-card" style="all:unset;cursor:pointer;display:none;width:100%;box-sizing:border-box;background:linear-gradient(135deg,var(--forest),var(--green));color:var(--ivory);border-radius:14px;padding:14px;margin-bottom:12px;font-family:inherit;">
         <div style="font-size:13px;opacity:0.85;">${t('clientWelcome')}</div>
         <div style="font-size:22px;font-weight:800;margin:2px 0;">${clientProfile.name||''}</div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
@@ -7503,8 +7651,8 @@
           <span class="num" style="font-size:20px;font-weight:800;color:var(--gold);">${fmt(pts)} ${t('currency')}</span>
         </div>
       </button>
-      <!-- 🆕 v2.6.7 — Lavagna comunicazioni: sezione benvenuto cliente -->
-      <div id="chalkboard-wrap" style="margin-bottom:14px;display:none;"></div>`;
+      <!-- 🆕 v2.7.2 — Lavagna fullscreen (senza margin, prende tutta la schermata) -->
+      <div id="chalkboard-wrap" style="margin:0;padding:0;display:none;"></div>`;
       if(!clientBranchId){
         c.innerHTML=html+`<div class="empty" style="margin-top:14px;">☰ ${t('chooseBranch')}</div>`;
         // الضغط على كرت النقاط ينقلني لتبويب النقاط
@@ -7519,6 +7667,7 @@
       // نحمّل منتجات الفرع المختار + مخزونه
       try{
         if(!products.length) await loadCatalog();
+        renderChalkboard(); // 🆕 v2.7.3 — Refresh lavagna ORA che products è caricato (nuovi arrivi + offerte)
         const invSnap=await getDocs(query(collection(db,'inventory'),where('branchId','==',clientBranchId)));
         const stock={}; invSnap.forEach(d=>{ const x=d.data(); stock[x.productId]=x.qty||0; });
         // 🛍️ فلتر فئات الفرع للعميل (إذا الإدارة قيّدت بعض الفئات)
@@ -8194,10 +8343,10 @@
             <div style="flex:1;min-width:0;">
               <div style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:13.5px;color:var(--forest);margin-bottom:3px;">
                 <span style="font-size:18px;">${a.icon||'📢'}</span>
-                <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(a.title||'')}</span>
+                <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc((lang==='ar'?(a.titleAr||a.title):(a.titleEn||a.title))||'')}</span>
                 ${a.pinned?'<span style="font-size:11px;">📌</span>':''}
               </div>
-              ${a.message?`<div style="font-size:11.5px;color:rgba(26,26,26,0.65);line-height:1.4;margin-bottom:5px;">${esc(a.message)}</div>`:''}
+              ${(a.messageAr||a.messageEn||a.message)?`<div style="font-size:11.5px;color:rgba(26,26,26,0.65);line-height:1.4;margin-bottom:5px;">${esc((lang==='ar'?(a.messageAr||a.message):(a.messageEn||a.message))||'')}</div>`:''}
               <div style="display:flex;gap:8px;align-items:center;font-size:10.5px;color:${statusCol};font-weight:700;">
                 <span>● ${statusLbl}</span>
                 ${expiryStr?`<span style="color:rgba(26,26,26,0.45);font-weight:500;">⏰ ${expiryStr}</span>`:''}
@@ -8247,8 +8396,10 @@
             <label class="lbl">${t('chalkboardIcon')}</label>
             <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">${iconsHtml}</div>
           </div>
-          <div class="field" style="margin:0;"><label class="lbl">${t('chalkboardTitleField')}</label><input class="input" id="chk-title" value="${esc(a.title)}" maxlength="60" placeholder="${t('chalkboardTitlePlaceholder')}"></div>
-          <div class="field" style="margin:0;"><label class="lbl">${t('chalkboardMessageField')}</label><textarea class="input" id="chk-message" rows="3" maxlength="200" style="resize:vertical;font-family:inherit;" placeholder="${t('chalkboardMessagePlaceholder')}">${esc(a.message)}</textarea></div>
+          <div class="field" style="margin:0;"><label class="lbl">${t('chalkboardTitleField')} 🇪🇬 (عربي)</label><input class="input" id="chk-title-ar" dir="rtl" value="${esc(a.titleAr||a.title||'')}" maxlength="60" placeholder="${t('chalkboardTitlePlaceholder')}"></div>
+          <div class="field" style="margin:0;"><label class="lbl">${t('chalkboardTitleField')} 🇬🇧 (English)</label><input class="input" id="chk-title-en" dir="ltr" value="${esc(a.titleEn||a.title||'')}" maxlength="60" placeholder="${t('chalkboardTitlePlaceholder')}"></div>
+          <div class="field" style="margin:0;"><label class="lbl">${t('chalkboardMessageField')} 🇪🇬 (عربي)</label><textarea class="input" id="chk-message-ar" dir="rtl" rows="2" maxlength="200" style="resize:vertical;font-family:inherit;" placeholder="${t('chalkboardMessagePlaceholder')}">${esc(a.messageAr||a.message||'')}</textarea></div>
+          <div class="field" style="margin:0;"><label class="lbl">${t('chalkboardMessageField')} 🇬🇧 (English)</label><textarea class="input" id="chk-message-en" dir="ltr" rows="2" maxlength="200" style="resize:vertical;font-family:inherit;" placeholder="${t('chalkboardMessagePlaceholder')}">${esc(a.messageEn||a.message||'')}</textarea></div>
           <!-- 🆕 v2.7.0 Stage 5b — Filiali (multi-select, default vuoto) -->
           <div>
             <label class="lbl">${t('offerBranches')}</label>
@@ -8283,9 +8434,16 @@
       };
       $('chk-cancel').onclick=()=>{ closeSheet(); openChalkboardManager(); };
       $('chk-save').onclick=async()=>{
-        const title=$('chk-title').value.trim();
-        const message=$('chk-message').value.trim();
-        if(!title){ toast(t('chalkboardTitleRequired'),true); return; }
+        const titleAr=$('chk-title-ar').value.trim();
+        const titleEn=$('chk-title-en').value.trim();
+        const messageAr=$('chk-message-ar').value.trim();
+        const messageEn=$('chk-message-en').value.trim();
+        if(!titleAr && !titleEn){ toast(t('chalkboardTitleRequired'),true); return; }
+        // Fallback: se una lingua è vuota, usa l'altra
+        const fTitleAr = titleAr || titleEn;
+        const fTitleEn = titleEn || titleAr;
+        const fMsgAr = messageAr || messageEn;
+        const fMsgEn = messageEn || messageAr;
         // 🆕 Stage 5b — Verifica filiali (vuoto NON ammesso, come decisione Dottore)
         const allOn = $('chk-all').checked;
         let branchIds = [];
@@ -8298,11 +8456,13 @@
         const pinned = $('chk-pinned').checked;
         const btn=$('chk-save'); btn.disabled=true; btn.textContent='...';
         try{
+          // Campi bilingue + title/message legacy (per retrocompatibilità con vecchio codice)
+          const payload = { icon:pickedIcon, titleAr:fTitleAr, titleEn:fTitleEn, messageAr:fMsgAr, messageEn:fMsgEn, title:fTitleAr, message:fMsgAr, active, pinned, expiresAt:expTs, branchIds };
           if(isEdit){
-            await updateDoc(doc(db,'announcements',existing.id), { icon:pickedIcon, title, message, active, pinned, expiresAt:expTs, branchIds });
+            await updateDoc(doc(db,'announcements',existing.id), payload);
             toast(t('chalkboardUpdated'));
           } else {
-            await addDoc(collection(db,'announcements'), { icon:pickedIcon, title, message, active, pinned, expiresAt:expTs, branchIds, createdAt:Date.now(), createdBy:user.uid });
+            await addDoc(collection(db,'announcements'), { ...payload, createdAt:Date.now(), createdBy:user.uid });
             toast(t('chalkboardCreated'));
           }
           closeSheet(); openChalkboardManager();
