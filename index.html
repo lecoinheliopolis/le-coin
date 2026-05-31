@@ -114,6 +114,37 @@
     .prod-photo { width:56px; height:56px; border-radius:10px; object-fit:cover; flex-shrink:0; background:var(--ivory-dark); display:flex; align-items:center; justify-content:center; font-size:22px; color:rgba(26,26,26,0.3); }
     .prod-info { flex:1; min-width:0; }
     .prod-meta { display:flex; gap:10px; margin-top:4px; font-size:11px; }
+    /* 🆕 v2.7.3 — Design system Prodotti + componenti riutilizzabili */
+    .btn-icon-sq { width:42px; height:42px; border-radius:11px; border:1px solid var(--ivory-dark); background:#fff; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; color:var(--forest); transition:background .2s; }
+    .btn-icon-sq:active { background:var(--ivory-dark); }
+    .fs-bar { background:#fff; border:1px solid var(--ivory-dark); border-radius:14px; padding:12px; margin-bottom:14px; box-shadow:0 2px 8px rgba(0,0,0,0.04); }
+    .fs-search { display:flex; align-items:center; gap:9px; background:var(--ivory); border-radius:10px; padding:10px 13px; margin-bottom:10px; color:rgba(26,26,26,0.4); }
+    .fs-search input { border:none; background:none; outline:none; flex:1; font-size:14px; font-family:inherit; color:var(--charcoal); }
+    .fs-chips { display:flex; gap:7px; flex-wrap:wrap; align-items:center; }
+    .fs-chip { font-size:12px; font-weight:600; padding:7px 13px; border-radius:9px; border:1px solid var(--ivory-dark); background:#fff; cursor:pointer; color:rgba(26,26,26,0.65); white-space:nowrap; display:inline-flex; align-items:center; gap:5px; font-family:inherit; transition:all .15s; }
+    .fs-chip.active { background:var(--forest); color:#fff; border-color:var(--forest); }
+    .fs-chip.sort { background:rgba(201,168,76,0.12); border-color:rgba(201,168,76,0.4); color:#9a7d2e; }
+    .fs-divider { width:1px; height:24px; background:var(--ivory-dark); margin:0 3px; }
+    .alert-card { background:linear-gradient(135deg,rgba(216,142,42,0.12),rgba(216,142,42,0.04)); border:1px solid rgba(216,142,42,0.4); border-radius:14px; padding:14px 16px; margin-bottom:14px; }
+    .alert-head { display:flex; align-items:center; gap:9px; font-weight:800; color:var(--amber); font-size:14px; margin-bottom:10px; }
+    .alert-items { display:flex; gap:9px; overflow-x:auto; padding-bottom:4px; }
+    .alert-item { flex:0 0 auto; background:#fff; border-radius:11px; padding:9px 11px; display:flex; align-items:center; gap:9px; border:1px solid rgba(216,142,42,0.25); min-width:165px; cursor:pointer; }
+    .alert-item .ai-ph { width:42px; height:42px; border-radius:8px; background:var(--ivory-dark); display:flex; align-items:center; justify-content:center; color:rgba(26,26,26,0.3); overflow:hidden; flex:0 0 auto; }
+    .alert-item .ai-ph img { width:100%; height:100%; object-fit:cover; }
+    .alert-item .ai-name { font-size:12.5px; font-weight:700; }
+    .alert-item .ai-qty { font-size:11px; color:var(--red); font-weight:700; margin-top:2px; }
+    .prod-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; }
+    .pcard { background:#fff; border:1px solid var(--ivory-dark); border-radius:16px; overflow:hidden; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.04); position:relative; transition:transform .15s, box-shadow .2s; }
+    .pcard:active { transform:scale(0.98); }
+    .pcard-photo { width:100%; aspect-ratio:1/1; background:var(--ivory-dark); display:flex; align-items:center; justify-content:center; color:rgba(26,26,26,0.18); overflow:hidden; }
+    .pcard-body { padding:11px 12px 13px; }
+    .pcard-name { font-size:14px; font-weight:700; line-height:1.25; margin-bottom:3px; }
+    .pcard-cat { font-size:10.5px; color:rgba(26,26,26,0.5); margin-bottom:8px; display:flex; align-items:center; gap:4px; }
+    .pcard-row { display:flex; justify-content:space-between; align-items:center; }
+    .pcard-price { font-size:16px; font-weight:800; color:var(--forest); }
+    .pcard-stock { font-size:11px; font-weight:700; padding:3px 8px; border-radius:7px; display:inline-flex; align-items:center; gap:3px; }
+    .pcard-margin { position:absolute; top:8px; left:8px; background:rgba(31,58,46,0.92); color:#fff; font-size:11px; font-weight:800; padding:3px 8px; border-radius:7px; }
+    .pcard-low { position:absolute; top:8px; right:8px; background:var(--amber); color:#fff; font-size:10px; font-weight:800; padding:3px 7px; border-radius:7px; display:inline-flex; align-items:center; gap:3px; }
     .photo-upload { width:100%; height:160px; border:2px dashed var(--ivory-dark); border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; gap:6px; color:rgba(26,26,26,0.5); background:white; overflow:hidden; position:relative; }
     .photo-upload img { width:100%; height:100%; object-fit:cover; }
     .toggle { position:relative; width:44px; height:26px; border-radius:999px; border:none; cursor:pointer; padding:0; flex-shrink:0; }
@@ -683,6 +714,45 @@
     const fmt = n => Math.abs(n||0).toLocaleString('en-US',{maximumFractionDigits:0});
     // 🆕 v2.7.3 — esc globale per HTML escaping (le funzioni locali con `const esc` lo ombreggiano senza conflitti)
     const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    // 🆕 v2.7.3 — ICON SYSTEM premium SVG (stile lineare coerente, currentColor) — usato in tutto il sito
+    const ICON_PATHS = {
+      box:'<path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>',
+      boxes:'<path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z"/><path d="m7 16.5-4.74-2.85"/><path d="m7 16.5 5-3"/><path d="M7 16.5v5.17"/><path d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z"/><path d="m17 16.5-5-3"/><path d="m17 16.5 4.74-2.85"/><path d="M17 16.5v5.17"/><path d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z"/><path d="M12 8 7.26 5.15"/><path d="m12 8 4.74-2.85"/><path d="M12 13.5V8"/>',
+      tag:'<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/>',
+      warehouse:'<path d="M22 8.35V20a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z"/><path d="M6 18h12"/><path d="M6 14h12"/><rect width="12" height="12" x="6" y="10"/>',
+      truck:'<path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/>',
+      users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+      user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+      building:'<rect width="16" height="20" x="4" y="2" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/>',
+      barChart:'<path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>',
+      cart:'<circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>',
+      clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+      receipt:'<path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/>',
+      search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+      camera:'<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>',
+      alert:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+      sort:'<path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="m21 8-4-4-4 4"/><path d="M17 4v16"/>',
+      plus:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+      pencil:'<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497Z"/><path d="m15 5 4 4"/>',
+      gem:'<path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/>',
+      home:'<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+      bag:'<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>',
+      settings:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+      trash:'<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>',
+      check:'<polyline points="20 6 9 17 4 12"/>',
+      x:'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+      calendar:'<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>',
+      filter:'<polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>',
+      download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+      print:'<polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/>',
+      phone:'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92Z"/>',
+      menu:'<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>',
+      chevronDown:'<polyline points="6 9 12 15 18 9"/>'
+    };
+    function ic(name, size=20, sw=2){
+      const p = ICON_PATHS[name]; if(!p) return '';
+      return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex:0 0 auto;">${p}</svg>`;
+    }
     // مثل fmt لكن مع كسور (للحساب الدقيق زي "كل X ج.م = ١ نقطة")
     const fmt2 = n => Math.abs(n||0).toLocaleString('en-US',{maximumFractionDigits:2});
     // Orario sempre su fuso del Cairo (Egitto), 24h, cifre occidentali — calcolato da noi, NON dipende dal browser
@@ -2768,37 +2838,131 @@
 
     // ============ PRODUCTS ============
     let prodSearch='';
+    let prodSort='name'; // name | priceDesc | priceAsc | stockAsc | marginDesc | valueDesc
+    let prodCatFilter='all';
     function renderProducts(){
       const catName=id=>{const c=categories.find(x=>x.id===id);return c?(lang==='ar'?c.nameAr:c.nameEn):'—';};
-      let html=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;"><input class="input" id="p-search" placeholder="${t('search')}" value="${prodSearch}" style="flex:1;"><button class="btn-secondary" id="scan-prod" style="padding:8px 12px;white-space:nowrap;">📷</button><button class="btn-gold" id="add-prod" style="padding:8px 14px;white-space:nowrap;">+ ${t('addProduct')}</button></div>`;
-      // 🆕 v2.5.6 — pulsante reports rimosso: ora c'è solo Reports Hub centrale
-      let list=products.filter(p=>!prodSearch||(p.name||'').toLowerCase().includes(prodSearch.toLowerCase())||(p.nameAr||'').includes(prodSearch)||(p.barcode||'').includes(prodSearch));
+      const cur=t('currency');
+      // 1. Filtro ricerca + categoria
+      let list=products.filter(p=>{
+        if(prodCatFilter!=='all' && p.categoryId!==prodCatFilter) return false;
+        if(prodSearch){
+          const q=prodSearch.toLowerCase();
+          return (p.name||'').toLowerCase().includes(q)||(p.nameAr||'').includes(prodSearch)||(p.barcode||'').includes(prodSearch);
+        }
+        return true;
+      });
+      // 2. Sort
+      const invOf=p=>inventory[p.id]||{qty:0,threshold:20,lastCost:0};
+      const sorters={
+        name:(a,b)=>(pName(a)||'').localeCompare(pName(b)||''),
+        priceDesc:(a,b)=>(b.price||0)-(a.price||0),
+        priceAsc:(a,b)=>(a.price||0)-(b.price||0),
+        stockAsc:(a,b)=>(invOf(a).qty||0)-(invOf(b).qty||0),
+        marginDesc:(a,b)=>{const ma=a.price>0?(a.price-a.cost)/a.price:0;const mb=b.price>0?(b.price-b.cost)/b.price:0;return mb-ma;},
+        valueDesc:(a,b)=>(invOf(b).qty*(b.cost||0))-(invOf(a).qty*(a.cost||0))
+      };
+      list.sort(sorters[prodSort]||sorters.name);
+      // 3. Prodotti sotto soglia
+      const lowStock=products.filter(p=>{const iv=invOf(p);return iv.qty<=(iv.threshold||20);});
+      // Etichette sort
+      const sortLabels={name:lang==='ar'?'الاسم':'Name',priceDesc:lang==='ar'?'السعر ↓':'Price ↓',priceAsc:lang==='ar'?'السعر ↑':'Price ↑',stockAsc:lang==='ar'?'المخزون ↑':'Stock ↑',marginDesc:lang==='ar'?'الربح ↓':'Margin ↓',valueDesc:lang==='ar'?'القيمة ↓':'Value ↓'};
+      const reorderLbl=lang==='ar'?'وصلت حد إعادة الطلب':'Reached reorder threshold';
+      const remLbl=lang==='ar'?'متبقّي':'left';
+      const thrLbl=lang==='ar'?'حد':'thr';
+      // === HTML ===
+      let html=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;">
+        <div style="font-size:21px;font-weight:800;color:var(--forest);display:flex;align-items:center;gap:9px;">${ic('box',24)} ${t('products')} <span style="font-size:12px;font-weight:600;background:var(--ivory-dark);color:rgba(26,26,26,0.6);padding:3px 10px;border-radius:20px;">${list.length}</span></div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-icon-sq" id="scan-prod">${ic('camera',20)}</button>
+          <button class="btn-gold" id="add-prod" style="display:inline-flex;align-items:center;gap:6px;">${ic('plus',18,2.4)} ${t('addProduct')}</button>
+        </div>
+      </div>`;
+      // Barra filtri+sort
+      html+=`<div class="fs-bar">
+        <div class="fs-search">${ic('search',17,2.2)}<input id="p-search" placeholder="${t('search')}" value="${esc(prodSearch)}"></div>
+        <div class="fs-chips">
+          <button class="fs-chip sort" id="p-sort">${ic('sort',14,2.2)} ${sortLabels[prodSort]}</button>
+          <div class="fs-divider"></div>
+          <button class="fs-chip ${prodCatFilter==='all'?'active':''}" data-cat="all">${lang==='ar'?'الكل':'All'}</button>
+          ${categories.filter(c=>c.active!==false).map(c=>`<button class="fs-chip ${prodCatFilter===c.id?'active':''}" data-cat="${c.id}">${esc(lang==='ar'?c.nameAr:c.nameEn)}</button>`).join('')}
+        </div>
+      </div>`;
+      // Alert soglia
+      if(lowStock.length){
+        html+=`<div class="alert-card">
+          <div class="alert-head">${ic('alert',19,2.2)} ${reorderLbl} (${lowStock.length})</div>
+          <div class="alert-items">
+            ${lowStock.map(p=>{const iv=invOf(p);return `<div class="alert-item alert-jump" data-id="${p.id}">
+              <div class="ai-ph">${p.photoUrl?`<img src="${p.photoUrl}">`:ic('box',20,1.6)}</div>
+              <div><div class="ai-name">${esc(pName(p))}</div><div class="ai-qty">${remLbl} ${fmt(iv.qty)} / ${thrLbl} ${fmt(iv.threshold||20)}</div></div>
+            </div>`;}).join('')}
+          </div>
+        </div>`;
+      }
+      // Griglia
       if(list.length===0) html+=`<div class="card"><div class="empty">${t('noProducts')}</div></div>`;
-      else html+=list.map(p=>{
-        const inv=inventory[p.id]||{qty:0,threshold:20}; const low=inv.qty<=5;
-        const m=p.price-p.cost,mPct=p.price>0?Math.round(m/p.price*100):0;
-        const sec=pName2(p);
-        return `<div class="prod-card" data-id="${p.id}" style="opacity:${p.active===false?0.5:1}">
-          ${p.photoUrl?`<img class="prod-photo" src="${p.photoUrl}">`:`<div class="prod-photo">🍽️</div>`}
-          <div class="prod-info">
-            <div style="font-size:16px;font-weight:600;">${pName(p)}</div>
-            ${sec?`<div class="fr" dir="ltr" style="font-size:12px;color:rgba(26,26,26,0.5);margin-top:1px;">${sec}</div>`:''}
-            <div style="font-size:11px;color:rgba(26,26,26,0.55);margin-top:1px;">${catName(p.categoryId)}</div>
-            <div class="prod-meta">
-              <span class="num" style="color:var(--forest);font-weight:700;">${p.price} ${t('currency')}</span>
-              <span class="num" style="color:${mPct<30?'var(--red)':'var(--green)'};">${mPct}%</span>
-              <span class="num" style="color:${low?'var(--red)':'rgba(26,26,26,0.55)'};">${t('stock')}: ${inv.qty}</span>
+      else html+=`<div class="prod-grid">${list.map(p=>{
+        const iv=invOf(p); const low=iv.qty<=(iv.threshold||20);
+        const m=(p.price||0)-(p.cost||0), mPct=p.price>0?Math.round(m/p.price*100):0;
+        const stockColor=low?'background:rgba(216,142,42,0.15);color:var(--amber);':'background:rgba(61,115,85,0.12);color:var(--green);';
+        return `<div class="pcard prod-jump" data-id="${p.id}" style="opacity:${p.active===false?0.55:1}">
+          <div class="pcard-margin">${mPct}%</div>
+          ${low?`<div class="pcard-low">${ic('alert',11,2.5)} ${fmt(iv.qty)}</div>`:''}
+          <div class="pcard-photo">${p.photoUrl?`<img src="${p.photoUrl}" style="width:100%;height:100%;object-fit:cover;">`:ic('box',46,1.5)}</div>
+          <div class="pcard-body">
+            <div class="pcard-name">${esc(pName(p))}</div>
+            <div class="pcard-cat">${ic('tag',11,2)} ${esc(catName(p.categoryId))}</div>
+            <div class="pcard-row">
+              <span class="pcard-price">${fmt(p.price||0)} <span style="font-size:11px;opacity:0.7;font-weight:600;">${cur}</span></span>
+              <span class="pcard-stock" style="${stockColor}">${fmt(iv.qty)}</span>
             </div>
           </div>
-          <span style="color:rgba(26,26,26,0.4);">✎</span>
         </div>`;
-      }).join('');
+      }).join('')}</div>`;
       $('content').innerHTML=html;
+      // Listeners
       $('add-prod')&&($('add-prod').onclick=()=>prodForm(null));
       $('scan-prod')&&($('scan-prod').onclick=()=>smartScan('edit_product'));
-      // 🆕 v2.5.6 — listener prod-reports rimosso
-      const ps=$('p-search'); if(ps){ps.oninput=()=>{prodSearch=ps.value;const pos=ps.selectionStart;renderProducts();const n=$('p-search');n.focus();n.setSelectionRange(pos,pos);};}
-      document.querySelectorAll('.prod-card').forEach(r=>r.onclick=()=>prodForm(products.find(p=>p.id===r.dataset.id)));
+      const ps=$('p-search'); if(ps){ps.oninput=()=>{prodSearch=ps.value;const pos=ps.selectionStart;renderProducts();const n=$('p-search');if(n){n.focus();n.setSelectionRange(pos,pos);}};}
+      // Sort: cicla tra le opzioni
+      $('p-sort')&&($('p-sort').onclick=()=>{const order=['name','priceDesc','priceAsc','stockAsc','marginDesc','valueDesc'];const i=order.indexOf(prodSort);prodSort=order[(i+1)%order.length];renderProducts();});
+      // Filtri categoria
+      document.querySelectorAll('.fs-chip[data-cat]').forEach(b=>b.onclick=()=>{prodCatFilter=b.dataset.cat;renderProducts();});
+      // Tap prodotto → briefing (NON apre subito il form di modifica)
+      document.querySelectorAll('.prod-jump').forEach(r=>r.onclick=()=>productBriefing(products.find(p=>p.id===r.dataset.id)));
+      document.querySelectorAll('.alert-jump').forEach(r=>r.onclick=()=>productBriefing(products.find(p=>p.id===r.dataset.id)));
+    }
+    // 🆕 v2.7.3 — Briefing prodotto: tap → modal con foto ingrandita, qty, costo, prezzo, valore stoccaggio
+    function productBriefing(p){
+      if(!p) return;
+      const iv=inventory[p.id]||{qty:0,threshold:20,lastCost:0};
+      const cur=t('currency');
+      const m=(p.price||0)-(p.cost||0), mPct=p.price>0?Math.round(m/p.price*100):0;
+      const stockValue=(iv.qty||0)*(p.cost||0);
+      const low=iv.qty<=(iv.threshold||20);
+      const catName=(()=>{const c=categories.find(x=>x.id===p.categoryId);return c?(lang==='ar'?c.nameAr:c.nameEn):'—';})();
+      const row=(label,value,color)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--ivory-dark);"><span style="font-size:13px;color:rgba(26,26,26,0.6);">${label}</span><span class="num" style="font-size:15px;font-weight:800;color:${color||'var(--charcoal)'};">${value}</span></div>`;
+      $('sheet-root').innerHTML=`<div class="overlay" id="ov" onclick="closeSheet()"><div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-head"><div><div class="sheet-sub">${ic('box',13)} ${esc(catName)}</div><div class="sheet-title">${esc(pName(p))}</div></div><button class="close-x" id="cx">×</button></div>
+        <div style="text-align:center;margin-bottom:16px;">
+          <div style="display:inline-block;width:200px;height:200px;border-radius:16px;overflow:hidden;background:var(--ivory-dark);border:1px solid var(--ivory-dark);">
+            ${p.photoUrl?`<img src="${p.photoUrl}" style="width:100%;height:100%;object-fit:contain;">`:`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(26,26,26,0.2);">${ic('box',64,1.3)}</div>`}
+          </div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--ivory-dark);border-radius:14px;padding:4px 16px;margin-bottom:14px;">
+          ${row(lang==='ar'?'الكمية في المخزن':'Qty in stock', `<span style="color:${low?'var(--amber)':'var(--green)'};">${fmt(iv.qty)}</span>`)}
+          ${row(lang==='ar'?'حد إعادة الطلب':'Reorder threshold', fmt(iv.threshold||20))}
+          ${row(lang==='ar'?'التكلفة':'Cost', `${fmt(p.cost||0)} ${cur}`)}
+          ${row(lang==='ar'?'السعر':'Price', `${fmt(p.price||0)} ${cur}`, 'var(--forest)')}
+          ${row(lang==='ar'?'هامش الربح':'Margin', `${mPct}%`, mPct<30?'var(--red)':'var(--green)')}
+          ${row(lang==='ar'?'قيمة المخزون':'Stock value', `${fmt(stockValue)} ${cur}`, 'var(--gold)')}
+        </div>
+        ${low?`<div style="background:rgba(216,142,42,0.12);border:1px solid rgba(216,142,42,0.4);color:var(--amber);border-radius:10px;padding:10px;text-align:center;font-weight:700;font-size:12.5px;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:7px;">${ic('alert',16,2.2)} ${lang==='ar'?'المنتج وصل حد إعادة الطلب':'Product reached reorder threshold'}</div>`:''}
+        <button class="btn-forest btn-wide" id="brief-edit" style="display:flex;align-items:center;justify-content:center;gap:7px;">${ic('pencil',17,2.2)} ${t('editProduct')}</button>
+      </div></div>`;
+      $('ov').onclick=closeSheet; $('cx').onclick=closeSheet;
+      $('brief-edit').onclick=()=>{ closeSheet(); prodForm(p); };
     }
 
     let pendingPhoto=null;
