@@ -1392,11 +1392,11 @@
       if(myShift){ bs.value=myShift.branchId; bs.style.opacity='0.6'; bs.title=t('branchLocked'); }
       else { bs.style.opacity='1'; bs.title=''; }
     }
-    function render(){
+    async function render(){
       // refresh nav labels & branch names for language
       const bs=$('branch-select'); if(bs){const cur=bs.value;bs.innerHTML=branches.map(b=>`<option value="${b.id}">${lang==='ar'?b.nameAr:b.nameEn}</option>`).join('');bs.value=cur;}
       document.querySelectorAll('.nav-btn').forEach(b=>{const k=b.dataset.tab;b.querySelector('.lbl2').textContent=k==='analytics'?t('analyticsTitle'):k==='dashboard'?t('dashboard_tab'):k==='cassa'?t('cashier_tab'):k==='shift'?t('shift_tab'):k==='receipts'?t('receipts_tab'):k==='products'?t('products'):k==='categories'?t('categories'):k==='warehouse'?t('warehouse'):k==='suppliers'?t('suppliers_tab'):k==='users'?t('users'):k==='staff'?t('staff_tab'):k==='reports'?t('reports'):k==='branches'?t('branches_tab'):k==='customers'?(lang==='ar'?'العملاء':'Customers'):t('cashier_tab');});
-      if(activeTab==='cassa') renderCassa();
+      if(activeTab==='cassa') return await renderCassa();  // 🆕 v2.7.2 — await renderCassa()
       else { const cb=$('cart-bar-root'); if(cb) cb.innerHTML=''; 
         if(activeTab==='analytics') renderAnalytics();
         else if(activeTab==='dashboard') renderAnalytics(); // 🔁 v2.6.0: redirect legacy → analytics
@@ -1544,7 +1544,7 @@
     function pName(p){ if(!p) return ''; return lang==='ar' ? (p.nameAr||p.name||'') : (p.name||p.nameAr||''); }
     function pName2(p){ if(!p) return ''; return lang==='ar' ? (p.name||'') : (p.nameAr||''); } // الاسم الثانوي
 
-    function renderCassa(){
+    async function renderCassa(){
       $('cart-bar-root')||$('content').insertAdjacentHTML('afterend','<div id="cart-bar-root"></div>');
       // الأدمن بس يقدر يبيع من غير وردية. الكاشير والمدير لازم يفتحوا وردية.
       if(!myShift && profile.role!=='admin'){
@@ -1559,8 +1559,8 @@
       }
       const actives=products.filter(p=>p.active!==false);
       if(actives.length===0){ $('content').innerHTML=`<div class="card"><div class="empty">${t('noProdYet')}</div></div>`; renderCartBar(); return; }
-      // 🆕 v2.7.0 Stage 4b — Pre-load offerte attive (cache 30s, non blocca render)
-      if(typeof loadActiveOffers==='function') loadActiveOffers().catch(()=>{});
+      // 🆕 v2.7.2 — Await offerte PRIMA di calcolare i chip (altrimenti al primo render la cache è vuota e il chip "Offerte" non appare)
+      if(typeof loadActiveOffers==='function'){ try{ await loadActiveOffers(); }catch(e){} }
       // شريط الطلبات الجاهزة (طلبات عملاء جهّزها الكاشير ومستنية الدفع)
       loadReadyOrdersForCassa();
       // 🆕 v2.7.2 — Pseudo-categorie "Offerte" e "Novità" (condizionali)
@@ -3710,18 +3710,35 @@
       // حمّل البيانات
       let sales=[], loadsArr=[], invAll=[], shiftsArr=[], customersArr=[];
       try{
-        if(profile.role==='admin'){ (await getDocs(collection(db,'sales'))).forEach(d=>sales.push({id:d.id,...d.data()})); }
-        else { for(const b of visIds){ (await getDocs(query(collection(db,'sales'),where('branchId','==',b)))).forEach(d=>sales.push({id:d.id,...d.data()})); } }
-        (await getDocs(collection(db,'loads'))).forEach(d=>loadsArr.push(d.data()));
+        // 🆕 v2.7.2 — Query Firestore CON filtro data (non dopo download) per evitare blocco memoria
+        const salesConds = [
+          where('createdAt','>=',fromTs),
+          where('createdAt','<=',toTs)
+        ];
+        if(profile.role==='admin'){ 
+          try{ (await getDocs(query(collection(db,'sales'), ...salesConds))).forEach(d=>sales.push({id:d.id,...d.data()})); }
+          catch(e){ if(e.code==='failed-precondition') { console.warn('[dash] Need index for date range query on sales'); sales=[]; } else throw e; }
+        }
+        else { 
+          for(const b of visIds){ 
+            try{ (await getDocs(query(collection(db,'sales'), where('branchId','==',b), ...salesConds))).forEach(d=>sales.push({id:d.id,...d.data()})); }
+            catch(e){ if(e.code!=='failed-precondition') throw e; }
+          } 
+        }
+        // loads: same filtering
+        const loadsConds = [where('createdAt','>=',fromTs), where('createdAt','<=',toTs)];
+        try{ (await getDocs(query(collection(db,'loads'), ...loadsConds))).forEach(d=>loadsArr.push(d.data())); }
+        catch(e){ if(e.code!=='failed-precondition') console.warn('[dash] loads:',e.message); }
         (await getDocs(collection(db,'inventory'))).forEach(d=>invAll.push(d.data()));
         (await getDocs(collection(db,'shifts'))).forEach(d=>shiftsArr.push(d.data()));
         // 🆕 v2.5.4 — clienti (solo admin)
         if(profile.role==='admin'){ try{(await getDocs(collection(db,'customers'))).forEach(d=>customersArr.push({id:d.id,...d.data()}));}catch(e){console.warn('[dash] customers load:',e.message);} }
-      }catch(e){ console.error(e); $('content').innerHTML=`<div class="empty">${t('errorGen')}</div>`; return; }
+      }catch(e){ console.error('[dash] load error:',e); $('content').innerHTML=`<div class="empty">${t('errorGen')}</div>`; return; }
       const vis=id=>visIds.includes(id);
       const inRange=ts=>ts>=fromTs&&ts<=toTs;
-      sales=sales.filter(s=>vis(s.branchId)&&inRange(s.createdAt));
-      loadsArr=loadsArr.filter(l=>vis(l.branchId)&&inRange(l.createdAt));
+      // 🆕 v2.7.2 — Non re-filtrare per data (già fatto in Firestore), ma filtrare per visibilità branch
+      sales=sales.filter(s=>vis(s.branchId));
+      loadsArr=loadsArr.filter(l=>vis(l.branchId));
       invAll=invAll.filter(i=>vis(i.branchId));
       // حسابات
       const rmFn=s=>{ const m={}; if(s.voided)(s.items||[]).forEach(it=>m[it.productId]=(m[it.productId]||0)+it.qty); (s.returns||[]).forEach(r=>(r.lines||[]).forEach(l=>m[l.productId]=(m[l.productId]||0)+l.qty)); return m; };
@@ -3873,7 +3890,16 @@
           $('dash-custom-range').innerHTML = `<div class="row2" style="margin-top:10px;"><div class="field" style="margin:0;"><label class="lbl">${t('repFrom')}</label><input class="input" id="dash-from" type="date" value="${fromDef}"></div><div class="field" style="margin:0;"><label class="lbl">${t('repTo')}</label><input class="input" id="dash-to" type="date" value="${toDef}"></div></div>`;
           document.querySelectorAll('.dash-r').forEach(b2=>b2.onclick=dashRangeHandler);
           const f=$('dash-from'),tt=$('dash-to');
-          const upd=()=>{ dashRange.from=f.value; dashRange.to=tt.value; renderDashboard(); };
+          // 🆕 v2.7.2 — Fix freeze: skip se incompleto, swap se invertite, debounce 250ms
+          const upd=()=>{
+            if(window._dashUpdT) clearTimeout(window._dashUpdT);
+            window._dashUpdT = setTimeout(()=>{
+              const vF=f?f.value:'', vT=tt?tt.value:'';
+              if(!vF || !vT) return; // aspetta che entrambe siano compilate
+              if(vF > vT){ dashRange.from=vT; dashRange.to=vF; } else { dashRange.from=vF; dashRange.to=vT; }
+              renderDashboard();
+            }, 250);
+          };
           if(f)f.onchange=upd; if(tt)tt.onchange=upd;
         } else {
           renderDashboard();
@@ -3882,7 +3908,20 @@
       document.querySelectorAll('.dash-r').forEach(b=>b.onclick=dashRangeHandler);
       // 🆕 v2.5.4 — chips filiale
       document.querySelectorAll('.dash-b').forEach(b=>b.onclick=()=>{ dashRange.branchId=b.dataset.bid; renderDashboard(); });
-      if(dashRange.mode==='custom'){ const f=$('dash-from'),tt=$('dash-to'); const upd=()=>{ dashRange.from=f.value; dashRange.to=tt.value; renderDashboard(); }; if(f)f.onchange=upd; if(tt)tt.onchange=upd; }
+      // 🆕 v2.7.2 — se ricarico mentre già in mode='custom', re-applica gli stessi listener protettivi
+      if(dashRange.mode==='custom'){
+        const f=$('dash-from'),tt=$('dash-to');
+        const upd=()=>{
+          if(window._dashUpdT) clearTimeout(window._dashUpdT);
+          window._dashUpdT = setTimeout(()=>{
+            const vF=f?f.value:'', vT=tt?tt.value:'';
+            if(!vF || !vT) return;
+            if(vF > vT){ dashRange.from=vT; dashRange.to=vF; } else { dashRange.from=vF; dashRange.to=vT; }
+            renderDashboard();
+          }, 250);
+        };
+        if(f)f.onchange=upd; if(tt)tt.onchange=upd;
+      }
     }
 
     async function renderReports(){
