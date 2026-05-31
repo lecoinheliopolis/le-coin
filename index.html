@@ -7757,6 +7757,11 @@
         // الضغط على كرت النقاط ينقلني لتبويب النقاط
         const ptsCard=$('cli-pts-card'); if(ptsCard) ptsCard.onclick=()=>{ clientTab='points'; document.querySelectorAll('#client-nav .nav-btn').forEach(x=>x.classList.remove('active')); const b=document.querySelector('[data-ctab="points"]'); if(b) b.classList.add('active'); renderClientTab(); };
         renderChalkboard(); // 🆕 v2.6.7
+        // 🆕 v2.7.3 — Carica catalogo anche senza filiale scelta, così la lavagna mostra offerte e nuovi arrivi dall'inizio
+        try{
+          if(!products.length) await loadCatalog();
+          renderChalkboard(); // refresh ORA che products è caricato
+        }catch(e){ console.warn('[client] catalog preload failed:', e); }
         return;
       }
       c.innerHTML=html+`<div id="cli-prods"><div class="spinner"></div></div>`;
