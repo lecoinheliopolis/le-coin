@@ -1127,7 +1127,7 @@
           const timeLeft = lang==='ar'
             ? `${dH>0?dH+' س ':''}${dM} د`
             : `${dH>0?dH+'h ':''}${dM}min`;
-          const closeLbl = lang==='ar' ? 'هنقفل بعد' : 'Chiude tra';
+          const closeLbl = lang==='ar' ? 'هنقفل بعد' : 'Closes in';
           closingSoonHtml = `<div style="text-align:center;margin-top:10px;"><span style="display:inline-flex;align-items:center;gap:7px;background:rgba(201,168,76,0.13);border:1px solid rgba(201,168,76,0.4);border-radius:20px;padding:5px 14px;${bodyChalk}font-size:17px;color:${GOLD_HDR};">⏳ ${closeLbl} <span dir="ltr" style="font-weight:700;">${timeLeft}</span></span></div>`;
         }
       }
@@ -7721,6 +7721,21 @@
       $('cg-shop').onclick=()=>{ closeSheet(); clientTab='home'; renderClientTab(); };
     }
     function renderClientTab(){ if(clientTab==='home') renderClientHome(); else if(clientTab==='orders') renderClientOrders(); else if(clientTab==='points') renderClientPoints(); else if(clientTab==='mydata') renderClientMyData(); }
+    // 🆕 v2.7.3 — Helper: preserva la posizione di scroll attraverso un re-render
+    // Uso: withScrollPreserved(() => renderClientHome())
+    // Salva scrollY, chiama fn, ripristina scrollY più volte per coprire render async
+    function withScrollPreserved(fn){
+      const sy = window.scrollY || document.documentElement.scrollTop || 0;
+      const restore = () => window.scrollTo(0, sy);
+      const result = fn();
+      // Ripristino multiplo: copre re-render sincroni E async (innerHTML in più step)
+      requestAnimationFrame(restore);
+      setTimeout(restore, 60);
+      setTimeout(restore, 200);
+      if(result && typeof result.then === 'function'){
+        result.finally(restore).catch(()=>{});
+      }
+    }
     async function renderClientHome(){
       const c=$('client-content');
       await refreshClientProfile(); // ⭐ نحدّث بيانات العميل عشان نشوف الرصيد الحالي
@@ -7770,14 +7785,14 @@
         const cartCount=clientCart.reduce((a,i)=>a+i.qty,0);
         const cartBar = cartCount>0 ? `<button class="btn-gold btn-wide" id="cli-cart-btn" style="position:sticky;bottom:8px;margin-top:10px;padding:14px;font-size:15px;box-shadow:0 4px 14px rgba(201,168,76,0.4);">🛒 ${t('myCart')} (${cartCount}) — ${fmt(clientCart.reduce((a,i)=>a+i.qty*i.price,0))} ${t('currency')}</button>` : '';
         $('cli-prods').innerHTML=favSection+`<div style="font-size:11px;letter-spacing:0.5px;color:var(--forest);font-weight:700;margin:8px 0 6px;">🛒 ${t('browseProducts')}</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:6px;">${grid}</div>${cartBar}`;
-        document.querySelectorAll('.cli-add').forEach(b=>b.onclick=()=>{ const p=products.find(x=>x.id===b.dataset.pid); if(!p)return; const it=clientCart.find(i=>i.id===p.id); if(it) it.qty++; else clientCart.push({id:p.id,name:pName(p),price:p.price||0,qty:1}); beep(); renderClientHome(); });
+        document.querySelectorAll('.cli-add').forEach(b=>b.onclick=()=>{ const p=products.find(x=>x.id===b.dataset.pid); if(!p)return; const it=clientCart.find(i=>i.id===p.id); if(it) it.qty++; else clientCart.push({id:p.id,name:pName(p),price:p.price||0,qty:1}); beep(); withScrollPreserved(()=>renderClientHome()); });
         document.querySelectorAll('.cli-fav').forEach(b=>b.onclick=async(ev)=>{
           ev.stopPropagation();
           const pid=b.dataset.pid; const arr=[...(clientProfile.favorites||[])];
           const idx=arr.indexOf(pid); if(idx>=0) arr.splice(idx,1); else arr.push(pid);
           clientProfile.favorites=arr;
           try{ await updateDoc(doc(db,'customers',clientProfile.id),{favorites:arr}); }catch(e){console.warn(e);}
-          renderClientHome();
+          withScrollPreserved(()=>renderClientHome());
         });
         $('cli-cart-btn')&&($('cli-cart-btn').onclick=openClientCart);
       }catch(e){ console.error(e); $('cli-prods').innerHTML=`<div class="empty">${t('errorGen')}</div>`; }
