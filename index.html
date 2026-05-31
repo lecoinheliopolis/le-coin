@@ -1124,11 +1124,18 @@
           if(diffMs < 0) diffMs += 24*3600*1000; // chiusura dopo mezzanotte
           const dH = Math.floor(diffMs/3600000);
           const dM = Math.floor((diffMs%3600000)/60000);
-          const timeLeft = lang==='ar'
-            ? `${dH>0?dH+' س ':''}${dM} د`
-            : `${dH>0?dH+'h ':''}${dM}min`;
+          // 🆕 v2.7.3 — In arabo, ordine 5س 2د forzato con <bdi dir="ltr">
+          let timeLeft;
+          if(lang==='ar'){
+            const parts = [];
+            if(dH>0) parts.push(dH+'س');
+            parts.push(dM+'د');
+            timeLeft = `<bdi dir="ltr">${parts.join(' ')}</bdi>`;
+          } else {
+            timeLeft = (dH>0?dH+'h ':'') + dM + 'min';
+          }
           const closeLbl = lang==='ar' ? 'هنقفل بعد' : 'Closes in';
-          closingSoonHtml = `<div style="text-align:center;margin-top:10px;"><span style="display:inline-flex;align-items:center;gap:7px;background:rgba(201,168,76,0.13);border:1px solid rgba(201,168,76,0.4);border-radius:20px;padding:5px 14px;${bodyChalk}font-size:17px;color:${GOLD_HDR};">⏳ ${closeLbl} <span dir="ltr" style="font-weight:700;">${timeLeft}</span></span></div>`;
+          closingSoonHtml = `<div style="text-align:center;margin-top:10px;"><span style="display:inline-flex;align-items:center;gap:7px;background:rgba(201,168,76,0.13);border:1px solid rgba(201,168,76,0.4);border-radius:20px;padding:5px 14px;${bodyChalk}font-size:17px;color:${GOLD_HDR};">⏳ ${closeLbl} <span style="font-weight:700;">${timeLeft}</span></span></div>`;
         }
       }
       const fixedSectionHtml = `
@@ -1254,10 +1261,11 @@
             ? `<img src="${p.photoUrl}" style="width:${phSize}px;height:${phSize}px;border-radius:12px;object-fit:contain;background:rgba(0,0,0,0.2);flex-shrink:0;border:1px solid rgba(201,168,76,0.25);">`
             : `<div style="width:${phSize}px;height:${phSize}px;border-radius:12px;background:rgba(0,0,0,0.2);flex-shrink:0;border:1px solid rgba(201,168,76,0.25);display:flex;align-items:center;justify-content:center;font-size:${Math.round(phSize*0.4)}px;">✨</div>`;
           const newSticker = `<div style="position:absolute;top:-7px;${lang==='ar'?'right':'left'}:-7px;background:linear-gradient(135deg,#E53935,#C62828);color:#fff;font-weight:800;font-size:13px;padding:4px 11px;border-radius:6px;box-shadow:0 3px 8px rgba(0,0,0,0.4);font-family:system-ui,sans-serif;letter-spacing:0.5px;transform:rotate(-8deg);border:1.5px solid rgba(255,255,255,0.3);z-index:2;">${newLabel}</div>`;
+          // 🆕 v2.7.3 — Sticker HERO NEW: più grande, attaccato alla foto
+          const heroNewSticker = `<div style="position:absolute;top:-14px;${lang==='ar'?'right':'left'}:-14px;background:linear-gradient(135deg,#E53935,#C62828);color:#fff;font-weight:800;font-size:22px;padding:8px 18px;border-radius:10px;box-shadow:0 4px 14px rgba(0,0,0,0.5);font-family:system-ui,sans-serif;letter-spacing:1px;transform:rotate(-8deg);border:2.5px solid rgba(255,255,255,0.4);z-index:3;">${newLabel}</div>`;
           if(isHero){
             return `<div class="chalk-product-card" data-product-id="${p.id}" data-product-name="${esc(pName(p))}" data-product-price="${p.price||0}" data-product-photo="${p.photoUrl||''}" style="position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px;background:rgba(0,0,0,0.13);border:1px solid rgba(201,168,76,0.22);border-radius:16px;padding:28px 24px;max-width:${arrivalsFullWidth?500:380}px;margin:0 auto;">
-              ${newSticker}
-              ${photo}
+              <div style="position:relative;display:inline-block;">${photo}${heroNewSticker}</div>
               <div style="width:100%;">
                 <div style="${bodyChalk};font-size:${heroNameSize}px;line-height:1.2;margin-bottom:10px;word-break:break-word;">${esc(pName(p))}</div>
                 <div style="font-family:${chalkFont};${chalkDust}${chalkRough}font-size:${heroPriceSize}px;color:${GOLD};line-height:1;">${fmt(p.price||0)} <span style="font-size:${Math.round(heroPriceSize*0.55)}px;opacity:0.85;">${currency}</span></div>
@@ -1298,11 +1306,12 @@
           if(o.expiresAt) daysLeft = Math.max(0, Math.ceil((o.expiresAt - Date.now())/(24*3600*1000)));
           if(o.maxUnits) unitsLeft = `${Math.max(0, o.maxUnits-(o.soldUnits||0))}/${o.maxUnits}`;
           const badge = pctOff>0 ? `<div style="position:absolute;top:-7px;${lang==='ar'?'right':'left'}:-7px;background:linear-gradient(135deg,#C9A84C,#B8973C);color:#1A1A1A;font-weight:800;font-size:13px;padding:4px 11px;border-radius:6px;box-shadow:0 3px 8px rgba(0,0,0,0.4);font-family:system-ui,sans-serif;transform:rotate(-8deg);border:1.5px solid rgba(255,255,255,0.3);z-index:2;">−${pctOff}%</div>` : '';
+          // 🆕 v2.7.3 — Badge HERO: più grande, attaccato al bordo della foto (non della card)
+          const heroBadge = pctOff>0 ? `<div style="position:absolute;top:-14px;${lang==='ar'?'right':'left'}:-14px;background:linear-gradient(135deg,#C9A84C,#B8973C);color:#1A1A1A;font-weight:800;font-size:22px;padding:8px 18px;border-radius:10px;box-shadow:0 4px 14px rgba(0,0,0,0.5);font-family:system-ui,sans-serif;transform:rotate(-8deg);border:2.5px solid rgba(255,255,255,0.4);z-index:3;letter-spacing:0.5px;">−${pctOff}%</div>` : '';
           const dataAttrs = `data-product-id="${p.id}" data-product-name="${esc(pName(p))}" data-product-price="${o.priceNew||0}" data-product-photo="${p.photoUrl||''}" data-offer-price="${p.price||0}" data-offer-discount="${pctOff}" data-offer-days="${daysLeft}" data-offer-units="${unitsLeft}"`;
           if(isHero){
             return `<div class="chalk-product-card" ${dataAttrs} style="position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px;background:rgba(0,0,0,0.13);border:1px solid rgba(201,168,76,0.3);border-radius:16px;padding:28px 24px;max-width:${offersFullWidth?500:380}px;margin:0 auto;">
-              ${badge}
-              ${photo}
+              <div style="position:relative;display:inline-block;">${photo}${heroBadge}</div>
               <div style="width:100%;">
                 <div style="${bodyChalk};font-size:${heroNameSize}px;line-height:1.2;margin-bottom:10px;word-break:break-word;">${esc(pName(p))}</div>
                 <div style="display:flex;align-items:baseline;justify-content:center;gap:14px;flex-wrap:wrap;">
