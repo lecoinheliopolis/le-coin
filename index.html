@@ -7811,40 +7811,46 @@
     // 🆕 v2.7.3 — Era renderClientHome; ora renderClientShop (scelta filiale + prodotti + carrello)
     async function renderClientShop(){
       const c=$('client-content');
-      await refreshClientProfile(); // ⭐ نحدّث بيانات العميل عشان نشوف الرصيد الحالي
-      const pts=(clientProfile&&clientProfile.points)||0;
-      const suspendedBanner = (clientProfile&&clientProfile.suspended) ? `<div class="card" style="background:rgba(192,72,72,0.12);border:1px solid var(--red);color:var(--red);text-align:center;font-weight:700;font-size:13px;">⏸️ ${t('accountSuspended')}</div>` : '';
-      // 🆕 v2.7.2 — Box Welcome/Points HIDDEN, lavagna fullscreen
-      let html=suspendedBanner+`<button id="cli-pts-card" style="all:unset;cursor:pointer;display:none;width:100%;box-sizing:border-box;background:linear-gradient(135deg,var(--forest),var(--green));color:var(--ivory);border-radius:14px;padding:14px;margin-bottom:12px;font-family:inherit;">
-        <div style="font-size:13px;opacity:0.85;">${t('clientWelcome')}</div>
-        <div style="font-size:22px;font-weight:800;margin:2px 0;">${clientProfile.name||''}</div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
-          <span style="font-size:13px;opacity:0.85;">💎 ${t('pointsBalance')} ›</span>
-          <span class="num" style="font-size:20px;font-weight:800;color:var(--gold);">${fmt(pts)} ${t('currency')}</span>
-        </div>
-      </button>
-      <!-- 🆕 v2.7.2 — Lavagna fullscreen (senza margin, prende tutta la schermata) -->
-      <div id="chalkboard-wrap" style="margin:0;padding:0;display:none;"></div>`;
+      await refreshClientProfile();
+      const suspendedBanner = (clientProfile&&clientProfile.suspended) ? `<div class="card" style="background:rgba(192,72,72,0.12);border:1px solid var(--red);color:var(--red);text-align:center;font-weight:700;font-size:13px;margin-bottom:12px;">⏸️ ${t('accountSuspended')}</div>` : '';
+      // Etichette
+      const chooseTitle = lang==='ar' ? 'اختر فرعك' : 'Choose your branch';
+      const chooseHint  = lang==='ar' ? 'اختر فرعاً لتصفّح المنتجات والطلب' : 'Select a branch to browse products and order';
+      const shoppingFrom= lang==='ar' ? 'تتسوّق من' : 'Shopping from';
+      const changeLbl   = lang==='ar' ? 'تغيير' : 'Change';
+
+      // === Nessuna filiale scelta: invito elegante ===
       if(!clientBranchId){
-        c.innerHTML=html; // 🆕 v2.7.3 — Rimossa scritta "Scegli filiale" (la lavagna è già visibile con fallback)
-        // الضغط على كرت النقاط ينقلني لتبويب النقاط
-        const ptsCard=$('cli-pts-card'); if(ptsCard) ptsCard.onclick=()=>{ clientTab='points'; document.querySelectorAll('#client-nav .nav-btn').forEach(x=>x.classList.remove('active')); const b=document.querySelector('[data-ctab="points"]'); if(b) b.classList.add('active'); renderClientTab(); };
-        renderChalkboard(); // 🆕 v2.6.7
-        // 🆕 v2.7.3 — Carica catalogo anche senza filiale scelta, così la lavagna mostra offerte e nuovi arrivi dall'inizio
-        try{
-          if(!products.length) await loadCatalog();
-          renderChalkboard(); // refresh ORA che products è caricato
-        }catch(e){ console.warn('[client] catalog preload failed:', e); }
+        c.innerHTML = suspendedBanner + `
+          <div style="text-align:center;padding:56px 24px;display:flex;flex-direction:column;align-items:center;">
+            <div style="width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,rgba(31,58,46,0.08),rgba(201,168,76,0.12));display:flex;align-items:center;justify-content:center;font-size:46px;margin-bottom:18px;">🏢</div>
+            <div style="font-size:19px;font-weight:800;color:var(--forest);margin-bottom:8px;">${chooseTitle}</div>
+            <div style="font-size:13.5px;color:rgba(26,26,26,0.6);margin-bottom:22px;max-width:280px;line-height:1.5;">${chooseHint}</div>
+            <button class="btn-forest" id="shop-choose-branch" style="padding:14px 32px;font-size:14.5px;font-weight:700;border-radius:12px;">🏢 ${t('chooseBranch')}</button>
+          </div>`;
+        $('shop-choose-branch').onclick = ()=>openClientBranchMenu();
         return;
       }
-      c.innerHTML=html+`<div id="cli-prods"><div class="spinner"></div></div>`;
-      renderChalkboard(); // 🆕 v2.6.7 — lavagna dentro home cliente
-      // الضغط على كرت النقاط ينقلني لتبويب النقاط
-      const ptsCard=$('cli-pts-card'); if(ptsCard) ptsCard.onclick=()=>{ clientTab='points'; document.querySelectorAll('#client-nav .nav-btn').forEach(x=>x.classList.remove('active')); const b=document.querySelector('[data-ctab="points"]'); if(b) b.classList.add('active'); renderClientTab(); };
+
+      // === Filiale scelta: banner + prodotti ===
+      const br0 = branches.find(x=>x.id===clientBranchId);
+      const brName = br0 ? esc(lang==='ar'?br0.nameAr:br0.nameEn) : '';
+      const branchBanner = `<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(135deg,var(--forest),var(--forest-dark));color:var(--ivory);border-radius:14px;padding:13px 16px;margin-bottom:14px;box-shadow:0 3px 12px rgba(31,58,46,0.22);">
+        <div style="display:flex;align-items:center;gap:11px;min-width:0;">
+          <span style="font-size:22px;flex:0 0 auto;">🏢</span>
+          <div style="min-width:0;">
+            <div style="font-size:10px;opacity:0.7;letter-spacing:0.6px;text-transform:uppercase;">${shoppingFrom}</div>
+            <div style="font-size:15.5px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${brName}</div>
+          </div>
+        </div>
+        <button id="shop-change-branch" style="all:unset;cursor:pointer;background:rgba(201,168,76,0.2);color:var(--gold);border:1px solid rgba(201,168,76,0.45);border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;font-family:inherit;flex:0 0 auto;">🔄 ${changeLbl}</button>
+      </div>`;
+
+      c.innerHTML = suspendedBanner + branchBanner + `<div id="cli-prods"><div class="spinner"></div></div>`;
+      $('shop-change-branch').onclick = ()=>openClientBranchMenu();
       // نحمّل منتجات الفرع المختار + مخزونه
       try{
         if(!products.length) await loadCatalog();
-        renderChalkboard(); // 🆕 v2.7.3 — Refresh lavagna ORA che products è caricato (nuovi arrivi + offerte)
         const invSnap=await getDocs(query(collection(db,'inventory'),where('branchId','==',clientBranchId)));
         const stock={}; invSnap.forEach(d=>{ const x=d.data(); stock[x.productId]=x.qty||0; });
         // 🛍️ فلتر فئات الفرع للعميل (إذا الإدارة قيّدت بعض الفئات)
@@ -8090,30 +8096,111 @@
     async function renderClientOrdersInner(){
       const c=$('client-content');
       try{
-        const qs=await getDocs(query(collection(db,'orders'),where('customerId','==',clientProfile.id)));
-        const arr=[]; qs.forEach(d=>arr.push({id:d.id,...d.data()}));
-        arr.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
-        if(!arr.length){ c.innerHTML=`<div class="empty">${t('myOrders')}</div>`; return; }
-        const statusColor={pending:'var(--amber)',preparing:'var(--amber)',ready:'var(--green)',paid:'var(--forest)',cancelled:'var(--red)',hold:'rgba(26,26,26,0.4)'};
-        const statusLabel={pending:t('orderStatusPending'),preparing:t('orderStatusPreparing'),ready:t('orderStatusReady'),paid:t('orderStatusPaid'),cancelled:t('orderStatusCancelled'),hold:t('orderStatusHold')};
-        c.innerHTML=arr.map(o=>{
+        // 🆕 v2.7.3 — Unisce ordini ONLINE (orders) + acquisti IN FILIALE (sales con customerId)
+        const [onlineSnap, salesSnap] = await Promise.all([
+          getDocs(query(collection(db,'orders'),where('customerId','==',clientProfile.id))),
+          getDocs(query(collection(db,'sales'),where('customerId','==',clientProfile.id)))
+        ]);
+        const all=[];
+        onlineSnap.forEach(d=>{ const o={id:d.id,...d.data()}; all.push({
+          kind:'online', id:o.id, branchId:o.branchId, items:o.items||[], total:o.total||0,
+          status:o.status||'pending', createdAt:o.createdAt||0,
+          pointsEarned:o.pointsEarned||0, pointsUsed:o.pointsUsed||0, voided:o.status==='cancelled'
+        }); });
+        salesSnap.forEach(d=>{ const s={id:d.id,...d.data()}; all.push({
+          kind:'instore', id:s.id, branchId:s.branchId, items:s.items||[], total:s.total||0,
+          createdAt:s.createdAt||0, pointsEarned:s.pointsEarned||0, pointsUsed:s.pointsUsed||0,
+          voided:!!s.voided, refundTotal:s.refundTotal||0, receiptNo:s.receiptNo||''
+        }); });
+        all.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+        if(!all.length){ c.innerHTML=`<div class="empty" style="padding:50px 20px;text-align:center;"><div style="font-size:46px;margin-bottom:12px;opacity:0.5;">🧾</div>${t('myOrders')}</div>`; return; }
+
+        // Etichette
+        const onlineLbl   = lang==='ar' ? 'طلب أونلاين' : 'Online order';
+        const instoreLbl  = lang==='ar' ? 'شراء من الفرع' : 'In-store purchase';
+        const atCounterMsg= lang==='ar' ? 'تم الشراء مباشرة من الكاشير في الفرع' : 'Purchased directly at the counter in the branch';
+        const earnedLbl   = lang==='ar' ? 'نقطة مكتسبة' : 'points earned';
+        const usedLbl     = lang==='ar' ? 'نقطة مستخدمة' : 'points used';
+        const reversedLbl = lang==='ar' ? 'نقاط مستردة (إلغاء)' : 'points reversed';
+        const receiptLbl  = lang==='ar' ? 'إيصال' : 'Receipt';
+        // Timeline stati ONLINE
+        const steps=['pending','preparing','ready','paid'];
+        const stepLabel={pending:t('orderStatusPending'),preparing:t('orderStatusPreparing'),ready:t('orderStatusReady'),paid:t('orderStatusPaid')};
+        const stepIcon={pending:'📝',preparing:'👨‍🍳',ready:'✅',paid:'💳'};
+
+        c.innerHTML = all.map(o=>{
           const b=branches.find(x=>x.id===o.branchId);
-          const bn=b?(lang==='ar'?b.nameAr:b.nameEn):o.branchId;
-          const col=statusColor[o.status]||'rgba(26,26,26,0.4)';
-          const lbl=statusLabel[o.status]||o.status;
-          const isReady=o.status==='ready';
-          return `<div class="card" style="${isReady?'border:2px solid var(--green);background:rgba(61,115,85,0.05);':''}">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
-              <div style="flex:1;min-width:0;"><div style="font-weight:700;">${bn}</div><div style="font-size:11.5px;color:rgba(26,26,26,0.55);">${fmtDT(o.createdAt,0)}</div></div>
-              <span style="background:${col};color:#fff;font-size:11.5px;padding:4px 10px;border-radius:8px;font-weight:700;white-space:nowrap;">${lbl}</span>
+          const bn=b?esc(lang==='ar'?b.nameAr:b.nameEn):esc(o.branchId);
+          const isReady = o.kind==='online' && o.status==='ready';
+          const isCancelled = o.voided || o.status==='cancelled';
+
+          // Badge tipo ordine
+          const typeBadge = o.kind==='online'
+            ? `<span style="display:inline-flex;align-items:center;gap:5px;background:rgba(31,58,46,0.1);color:var(--forest);font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px;">📱 ${onlineLbl}</span>`
+            : `<span style="display:inline-flex;align-items:center;gap:5px;background:rgba(201,168,76,0.16);color:#9a7d2e;font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px;">🏪 ${instoreLbl}</span>`;
+
+          // Timeline (solo ONLINE, non annullato)
+          let timeline='';
+          if(o.kind==='online' && !isCancelled){
+            const curIdx = steps.indexOf(o.status);
+            timeline = `<div style="display:flex;align-items:center;gap:0;margin:12px 0 4px;">
+              ${steps.map((st,i)=>{
+                const done = i<=curIdx;
+                const isCur = i===curIdx;
+                const color = done ? 'var(--forest)' : 'rgba(26,26,26,0.18)';
+                const conn = i<steps.length-1 ? `<div style="flex:1;height:2px;background:${i<curIdx?'var(--forest)':'rgba(26,26,26,0.13)'};"></div>` : '';
+                return `<div style="display:flex;align-items:center;${i<steps.length-1?'flex:1;':''}">
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:0 0 auto;">
+                    <div style="width:30px;height:30px;border-radius:50%;background:${done?'var(--forest)':'#fff'};border:2px solid ${color};display:flex;align-items:center;justify-content:center;font-size:13px;${isCur?'box-shadow:0 0 0 4px rgba(31,58,46,0.12);':''}">${done?stepIcon[st]:''}</div>
+                    <span style="font-size:8.5px;font-weight:${isCur?'800':'600'};color:${done?'var(--forest)':'rgba(26,26,26,0.4)'};white-space:nowrap;">${stepLabel[st]}</span>
+                  </div>
+                  ${conn}
+                </div>`;
+              }).join('')}
+            </div>`;
+          }
+
+          // In-store: spiegazione
+          let instoreNote='';
+          if(o.kind==='instore'){
+            instoreNote = `<div style="display:flex;align-items:center;gap:8px;background:rgba(201,168,76,0.08);border-radius:9px;padding:9px 11px;margin:8px 0;font-size:11.5px;color:rgba(26,26,26,0.7);">
+              <span style="font-size:16px;flex:0 0 auto;">🏪</span>
+              <span>${atCounterMsg}${o.receiptNo?` · ${receiptLbl} #${esc(String(o.receiptNo))}`:''}</span>
+            </div>`;
+          }
+
+          // Banner stato (ready / cancelled)
+          let stateBanner='';
+          if(isReady) stateBanner=`<div style="background:var(--gold);color:#fff;padding:8px;border-radius:8px;text-align:center;margin:8px 0;font-weight:700;font-size:13px;">🎉 ${t('orderReady')}</div>`;
+          else if(isCancelled) stateBanner=`<div style="background:rgba(192,72,72,0.1);color:var(--red);padding:8px;border-radius:8px;text-align:center;margin:8px 0;font-weight:700;font-size:12.5px;">✕ ${t('orderStatusCancelled')}</div>`;
+
+          // Punti
+          let pointsRow='';
+          const pe=o.pointsEarned||0, pu=o.pointsUsed||0;
+          if(isCancelled && pe>0){
+            pointsRow = `<div style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12.5px;font-weight:700;color:var(--red);">💔 −${fmt(pe)} ${reversedLbl}</div>`;
+          } else if(pe>0 || pu>0){
+            const parts=[];
+            if(pe>0) parts.push(`<span style="color:var(--green);font-weight:700;">💎 +${fmt(pe)} ${earnedLbl}</span>`);
+            if(pu>0) parts.push(`<span style="color:var(--gold);font-weight:700;">💎 −${fmt(pu)} ${usedLbl}</span>`);
+            pointsRow = `<div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;font-size:12.5px;">${parts.join('')}</div>`;
+          }
+
+          return `<div class="card" style="${isReady?'border:2px solid var(--green);background:rgba(61,115,85,0.05);':''}${isCancelled?'opacity:0.82;':''}">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px;">
+              <div style="flex:1;min-width:0;"><div style="font-weight:800;font-size:14.5px;">${bn}</div><div style="font-size:11px;color:rgba(26,26,26,0.5);">${fmtDT(o.createdAt,0)}</div></div>
+              ${typeBadge}
             </div>
-            ${isReady?`<div style="background:var(--gold);color:#fff;padding:8px;border-radius:8px;text-align:center;margin:8px 0;font-weight:700;font-size:13px;">🎉 ${t('orderReady')}</div>`:''}
+            ${timeline}
+            ${instoreNote}
+            ${stateBanner}
             <div style="font-size:12.5px;color:rgba(26,26,26,0.7);margin-top:6px;">
-              ${(o.items||[]).map(i=>`<div style="display:flex;justify-content:space-between;padding:3px 0;"><span>${i.name} ×${i.qty}</span><span class="num">${fmt(i.qty*i.price)} ${t('currency')}</span></div>`).join('')}
+              ${(o.items||[]).map(i=>`<div style="display:flex;justify-content:space-between;padding:3px 0;"><span>${esc(i.name)} ×${i.qty}</span><span class="num">${fmt(i.qty*i.price)} ${t('currency')}</span></div>`).join('')}
             </div>
             <div style="display:flex;justify-content:space-between;padding-top:8px;margin-top:6px;border-top:1px solid var(--ivory-dark);font-weight:800;">
-              <span>${t('total')}</span><span class="num" style="color:var(--forest);">${fmt(o.total||0)} ${t('currency')}</span>
+              <span>${t('total')}</span><span class="num" style="color:var(--forest);${isCancelled?'text-decoration:line-through;opacity:0.6;':''}">${fmt(o.total||0)} ${t('currency')}</span>
             </div>
+            ${pointsRow}
           </div>`;
         }).join('');
       }catch(e){ console.error(e); c.innerHTML=`<div class="empty">${t('errorGen')}</div>`; }
